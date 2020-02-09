@@ -1,0 +1,40 @@
+{
+  "type": "module",
+  "name": "mealplanner",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "clean": "rm -rf ./temp & rm -rf ./build && mkdir ./build & mkdir ./temp && npm run build-directories",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start:node": "nodemon ./dist/",
+    "start": "sirv ./build",
+    "start:lambda": "netlify-lambda serve functions",
+    "build:lambda": "netlify-lambda build functions",
+    "tsc:watch": "npx tsc -c -w",
+    "html:watch": "npx chokidar \"./temp/**/*.js\" -c \"./scripts/build-html.sh {path}\"",
+    "ts:watch": "npx rollup -c -w",
+    "watch": "npm-run-all -s clean -p ts:watch html:watch",
+    "build": "npm-run-all -s build-directories -p copy-js build-html",
+    "build:html": "./scripts/build-html.sh",
+    "build-directories": "./scripts/build-directories.sh"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.610.0",
+    "stage0": "0.0.24"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^11.0.2",
+    "@rollup/plugin-node-resolve": "^7.1.1",
+    "@rollup/plugin-typescript": "^3.0.0",
+    "@types/node": "^12.12.24",
+    "chokidar-cli": "^2.1.0",
+    "netlify-lambda": "^1.6.3",
+    "nodemon": "^2.0.2",
+    "npm-run-all": "^4.1.5",
+    "rollup": "^1.31.0",
+    "typescript": "^3.7.5"
+  }
+}

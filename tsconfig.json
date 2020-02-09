@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "target": "ES2019",
+    "module": "ES2015",
+    "moduleResolution": "node",
+
+    "strict": true,
+    "noImplicitAny": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+
+   //  "outDir": "./src",
+    "watch": true,
+    "skipLibCheck": true,
+  },
+  "compileOnSave": true,
+  "files": [
+    "./node_modules/@types/node/index.d.ts"
+  ],
+  "include": [ "src/**/*.ts" ],
+  "exclude": [
+    "node_modules"
+  ]
+}
