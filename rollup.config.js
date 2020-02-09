@@ -13,7 +13,7 @@ var pages = [
    plugins: [
       typescript()
    ],
-   external: ["../utils/utils.js"]
+   external: ["../utils/utils.js", "../../utils/utils.js"]
 }, {
    input: `./src/${x}/index.html.ts`,
    output: {
