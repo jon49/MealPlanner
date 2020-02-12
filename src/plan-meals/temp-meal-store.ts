@@ -1,4 +1,23 @@
-var recipeInfo = [
+import { getDb } from "../utils/utils.js"
+import { Location } from "../utils/database"
+
+function getLocation(location: string) : Location {
+   location = location.trim()
+   if (!location) {
+      return ""
+   }
+   if (/(\.com|\.net|\.org)/.test(location)) {
+      return { url: location, title: location }
+   }
+   var match : RegExpMatchArray | null;
+   var bookRgx = /(.*) (\d+)$/
+   if (match = location.match(bookRgx)) {
+      return { book: match[1], page: +match[2] }
+   }
+   return location
+}
+
+[
 "????, 1000 Veg 457",
 "Acorn squash soup, 1000 Veg 26",
 "African sweet potato stew, VP 301",
@@ -461,6 +480,20 @@ var recipeInfo = [
    } else {
       var [recipe, location] = [s.slice(0, idx).trim(), s.slice(idx - length + 1).trim() ]
       return { recipe, location }
+   }
+})
+.forEach((recipe, i) => {
+   if (!window.localStorage["db-created"]) {
+      getDb().then(db => {
+         var id = i + 1
+         db.put("recipe", {
+            id,
+            name: recipe.recipe,
+            location: getLocation(recipe.location)
+         })
+      }).then(_ => {
+         localStorage.setItem("db-created", "yep")
+      })
    }
 })
 

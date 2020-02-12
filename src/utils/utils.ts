@@ -1,4 +1,5 @@
 import { compile, hElement } from "stage0"
+import getDb from "./database.js"
 
 function getTemplate<T extends string>(id : T) : hElement {
    var node = <Node>(<HTMLTemplateElement>document.getElementById(id))?.content?.firstChild
@@ -10,5 +11,6 @@ function getTemplate<T extends string>(id : T) : hElement {
 }
 
 export {
-   getTemplate
+   getTemplate,
+   getDb
 }

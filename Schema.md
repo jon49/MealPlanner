@@ -33,6 +33,7 @@ IngredientUnit
 - quantity: int
 
 Direction
+- Id : int
 - Description: string
 - Ingredients: IngredientUnit[]
 
@@ -41,11 +42,11 @@ Recipe
 - name: string
 - active: bool
 - rating: int (out of 5)
-- notes: string
+- description: string
 - location: Location
 - season id: int
-- directions: Direction[]
-- category: int (category id)
+- directions: id[] -> Direction Ids
+- category: int (category id) <- Should index this one?
 
 Category (e.g., Dinner, Lunch, etc)
 - id: int
@@ -61,8 +62,9 @@ Setting
 - UseFavorites: int (number of times to use favorites in a week)
 
 RecipeDateDinner (When the recipe was used last)
+- Date: date <- composite primary key with category id
+- Category Id: int
 - Recipe Id: int
-- Date: date
 - Quantity: float (e.g., doubled, tripled)
 
 NutritionInformationType (e.g., carbs, protein, fat, calories)

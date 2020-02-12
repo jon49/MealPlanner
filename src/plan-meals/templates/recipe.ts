@@ -22,8 +22,9 @@ export interface Recipe {
 
 var recipeView = getTemplate<MealPlanTemplateId>("_recipe-template")
 
-export const recipeCancelMeal = new WeakMap<HTMLButtonElement, Recipe>()
-export const recipeChangeMeal = new WeakMap<HTMLButtonElement, Recipe>()
+export var
+   recipeCancelMeal = new WeakMap<HTMLButtonElement, Recipe>(),
+   recipeChangeMeal = new WeakMap<HTMLButtonElement, Recipe>()
 
 export function CreateRecipe({name, location, id, description = "", date} : RecipeOptions) {
    var root = recipeView.cloneNode(true)
