@@ -20,22 +20,18 @@ var actions = {
 
 var mealSelections = document.getElementById(page.mealSelectionsId)
 
-var handlingAction = false
-
+var handlingMealSelectionAction = false
 mealSelections?.addEventListener("click", function(e : Event) {
    e.preventDefault()
    var $button = e.target
-   if ($button instanceof HTMLButtonElement) {
-      if (handlingAction) {
-         return
-      }
-      handlingAction = true
+   if ($button instanceof HTMLButtonElement && !handlingMealSelectionAction) {
+      handlingMealSelectionAction = true
       var action : CancelledRecipe | Recipe | undefined
       if (action = actions.recipeCancelMeal.get($button)) {
          var cancelledRecipe = CreateCancelledRecipe({ date: action.date })
          action.nodes.root.replaceWith(cancelledRecipe.nodes.root)
          cancelledRecipe.nodes["add-recipe"].focus()
-         handlingAction = false
+         handlingMealSelectionAction = false
       } else {
          getRecipes()
          .then(recipes => {
@@ -49,7 +45,7 @@ mealSelections?.addEventListener("click", function(e : Event) {
                   action.nodes.root.replaceWith(newRecipe.nodes.root)
                   newRecipe.nodes["change-meal"].focus()
                }
-               handlingAction = false
+               handlingMealSelectionAction = false
             }
          })
       }
@@ -63,7 +59,11 @@ function getRecipe(date : Date, recipe : RecipeData) {
    } else if ("book" in recipe.location) {
       location = `${recipe.location.book} (${recipe.location.page})`
    } else {
-      location = `${recipe.location.url}`
+      var url = recipe.location.url
+      if (!url.startsWith("http") && url[0] !== "/") {
+         url = `//${url}`
+      }
+      location = `<a href="${url}">${recipe.location.title}</a>`
    }
 
    return CreateRecipe({

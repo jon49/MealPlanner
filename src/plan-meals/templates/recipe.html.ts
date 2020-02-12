@@ -5,7 +5,7 @@ export type MealPlanTemplateId = "_recipe-template"
 export interface RecipeTemplate {
    "cancel-meal": HTMLButtonElement
    name: Text
-   "recipe-location": Text
+   "recipe-location": HTMLElement
    "recipe-date": Text
    description: Text
    "change-meal": HTMLButtonElement
@@ -21,7 +21,7 @@ export const recipeTemplate = html`
          <button #change-meal>Change Meal</button>
       </div>
       <h2>#name</h2>
-      <p><small>#recipe-location</small></p>
+      <p><small #recipe-location></small></p>
       <p>#description</p>
    </div>
 </template>`

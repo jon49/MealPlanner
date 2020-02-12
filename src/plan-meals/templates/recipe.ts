@@ -31,7 +31,11 @@ export function CreateRecipe({name, location, id, description = "", date} : Reci
    var nodes = <RecipeTemplate>recipeView.collect(root)
 
    nodes.name.nodeValue = name
-   nodes["recipe-location"].nodeValue = location || "Unknown"
+   if (location[0] === "<") {
+      nodes["recipe-location"].innerHTML = location
+   } else {
+      nodes["recipe-location"].textContent = location || "Unknown"
+   }
    nodes["recipe-date"].nodeValue = date.toLocaleDateString()
    nodes.description.nodeValue = description
 
