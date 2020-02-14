@@ -3,7 +3,7 @@ import { RecipeTemplate, MealPlanTemplateId } from "./recipe.html.js"
 
 interface RecipeOptions {
    name : string
-   location : string
+   location : string | HTMLAnchorElement
    id : number
    description?: string
    date: Date
@@ -31,8 +31,8 @@ export function CreateRecipe({name, location, id, description = "", date} : Reci
    var nodes = <RecipeTemplate>recipeView.collect(root)
 
    nodes.name.nodeValue = name
-   if (location[0] === "<") {
-      nodes["recipe-location"].innerHTML = location
+   if (location instanceof HTMLAnchorElement) {
+      nodes["recipe-location"].append(location)
    } else {
       nodes["recipe-location"].textContent = location || "Unknown"
    }

@@ -1,8 +1,8 @@
 import { Page } from "./index.html"
 import { Recipe, recipeCancelMeal, recipeChangeMeal, CreateRecipe } from "./templates/recipe.js"
 import { addRecipe, CancelledRecipe, CreateCancelledRecipe } from "./templates/cancelled-recipe.js"
-import { random, range } from "./util/util.js"
-import { getRecipes } from "./repository/get-recipes.js"
+import { random, range, anchor } from "./util/util.js"
+import { getRecipes, setRecipeDate } from "./repository/get-recipes.js"
 import { RecipeData } from "../utils/database"
 
 var page : Page = {
@@ -20,6 +20,37 @@ var actions = {
 
 var mealSelections = document.getElementById(page.mealSelectionsId)
 
+async function run<T, E extends Error, R>(
+   f : () => Generator<Promise<T> | E, R, T>) {
+   var iterator = f()
+   var result = iterator.next()
+   var value : T | E | undefined
+
+   while(!result.done) {
+      var newValue = result.value
+      if (newValue instanceof Promise) {
+         value = await newValue
+         if (value instanceof Error) {
+            break
+         }
+         result = iterator.next(value)
+      } else {
+         value = newValue
+         break
+      }
+   }
+
+   if (!value) {
+      return result.value
+   }
+
+   if (value instanceof Error) {
+      return Promise.reject(value)
+   } else {
+      return Promise.resolve(value)
+   }
+}
+
 var handlingMealSelectionAction = false
 mealSelections?.addEventListener("click", function(e : Event) {
    e.preventDefault()
@@ -33,37 +64,34 @@ mealSelections?.addEventListener("click", function(e : Event) {
          cancelledRecipe.nodes["add-recipe"].focus()
          handlingMealSelectionAction = false
       } else {
-         getRecipes()
-         .then(recipes => {
-            if ($button instanceof HTMLButtonElement) {
-               if (action = actions.recipeChangeMeal.get($button)) {
-                  var newRecipe = getRecipe(action.date, recipes[random(0, recipes.length - 1)])
-                  action.nodes.root.replaceWith(newRecipe.nodes.root)
-                  newRecipe.nodes["change-meal"].focus()
-               } else if (action = actions.addRecipe.get($button)) {
-                  var newRecipe = getRecipe(action.date, recipes[random(0, recipes.length - 1)])
-                  action.nodes.root.replaceWith(newRecipe.nodes.root)
-                  newRecipe.nodes["change-meal"].focus()
-               }
-               handlingMealSelectionAction = false
+         run<RecipeData[] | void, Error, string>(function* () {
+            var recipes = <RecipeData[]>(yield getRecipes())
+            if ($button instanceof HTMLButtonElement
+            && (action = actions.recipeChangeMeal.get($button)) || (action = actions.addRecipe.get(<HTMLButtonElement>$button))) {
+
+               var newRecipe = getRecipe(action.date, recipes[random(0, recipes.length - 1)])
+               var date = action.date
+               var recipeId = newRecipe.id.value
+               action.nodes.root.replaceWith(newRecipe.nodes.root)
+               newRecipe.nodes["change-meal"].focus()
+               yield setRecipeDate([{ date, recipeId }])
+
             }
+            return "Yellow!"
          })
+         .finally(() => { handlingMealSelectionAction = false })
       }
    }
 })
 
 function getRecipe(date : Date, recipe : RecipeData) {
-   var location: string;
+   var location: string | HTMLAnchorElement;
    if (typeof recipe.location === "string") {
       location = recipe.location
    } else if ("book" in recipe.location) {
       location = `${recipe.location.book} (${recipe.location.page})`
    } else {
-      var url = recipe.location.url
-      if (!url.startsWith("http") && url[0] !== "/") {
-         url = `//${url}`
-      }
-      location = `<a href="${url}">${recipe.location.title}</a>`
+      location = anchor(recipe.location.url, recipe.location.title)
    }
 
    return CreateRecipe({
@@ -77,13 +105,15 @@ function getRecipe(date : Date, recipe : RecipeData) {
 
 var init = () => {
    getRecipes()
-   .then(xs => {
+   .then(async (xs) => {
       var startDate = new Date()
       var date = new Date(startDate.setDate(startDate.getDate() - 1))
-      range(0, 7)
-      .map(_ => xs[random(0, xs.length - 1)])
-      .map(recipe => getRecipe(new Date(date.setDate(date.getDate() + 1)), recipe))
-      .forEach(x => {
+      var recipes =
+         range(0, 7)
+         .map(_ => xs[random(0, xs.length - 1)])
+         .map(recipe => getRecipe(new Date(date.setDate(date.getDate() + 1)), recipe))
+      await setRecipeDate(recipes.map(x => ({ recipeId: x.id.value, date: x.date })))
+      recipes.forEach(x => {
          mealSelections?.appendChild(x.nodes.root)
       })
    })
