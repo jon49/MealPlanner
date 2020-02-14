@@ -41,14 +41,16 @@ async function run<T, E extends Error, R>(
    }
 
    if (!value) {
-      return result.value
+      return result.value instanceof Promise
+         ? result.value
+      : result.value instanceof Error
+         ? Promise.reject(result.value)
+      : Promise.resolve(result.value)
    }
 
-   if (value instanceof Error) {
-      return Promise.reject(value)
-   } else {
-      return Promise.resolve(value)
-   }
+   return (value instanceof Error)
+      ? Promise.reject(value)
+   : Promise.resolve(value)
 }
 
 var handlingMealSelectionAction = false
