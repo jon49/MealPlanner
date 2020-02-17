@@ -486,10 +486,12 @@ function getLocation(location: string) : Location {
    if (!window.localStorage["db-created"]) {
       getDb().then(db => {
          var id = i + 1
+         var lastUpdated = +(new Date())
          db.put("recipe", {
             id,
             name: recipe.recipe,
-            location: getLocation(recipe.location)
+            location: getLocation(recipe.location),
+            lastUpdated
          })
       }).then(_ => {
          localStorage.setItem("db-created", "yep")

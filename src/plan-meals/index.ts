@@ -2,7 +2,7 @@ import { Page } from "./index.html"
 import { Recipe, recipeCancelMeal, recipeChangeMeal, CreateRecipe } from "./templates/recipe.js"
 import { addRecipe, CancelledRecipe, CreateCancelledRecipe } from "./templates/cancelled-recipe.js"
 import { random, range, anchor } from "./util/util.js"
-import { getRecipes, setRecipeDate } from "./repository/get-recipes.js"
+import { getRecipes, setRecipeDate } from "./store/get-recipes.js"
 import { RecipeData } from "../utils/database"
 import { run } from "../utils/utils.js"
 
@@ -35,7 +35,7 @@ mealSelections?.addEventListener("click", function(e : Event) {
          handlingMealSelectionAction = false
       } else {
          run<RecipeData[] | void, Error, string>(function* () {
-            var recipes = <RecipeData[]>(yield getRecipes())
+            var recipes = <RecipeData[]><unknown>(yield getRecipes())
             if ($button instanceof HTMLButtonElement
             && (action = actions.recipeChangeMeal.get($button)) || (action = actions.addRecipe.get(<HTMLButtonElement>$button))) {
 

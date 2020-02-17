@@ -9,12 +9,14 @@ export async function getRecipes() {
 export async function setRecipeDate(data: { recipeId: number, date: Date }[]) {
    var db = await getDb()
    var tx = db.transaction("recipe-date", "readwrite")
+   var lastUpdated = +(new Date())
    for (var { recipeId, date } of data) {
       var o : RecipeDateData = {
          categoryId: 1,
          date: date.toISOString().substr(0, 10),
          quantity: 1,
-         recipeId
+         recipeId,
+         lastUpdated
       }
       tx.store.put(o)
    }

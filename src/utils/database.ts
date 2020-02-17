@@ -1,5 +1,9 @@
 import { openDB, DBSchema } from "idb"
 
+interface Tracking {
+   lastUpdated: number
+}
+
 type LocationBook = { book: string, page: number } 
 type LocationUrl = { title: string, url: string }
 type LocationOther = string
@@ -7,7 +11,7 @@ export type Location = LocationBook | LocationUrl | LocationOther
 
 interface CategoryStore { key: number; value: CategoryData }
 /** E.g., Dinner, Lunch, etc */
-export interface CategoryData {
+export interface CategoryData extends Tracking {
    // int
    id: number
    /** name of category */
@@ -15,7 +19,7 @@ export interface CategoryData {
 }
 
 interface RecipeDateStore { key: number; value: RecipeDateData }
-export interface RecipeDateData {
+export interface RecipeDateData extends Tracking {
    date: string
    categoryId: number
    recipeId: number
@@ -24,7 +28,7 @@ export interface RecipeDateData {
 }
 
 interface RecipeStore { key: number; value: RecipeData }
-export interface RecipeData {
+export interface RecipeData extends Tracking {
    id: number
    name: string
    location: Location
@@ -37,8 +41,8 @@ interface MealPlanner extends DBSchema {
 }
 
 export default async function getDB() {
-   return openDB<MealPlanner>("meal-planner", 9, {
-      upgrade(db) {
+   return openDB<MealPlanner>("meal-planner", 10, {
+      async upgrade(db, oldVersion, newVersion, tx) {
          var stores = db.objectStoreNames
          if (!stores.contains("category")) {
             db.createObjectStore("category", { keyPath: "id" })
@@ -51,6 +55,44 @@ export default async function getDB() {
          if (!stores.contains("recipe")) {
             db.createObjectStore("recipe", { keyPath: "id" })
          }
+
+         if (oldVersion !== newVersion && newVersion === 10) {
+            let lastUpdated = +(new Date())
+            {
+               let cursor = await tx.objectStore("recipe").openCursor()
+               while(cursor) {
+                  let newValue = { ...cursor.value, lastUpdated }
+                  await cursor.update(newValue)
+                  cursor = await cursor.continue()
+               }
+            }
+            {
+               let cursor = await tx.objectStore("category").openCursor()
+               if (!cursor) {
+                  let newValue : CategoryData = {
+                     id: 1,
+                     lastUpdated,
+                     name: "Dinner"
+                  }
+                  tx.objectStore("category").put(newValue)
+               }
+               while (cursor) {
+                  let newValue = { ...cursor.value, lastUpdated }
+                  await cursor.update(newValue)
+                  cursor = await cursor.continue()
+               }
+            }
+            {
+               let cursor = await tx.objectStore("recipe-date").openCursor()
+               while (cursor) {
+                  let newValue = { ...cursor.value, lastUpdated }
+                  await cursor.update(newValue)
+                  cursor = await cursor.continue()
+               }
+            }
+         }
+
+         // if (!stores.contains(""))
       }
    })
 }
