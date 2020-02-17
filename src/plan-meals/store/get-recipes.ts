@@ -1,4 +1,4 @@
-import { getDb } from "../../utils/utils.js"
+import getDb from "../../utils/database.js"
 import { RecipeDateData, RecipeData, Deleted } from "../../utils/database.js";
 
 var isRecipeData = (x: RecipeData | Deleted<RecipeData>) : x is RecipeData => !("deleted" in x)

@@ -1,5 +1,3 @@
-import getDb from "./database.js"
-
 async function run<T, E extends Error, R>(
    f : () => Generator<Promise<T> | E, R, T>) {
    var iterator = f()
@@ -34,6 +32,5 @@ async function run<T, E extends Error, R>(
 }
 
 export {
-   getDb,
    run
 }

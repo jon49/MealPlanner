@@ -10,6 +10,12 @@ export interface Page {
    }
 }
 
+var head = html`
+<script async src="../utils/utils.js" type="module"></script>
+<script async src="../utils/template.js" type="module"></script>
+<script async src="../utils/database.js" type="module"></script>
+`
+
 var main = html`
    <form id="_start-date">
       <label for="start-date"> Start Date: </label>
@@ -23,7 +29,7 @@ ${cancelledRecipeTemplate}
 <script src="/plan-meals/index.js" async type="module"></script>`
 
 const page = _default({
-   head: "",
+   head,
    header: "Meal Planner",
    currentPage: "Plan Meals",
    main,
