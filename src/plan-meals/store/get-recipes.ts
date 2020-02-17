@@ -1,9 +1,12 @@
 import { getDb } from "../../utils/utils.js"
-import { RecipeDateData } from "../../utils/database.js";
+import { RecipeDateData, RecipeData, Deleted } from "../../utils/database.js";
 
-export async function getRecipes() {
+var isRecipeData = (x: RecipeData | Deleted<RecipeData>) : x is RecipeData => !("deleted" in x)
+
+export async function getRecipes() : Promise<RecipeData[]> {
    var db = await getDb();
-   return await db.getAll("recipe")
+   var recipes = await db.getAll("recipe")
+   return recipes.filter(isRecipeData)
 }
 
 export async function setRecipeDate(data: { recipeId: number, date: Date }[]) {

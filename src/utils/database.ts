@@ -4,12 +4,16 @@ interface Tracking {
    lastUpdated: number
 }
 
+export interface Deleted<T> {
+   deleted: T
+}
+
 type LocationBook = { book: string, page: number } 
 type LocationUrl = { title: string, url: string }
 type LocationOther = string
 export type Location = LocationBook | LocationUrl | LocationOther
 
-interface CategoryStore { key: number; value: CategoryData }
+interface CategoryStore { key: number; value: CategoryData | Deleted<CategoryData> }
 /** E.g., Dinner, Lunch, etc */
 export interface CategoryData extends Tracking {
    // int
@@ -18,7 +22,7 @@ export interface CategoryData extends Tracking {
    name: string 
 }
 
-interface RecipeDateStore { key: number; value: RecipeDateData }
+interface RecipeDateStore { key: number; value: RecipeDateData | Deleted<RecipeDateData> }
 export interface RecipeDateData extends Tracking {
    date: string
    categoryId: number
@@ -27,7 +31,7 @@ export interface RecipeDateData extends Tracking {
    quantity: number
 }
 
-interface RecipeStore { key: number; value: RecipeData }
+interface RecipeStore { key: number; value: RecipeData | Deleted<RecipeData> }
 export interface RecipeData extends Tracking {
    id: number
    name: string
