@@ -1,4 +1,4 @@
-import { getTemplate } from "../../utils/utils.js"
+import template from "../../utils/template.js"
 import { RecipeTemplate, MealPlanTemplateId } from "./recipe.html.js"
 
 interface RecipeOptions {
@@ -20,7 +20,7 @@ export interface Recipe {
    date : Date
 }
 
-var recipeView = getTemplate<MealPlanTemplateId>("_recipe-template")
+var recipeView = template.get<MealPlanTemplateId>("_recipe-template")
 
 export var
    recipeCancelMeal = new WeakMap<HTMLButtonElement, Recipe>(),

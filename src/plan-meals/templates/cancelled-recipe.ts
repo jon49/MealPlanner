@@ -1,5 +1,5 @@
 import { CancelledRecipeTemplate, CancelledRecipeTemplateId } from "./cancelled-recipe.html.js"
-import { getTemplate } from "../../utils/utils.js"
+import template from "../../utils/template.js"
 
 interface CancelledRecipeOptions {
    date: Date
@@ -10,7 +10,7 @@ export interface CancelledRecipe {
    date: Date
 }
 
-var cancelledRecipeView = getTemplate<CancelledRecipeTemplateId>("_cancelled-recipe-template")
+var cancelledRecipeView = template.get<CancelledRecipeTemplateId>("_cancelled-recipe-template")
 export var addRecipe = new WeakMap<HTMLButtonElement, CancelledRecipe>()
 
 export function CreateCancelledRecipe({ date } : CancelledRecipeOptions) : CancelledRecipe {

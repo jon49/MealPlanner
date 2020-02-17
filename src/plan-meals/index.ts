@@ -4,7 +4,7 @@ import { addRecipe, CancelledRecipe, CreateCancelledRecipe } from "./templates/c
 import { random, range, anchor } from "./util/util.js"
 import { getRecipes, setRecipeDate } from "./repository/get-recipes.js"
 import { RecipeData } from "../utils/database"
-import { run } from "../utils/utils"
+import { run } from "../utils/utils.js"
 
 var page : Page = {
    mealSelectionsId: "_meal-selections",
@@ -45,7 +45,6 @@ mealSelections?.addEventListener("click", function(e : Event) {
                action.nodes.root.replaceWith(newRecipe.nodes.root)
                newRecipe.nodes["change-meal"].focus()
                yield setRecipeDate([{ date, recipeId }])
-
             }
             return "Yellow!"
          })

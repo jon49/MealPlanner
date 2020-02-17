@@ -1,5 +1,5 @@
 import resolve from "@rollup/plugin-node-resolve"
-import commonjs from "@rollup/plugin-commonjs"
+// import commonjs from "@rollup/plugin-commonjs"
 import typescript from "@rollup/plugin-typescript"
 
 var pages = [
@@ -13,7 +13,9 @@ var pages = [
    plugins: [
       typescript()
    ],
-   external: ["../utils/utils.js", "../../utils/utils.js"]
+   external: ["./utils/utils.js", "../utils/utils.js", "../../utils/utils.js", "../../../utils/utils.js",
+   "./utils/template.js", "../utils/template.js", "../../utils/template.js", "../../../utils/template.js",
+   ]
 }, {
    input: `./src/${x}/index.html.ts`,
    output: {
@@ -35,9 +37,18 @@ export default [{
   },
   plugins: [
      typescript(),
-     resolve(),
-     commonjs()
+     resolve()
   ]
+}, {
+   input: "./src/utils/template.ts",
+   output: {
+      file: "./build/utils/template.js",
+      format: "esm"
+   },
+   plugins: [
+      typescript(),
+      resolve()
+   ]
 }, {
    input: "./src/index.html.ts",
    output: {
