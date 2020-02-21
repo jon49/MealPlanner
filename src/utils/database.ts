@@ -1,4 +1,5 @@
 import { openDB, DBSchema } from "idb"
+import { ISODate } from "./utils.js"
 
 interface Tracking {
    lastUpdated: number
@@ -42,18 +43,38 @@ export interface RecipeData extends Tracking {
    location: Location
 }
 
+interface SettingsStore { key: number; value: SettingsData }
+export interface SettingsData extends Tracking {
+   mealPlanner: {
+      /** E.g., 2020-02-20 */
+      startDate: string
+   }
+}
+
 export interface MealPlanner extends DBSchema {
    recipe: RecipeStore
    category: CategoryStore
    "recipe-date": RecipeDateStore
+   settings: SettingsStore
 }
 
 export default async function getDB() {
-   return openDB<MealPlanner>("meal-planner", 10, {
+   return openDB<MealPlanner>("meal-planner", 14, {
       async upgrade(db, oldVersion, newVersion, tx) {
          var stores = db.objectStoreNames
          if (!stores.contains("category")) {
             db.createObjectStore("category", { keyPath: "id" })
+         }
+
+         if (!stores.contains("settings")) {
+            db.createObjectStore("settings")
+            tx.objectStore("settings")
+            .put({
+               mealPlanner: {
+                  startDate: new ISODate(new Date()).toString()
+               },
+               lastUpdated: Date.now()
+            }, 1)
          }
 
          if (!stores.contains("recipe-date")) {
@@ -65,7 +86,7 @@ export default async function getDB() {
          }
 
          if (oldVersion !== newVersion && newVersion === 10) {
-            let lastUpdated = +(new Date())
+            let lastUpdated = Date.now()
             {
                let cursor = await tx.objectStore("recipe").openCursor()
                while(cursor) {

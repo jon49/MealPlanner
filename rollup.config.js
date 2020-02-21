@@ -13,7 +13,7 @@ var pages = [
    plugins: [
       typescript()
    ],
-   external: ["./utils/utils.js", "../utils/utils.js", "../../utils/utils.js", "../../../utils/utils.js",
+   external: ["./utils.js", "./utils/utils.js", "../utils/utils.js", "../../utils/utils.js", "../../../utils/utils.js",
    "./utils/template.js", "../utils/template.js", "../../utils/template.js", "../../../utils/template.js",
    "./utils/database.js", "../utils/database.js", "../../utils/database.js", "../../../utils/database.js",
    ]
@@ -60,7 +60,8 @@ export default [{
    plugins: [
       typescript(),
       resolve()
-   ]
+   ],
+   external: ["./utils.js"]
 }, {
    input: "./src/index.html.ts",
    output: {

@@ -3,7 +3,7 @@ import { recipeCancelMeal, recipeChangeMeal, CreateRecipe, Recipe } from "./temp
 import { addRecipe, CancelledRecipe, CreateCancelledRecipe } from "./templates/cancelled-recipe.js"
 import { random, range } from "./util/util.js"
 import { getRecipes, setRecipeDate, getRecipeDates, getActiveRecipes } from "./store/store.js"
-import { TypeOrDeleted, isDeleted } from "../utils/database.js"
+import getDB, { TypeOrDeleted, isDeleted } from "../utils/database.js"
 import { run, ISODate, debounce } from "../utils/utils.js"
 import { RecipeDomain, RecipeDateDomain } from "./Domain/DomainTypes"
 
@@ -19,7 +19,7 @@ var actions = {
 }
 
 var mealSelections = document.getElementById(page.mealSelectionsId)
-var startDate = <HTMLInputElement | null>document.getElementById(page.startDateFormId)
+var startDate = <HTMLInputElement>document.getElementById(page.startDateFormId)
 
 type RecipeAndRecipeDate = { recipe: TypeOrDeleted<RecipeDomain>, date: RecipeDateDomain }
 async function handleDateChange(e: Event) {
@@ -83,7 +83,7 @@ async function handleDateChange(e: Event) {
    }
 }
 
-startDate && startDate.addEventListener("change", debounce(function(e: Event) {
+startDate.addEventListener("change", debounce(function(e: Event) {
       e.preventDefault()
       handleDateChange(e)
    }, 300))
@@ -145,13 +145,21 @@ function getRecipe(date : ISODate, recipe : RecipeDomain) {
 }
 
 function init() {
-   if (startDate) {
-      var val = startDate.value
-      if (val.length === 10) {
-         var e = new Event("change")
-         startDate.dispatchEvent(e)
-      }
-   }
+   var e = new Event("change")
+   startDate.dispatchEvent(e)
 }
 
-init()
+if (!startDate.value) {
+   getDB()
+   .then(db => {
+      db.get("settings", 1)
+      .then(settings => {
+         if (settings) {
+            startDate.value = settings.mealPlanner.startDate
+         }
+      })
+   })
+   .then(init)
+} else {
+   init()
+}
