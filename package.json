@@ -24,6 +24,7 @@
   "license": "ISC",
   "dependencies": {
     "aws-sdk": "^2.610.0",
+    "debounce": "^1.2.0",
     "idb": "^5.0.1",
     "stage0": "0.0.25"
   },
@@ -31,6 +32,7 @@
     "@rollup/plugin-commonjs": "^11.0.2",
     "@rollup/plugin-node-resolve": "^7.1.1",
     "@rollup/plugin-typescript": "^3.0.0",
+    "@types/debounce": "^1.2.0",
     "@types/node": "^12.12.24",
     "chokidar-cli": "^2.1.0",
     "http-server": "^0.12.1",

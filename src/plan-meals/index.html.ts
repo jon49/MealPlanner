@@ -5,9 +5,7 @@ import { cancelledRecipeTemplate } from './templates/cancelled-recipe.html.js'
 
 export interface Page {
    mealSelectionsId: "_meal-selections"
-   mealPlannerDetails: {
-      startDateFormId: "_start-date"
-   }
+   startDateFormId: "_start-date"
 }
 
 var head = html`
@@ -17,9 +15,9 @@ var head = html`
 `
 
 var main = html`
-   <form id="_start-date">
+   <form>
       <label for="start-date"> Start Date: </label>
-      <input name="start-date" type="date" required />
+      <input id="_start-date" name="start-date" type="date" required />
    </form>
    <div id="_meal-selections"></div>`
 

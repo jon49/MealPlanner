@@ -4,16 +4,20 @@ interface Tracking {
    lastUpdated: number
 }
 
-export interface Deleted<T> {
-   deleted: T
+export interface Deleted {
+   isDeleted: true
 }
+
+export type TypeOrDeleted<T> = T | T & Deleted
+
+export var isDeleted = <T>(x: TypeOrDeleted<T>) => "isDeleted" in x && x.isDeleted
 
 type LocationBook = { book: string, page: number } 
 type LocationUrl = { title: string, url: string }
 type LocationOther = string
 export type Location = LocationBook | LocationUrl | LocationOther
 
-interface CategoryStore { key: number; value: CategoryData | Deleted<CategoryData> }
+interface CategoryStore { key: number; value: TypeOrDeleted<CategoryData> }
 /** E.g., Dinner, Lunch, etc */
 export interface CategoryData extends Tracking {
    // int
@@ -22,7 +26,7 @@ export interface CategoryData extends Tracking {
    name: string 
 }
 
-interface RecipeDateStore { key: number; value: RecipeDateData | Deleted<RecipeDateData> }
+interface RecipeDateStore { key: number; value: TypeOrDeleted<RecipeDateData> }
 export interface RecipeDateData extends Tracking {
    date: string
    categoryId: number
@@ -31,14 +35,14 @@ export interface RecipeDateData extends Tracking {
    quantity: number
 }
 
-interface RecipeStore { key: number; value: RecipeData | Deleted<RecipeData> }
+interface RecipeStore { key: number; value: TypeOrDeleted<RecipeData> }
 export interface RecipeData extends Tracking {
    id: number
    name: string
    location: Location
 }
 
-interface MealPlanner extends DBSchema {
+export interface MealPlanner extends DBSchema {
    recipe: RecipeStore
    category: CategoryStore
    "recipe-date": RecipeDateStore
