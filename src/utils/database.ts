@@ -44,11 +44,12 @@ export interface RecipeData extends Tracking {
 }
 
 interface SettingsStore { key: number; value: SettingsData }
+export interface MealPlannerSettings {
+   /** ISODate E.g., 2020-02-20 */
+   startDate: string
+}
 export interface SettingsData extends Tracking {
-   mealPlanner: {
-      /** E.g., 2020-02-20 */
-      startDate: string
-   }
+   mealPlanner: MealPlannerSettings
 }
 
 export interface MealPlanner extends DBSchema {

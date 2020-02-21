@@ -1,6 +1,7 @@
 import getDb, { RecipeDateData, TypeOrDeleted, isDeleted } from "../../utils/database.js"
 import { ISODate } from "../../utils/utils.js";
 import { RecipeDomain, RecipeDateDomain } from "../Domain/DomainTypes.js";
+import getDB from "../../utils/database.js";
 
 const not = <T>(f: (val: T) => boolean) => (val: T) => !f(val)
 
@@ -18,6 +19,24 @@ export async function getRecipes() : Promise<TypeOrDeleted<RecipeDomain>[]> {
 
 export const getActiveRecipes = async () : Promise<RecipeDomain[]> =>
    (await getRecipes()).filter(not(isDeleted))
+
+interface MealPlannerStoreSettings { startDate: ISODate }
+export async function getMealPlannerSettings() : Promise<MealPlannerStoreSettings> {
+   var db = await getDB()
+   var settings = await db.get("settings", 1)
+   return {
+      startDate: new ISODate((settings && settings.mealPlanner.startDate) || new Date())
+   }
+}
+
+export async function setMealPlannerSettings(mealPlannerSettings: MealPlannerStoreSettings) {
+   var db = await getDb()
+   var settings = await db.get("settings", 1)
+   if (settings) {
+      settings.mealPlanner.startDate = mealPlannerSettings.startDate.toString()
+      await db.put("settings", settings, 1)
+   }
+}
 
 export async function getRecipeDates(startDate: ISODate, categoryId: number) : Promise<TypeOrDeleted<RecipeDateDomain>[]> {
    var db = await getDb()

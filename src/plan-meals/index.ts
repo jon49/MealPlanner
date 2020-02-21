@@ -2,8 +2,8 @@ import { Page } from "./index.html"
 import { recipeCancelMeal, recipeChangeMeal, CreateRecipe, Recipe } from "./templates/recipe.js"
 import { addRecipe, CancelledRecipe, CreateCancelledRecipe } from "./templates/cancelled-recipe.js"
 import { random, range } from "./util/util.js"
-import { getRecipes, setRecipeDate, getRecipeDates, getActiveRecipes } from "./store/store.js"
-import getDB, { TypeOrDeleted, isDeleted } from "../utils/database.js"
+import { getRecipes, setRecipeDate, getRecipeDates, getActiveRecipes, setMealPlannerSettings, getMealPlannerSettings } from "./store/store.js"
+import { TypeOrDeleted, isDeleted } from "../utils/database.js"
 import { run, ISODate, debounce } from "../utils/utils.js"
 import { RecipeDomain, RecipeDateDomain } from "./Domain/DomainTypes"
 
@@ -24,9 +24,9 @@ var startDate = <HTMLInputElement>document.getElementById(page.startDateFormId)
 type RecipeAndRecipeDate = { recipe: TypeOrDeleted<RecipeDomain>, date: RecipeDateDomain }
 async function handleDateChange(e: Event) {
    if (e.target instanceof HTMLInputElement) {
-      var date = e.target.value
-      var start = new ISODate(date)
-      var recipeDates = await getRecipeDates(new ISODate(date), 1)
+      var start = new ISODate(e.target.value)
+      await setMealPlannerSettings({startDate: start})
+      var recipeDates = await getRecipeDates(start, 1)
       var recipes = await getRecipes()
       var currentIds = recipeDates.map(x => x.recipeId.value)
       var currentRecipes : RecipeAndRecipeDate[] = []
@@ -86,7 +86,7 @@ async function handleDateChange(e: Event) {
 startDate.addEventListener("change", debounce(function(e: Event) {
       e.preventDefault()
       handleDateChange(e)
-   }, 300))
+   }, 200))
 
 mealSelections && mealSelections.addEventListener("click", debounce(function(e: Event) {
    e.preventDefault()
@@ -150,16 +150,13 @@ function init() {
 }
 
 if (!startDate.value) {
-   getDB()
-   .then(db => {
-      db.get("settings", 1)
-      .then(settings => {
-         if (settings) {
-            startDate.value = settings.mealPlanner.startDate
-         }
-      })
+   getMealPlannerSettings()
+   .then(settings => {
+      if (settings) {
+         startDate.value = settings.startDate.toString()
+         init()
+      }
    })
-   .then(init)
 } else {
    init()
 }
