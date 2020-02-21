@@ -1,5 +1,5 @@
 import template from "../../utils/template.js"
-import { RecipeTemplate, MealPlanTemplateId } from "./recipe.html.js"
+import { RecipeTemplate, MealPlanTemplateId } from "./_recipe.html.js"
 import { ISODate } from "../../utils/utils.js"
 import { RecipeId, RecipeAndDateDomain } from "../Domain/DomainTypes.js"
 import { Location } from "../../utils/database.js"

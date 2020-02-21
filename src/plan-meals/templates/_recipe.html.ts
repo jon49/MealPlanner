@@ -1,4 +1,4 @@
-import html from "../../layouts/util"
+import html from "../../layouts/util.js"
 
 export type MealPlanTemplateId = "_recipe-template"
 

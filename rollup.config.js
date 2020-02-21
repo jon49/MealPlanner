@@ -1,74 +1,60 @@
 import resolve from "@rollup/plugin-node-resolve"
 import commonjs from "@rollup/plugin-commonjs"
-import typescript from "@rollup/plugin-typescript"
 
 var pages = [
    "plan-meals"
 ].map(x => [{
-   input: `./src/${x}/index.ts`,
+   input: `./build/${x}/index.js`,
    output: {
-      file: `./build/${x}/index.js`,
+      file: `./public/${x}/index.js`,
       format: "esm"
    },
-   plugins: [
-      typescript()
-   ],
    external: ["./utils.js", "./utils/utils.js", "../utils/utils.js", "../../utils/utils.js", "../../../utils/utils.js",
    "./utils/template.js", "../utils/template.js", "../../utils/template.js", "../../../utils/template.js",
    "./utils/database.js", "../utils/database.js", "../../utils/database.js", "../../../utils/database.js",
    ]
 }, {
-   input: `./src/${x}/index.html.ts`,
+   input: `./build/${x}/index.html.js`,
    output: {
-      dir: `./temp/${x}`,
-      format: "esm"
-   },
-   plugins: [
-      typescript()
-   ]
-}
-])
+      file: `./build/${x}/__index.html.js`,
+      format: "cjs"
+   }
+} ])
 .flat()
 
 export default [{
-  input: "./src/utils/utils.ts",
+  input: "./build/utils/utils.js",
   output: {
-    file: "./build/utils/utils.js",
+    file: "./public/utils/utils.js",
     format: "esm"
   },
   plugins: [
-     typescript(),
      resolve(),
      commonjs()
   ]
 }, {
-   input: "./src/utils/template.ts",
+   input: "./build/utils/template.js",
    output: {
-      file: "./build/utils/template.js",
+      file: "./public/utils/template.js",
       format: "esm"
    },
    plugins: [
-      typescript(),
       resolve()
    ]
 }, {
-   input: "./src/utils/database.ts",
+   input: "./build/utils/database.js",
    output: {
-      file: "./build/utils/database.js",
+      file: "./public/utils/database.js",
       format: "esm"
    },
    plugins: [
-      typescript(),
       resolve()
    ],
    external: ["./utils.js"]
 }, {
-   input: "./src/index.html.ts",
+   input: "./build/index.html.js",
    output: {
-      dir: `./temp`,
-      format: "esm"
-   },
-   plugins: [
-      typescript()
-   ]
-}].concat(pages)
+      file: "./build/__index.html.js",
+      format: "cjs"
+   }
+} ].concat(pages)

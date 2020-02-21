@@ -17,8 +17,8 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
 
-   //  "outDir": "./src",
-    "watch": true,
+    "outDir": "./build",
+   //  "watch": true,
     "skipLibCheck": true,
   },
   "compileOnSave": true,
