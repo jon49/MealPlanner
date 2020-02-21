@@ -2,6 +2,7 @@
 
 temp
 build
+public
 *.zip
 
 # Logs
