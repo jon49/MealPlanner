@@ -9,7 +9,8 @@ var recipeView = template.get<MealPlanTemplateId>("_recipe-template")
 
 export var
    recipeCancelMeal = new WeakMap<HTMLButtonElement, Recipe>(),
-   recipeChangeMeal = new WeakMap<HTMLButtonElement, Recipe>()
+   recipeNextMeal = new WeakMap<HTMLButtonElement, Recipe>(),
+   recipePreviousMeal = new WeakMap<HTMLButtonElement, Recipe>()
 
 function getLocationElement(location: Location) : string | HTMLAnchorElement {
    return (typeof location === "string")
@@ -23,12 +24,16 @@ export class Recipe {
    nodes: RecipeTemplate
    id!: RecipeId
    date!: ISODate
+   recipeIndex = 0
+   recipes: RecipeAndDateDomain[] = []
+   stopUpdate = true
    constructor(nodes: RecipeTemplate, o: RecipeAndDateDomain) {
       this.nodes = nodes
-      this.update(o)
+      this.recipes.push(o)
+      this._update(o)
    }
 
-   update(o: RecipeAndDateDomain) {
+   _update(o: RecipeAndDateDomain) {
       this.id = o.id
       this.date = o.date
       this.nodes.name.nodeValue = o.name
@@ -44,6 +49,34 @@ export class Recipe {
       this.nodes["recipe-date"].nodeValue = o.date.getDate().toLocaleDateString()
       this.nodes.description.nodeValue = o.name
    }
+
+   previous() {
+      if (this.stopUpdate || this.recipeIndex === 0) {
+         return
+      }
+      this.recipeIndex--
+      const recipe = this.recipes[this.recipeIndex]
+      this._update(recipe)
+      return recipe
+   }
+
+   async next(f: () => Promise<RecipeAndDateDomain>) {
+      if (this.stopUpdate) {
+         return
+      }
+
+      this.recipeIndex++
+      if (this.recipeIndex === this.recipes.length) {
+         this.stopUpdate = true
+         const newRecipe = await f()
+         this.recipes.push(newRecipe)
+         this.stopUpdate = false
+      }
+
+      const newRecipe = this.recipes[this.recipeIndex]
+      this._update(newRecipe)
+      return newRecipe
+   }
 }
 
 export function CreateRecipe(options : RecipeAndDateDomain) {
@@ -53,7 +86,8 @@ export function CreateRecipe(options : RecipeAndDateDomain) {
    var recipe = new Recipe(nodes, options)
 
    recipeCancelMeal.set(nodes["cancel-meal"], recipe)
-   recipeChangeMeal.set(nodes["change-meal"], recipe)
+   recipeNextMeal.set(nodes["next-meal"], recipe)
+   recipePreviousMeal.set(nodes["previous-meal"], recipe)
 
    return recipe
 }

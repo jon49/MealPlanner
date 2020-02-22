@@ -1,11 +1,11 @@
 import { Page } from "./index.html"
-import { recipeCancelMeal, recipeChangeMeal, CreateRecipe, Recipe } from "./templates/recipe.js"
+import { recipeCancelMeal, recipeNextMeal, recipePreviousMeal, CreateRecipe, Recipe } from "./templates/recipe.js"
 import { addRecipe, CancelledRecipe, CreateCancelledRecipe } from "./templates/cancelled-recipe.js"
 import { random, range } from "./util/util.js"
 import { getRecipes, setRecipeDate, getRecipeDates, getActiveRecipes, setMealPlannerSettings, getMealPlannerSettings } from "./store/store.js"
 import { TypeOrDeleted, isDeleted } from "../utils/database.js"
 import { run, ISODate, debounce } from "../utils/utils.js"
-import { RecipeDomain, RecipeDateDomain } from "./Domain/DomainTypes"
+import { RecipeDomain, RecipeDateDomain, RecipeAndDateDomain } from "./Domain/DomainTypes"
 
 var page : Page = {
    mealSelectionsId: "_meal-selections",
@@ -14,8 +14,9 @@ var page : Page = {
 
 var actions = {
    recipeCancelMeal,
-   recipeChangeMeal,
-   addRecipe
+   recipeNextMeal,
+   recipePreviousMeal,
+   addRecipe,
 }
 
 var mealSelections = document.getElementById(page.mealSelectionsId)
@@ -94,13 +95,16 @@ mealSelections && mealSelections.addEventListener("click", debounce(function(e: 
    if ($button instanceof HTMLButtonElement) {
       var changeRecipe: Recipe | undefined,
           cancelledRecipe: Recipe | undefined,
-          toNewRecipe: CancelledRecipe | undefined
+          toNewRecipe: CancelledRecipe | undefined,
+          toPreviousRecipe: Recipe | undefined
       if (cancelledRecipe = actions.recipeCancelMeal.get($button)) {
          run(() => CancelRecipe(<Recipe>cancelledRecipe))
       } else if (toNewRecipe = actions.addRecipe.get($button)) {
          run(() => CancelledRecipeToNewRecipe(<CancelledRecipe>toNewRecipe))
-      } else if (changeRecipe = actions.recipeChangeMeal.get($button)) {
-         run(() => ChangeRecipe(<Recipe>changeRecipe))
+      } else if (changeRecipe = actions.recipeNextMeal.get($button)) {
+         run(() => NextRecipe(<Recipe>changeRecipe))
+      } else if (toPreviousRecipe = actions.recipePreviousMeal.get($button)) {
+         run(() => PreviousRecipe(<Recipe>toPreviousRecipe))
       }
    }
 }, 100))
@@ -123,21 +127,37 @@ function* CancelledRecipeToNewRecipe(cancelledRecipe: CancelledRecipe) {
    var date = cancelledRecipe.date
    let newRecipe = getRecipe(date, recipes[random(0, recipes.length - 1)])
    cancelledRecipe.nodes.root.replaceWith(newRecipe.nodes.root)
-   newRecipe.nodes["change-meal"].focus()
+   newRecipe.nodes["next-meal"].focus()
 }
 
-function* ChangeRecipe(oldRecipe: Recipe) {
-   var recipes = <RecipeDomain[]>(yield getActiveRecipes())
-   var newRecipe = recipes[random(0, recipes.length - 1)]
-   yield setRecipeDate([
-      { date: oldRecipe.date
-      , recipeId: newRecipe.id
+function* NextRecipe(oldRecipe: Recipe) {
+   const recipe = <RecipeAndDateDomain | undefined>(yield oldRecipe.next(() => getNewRecipe(oldRecipe)))
+   if (recipe) {
+      yield setNewRecipe(recipe)
+   }
+}
+
+function* PreviousRecipe(oldRecipe: Recipe) {
+   const recipe = oldRecipe.previous()
+   if (recipe) {
+      yield setNewRecipe(recipe)
+   }
+}
+
+async function setNewRecipe(o: RecipeAndDateDomain) {
+   var recipe: RecipeDateDomain =
+      { date: o.date
       , categoryId: { isCategoryId: true, value: 1 }
       , lastUpdated: 0
-      , quantity: 1 }])
+      , quantity: 1
+      , recipeId: o.id }
+   await setRecipeDate([recipe])
+}
 
-   recipes = []
-   oldRecipe.update({ ...newRecipe , date: oldRecipe.date })
+async function getNewRecipe(oldRecipe: Recipe) {
+   var recipes = <RecipeDomain[]>(await getActiveRecipes())
+   var newRecipe = recipes[random(0, recipes.length - 1)]
+   return { ...newRecipe , date: oldRecipe.date }
 }
 
 function getRecipe(date : ISODate, recipe : RecipeDomain) {

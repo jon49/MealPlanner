@@ -8,7 +8,8 @@ export interface RecipeTemplate {
    "recipe-location": HTMLElement
    "recipe-date": Text
    description: Text
-   "change-meal": HTMLButtonElement
+   "next-meal": HTMLButtonElement
+   "previous-meal": HTMLButtonElement
    root: HTMLDivElement
 }
 
@@ -18,7 +19,8 @@ export const recipeTemplate = html`
       <div><small>#recipe-date</small></div>
       <div>
          <button #cancel-meal>Cancel Meal</button>
-         <button #change-meal>Change Meal</button>
+         <button #previous-meal>Previous Meal</button>
+         <button #next-meal>Change Meal</button>
       </div>
       <h2>#name</h2>
       <p><small #recipe-location></small></p>
