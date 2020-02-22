@@ -26,7 +26,7 @@ export class Recipe {
    date!: ISODate
    recipeIndex = 0
    recipes: RecipeAndDateDomain[] = []
-   stopUpdate = true
+   stopUpdate = false
    constructor(nodes: RecipeTemplate, o: RecipeAndDateDomain) {
       this.nodes = nodes
       this.recipes.push(o)
@@ -39,15 +39,16 @@ export class Recipe {
       this.nodes.name.nodeValue = o.name
 
       var location = getLocationElement(o.location)
-      this.nodes["recipe-location"].textContent = ""
+      var locationNode = this.nodes["recipe-location"]
+      locationNode.textContent = ""
       if (location instanceof HTMLAnchorElement) {
-         this.nodes["recipe-location"].append(location)
+         locationNode.append(location)
       } else {
-         this.nodes["recipe-location"].textContent = location || "Unknown"
+         locationNode.textContent = location || "Unknown"
       }
 
       this.nodes["recipe-date"].nodeValue = o.date.getDate().toLocaleDateString()
-      this.nodes.description.nodeValue = o.name
+      this.nodes.description.nodeValue = ""
    }
 
    previous() {

@@ -1,7 +1,8 @@
-import glob from "glob"
-import fs from "fs"
-import { execFile } from "child_process"
-import path from "path"
+const glob = require("glob")
+const fs = require("fs")
+const cp = require("child_process")
+const execFile = cp.execFile
+const path = require("path")
 
 var cwd = process.cwd()
 
@@ -31,9 +32,10 @@ function GenerateHTML(filename) {
          throw error
       }
       const fullClean = path.join(cwd, clean)
-      console.log(fullClean)
+      console.log(`Writing file: ${fullClean}`)
       fs.writeFile(clean, stdout, (err) => {
          if (err) console.log(err)
+         console.log(`Finished writing file: ${fullClean}`)
       })
    })
 }
