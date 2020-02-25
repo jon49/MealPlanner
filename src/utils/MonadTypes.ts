@@ -7,6 +7,20 @@ export class SpecialEvent<T> {
    }
 }
 
+export class ErrorWithUserMessage {
+   userMessage: string
+   error: any
+   constructor(userMessage: string, error: any) {
+      this.userMessage = userMessage
+      this.error = error
+   }
+}
+
+export const FriendlyError =
+   (userMessage: string) =>
+   (error: any) =>
+   new ErrorWithUserMessage(userMessage, error)
+
 export class EventValue<T, S> {
    value: T
    event: SpecialEvent<S>

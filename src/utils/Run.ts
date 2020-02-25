@@ -1,4 +1,4 @@
-import { EventValue, SpecialEvent } from "./EventValue.js"
+import { EventValue, SpecialEvent, ErrorWithUserMessage } from "./MonadTypes.js"
 
 export default class Run {
    f: () => Generator<any, any, any>
@@ -23,7 +23,8 @@ export default class Run {
 
          if (newValue instanceof Promise) {
             value = await newValue
-            if (value instanceof Error) {
+            if (value instanceof ErrorWithUserMessage
+               || value instanceof Error) {
                break
             }
             result = iterator.next(value)
@@ -40,8 +41,10 @@ export default class Run {
 
       return result.value instanceof Promise
          ? result.value
-      : result.value instanceof Error
+      : result.value instanceof ErrorWithUserMessage
          ? Promise.reject(result.value)
+      : result.value instanceof Error
+         ? Promise.reject(new ErrorWithUserMessage("Unkown error occurred.", result.value))
       : Promise.resolve(result.value)
    }
 }

@@ -1,23 +1,23 @@
 import test from "ava"
 import Run from "./Run.js"
-import { SpecialEvent, EventValue } from "./EventValue.js"
+import { SpecialEvent, EventValue, FriendlyError } from "./MonadTypes.js"
+import { ErrorWithUserMessage } from "./utils.js"
 
 test("Should be able to return value from promise", async t => {
    const run = new Run(function* () {
-      const result = yield Promise.resolve("Yes!")
+      const result: string = yield Promise.resolve("Yes!")
       return result
    })
-   const result = await run.start()
+   const result: string = await run.start()
    t.is(result, "Yes!")
 })
 
-test("Should be able to return error value", t => {
+test("Should be able to return error value", async t => {
    const run = new Run(function* () {
       const result = yield Promise.reject("Error!")
       return result
    })
-   return run.start()
-   .catch(x => t.is(x, "Error!"))
+   return await run.start().catch(x => t.is(x, "Error!"))
 })
 
 test("Should be able to handle multiples values", async t => {
@@ -43,9 +43,10 @@ test("Should return rejected promise if error is returned.", t => {
       return new Error("Doh!")
    })
    return run.start()
-   .catch((x: Error) => {
-      t.true(x instanceof Error)
-      t.is(x.message, "Doh!")
+   .catch((x: ErrorWithUserMessage) => {
+      t.true(x instanceof ErrorWithUserMessage)
+      t.is(x.userMessage, "Unkown error occurred.")
+      t.true(x.error instanceof Error)
    })
 })
 
@@ -101,4 +102,14 @@ test("Should return early with rejected events.", t => {
       t.is(x, "Was rejected.")
       t.true(run.events.length === 1, "Has 1 event.")
    })
+})
+
+test("Should return friendly error", async t => {
+   const run = new Run(function* () {
+      yield Promise.resolve(FriendlyError("This is a friendly message.")("Error"))
+   })
+   const result: ErrorWithUserMessage = await run.start().catch(x => x)
+   t.true(result instanceof ErrorWithUserMessage)
+   t.is(result.userMessage, "This is a friendly message.")
+   t.is(result.error, "Error")
 })
