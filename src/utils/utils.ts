@@ -1,4 +1,4 @@
-import { debounce } from "ts-debounce"
+import debounce from "./debounce.js"
 import Run from "./Run.js"
 import { EventValue, SpecialEvent, ErrorWithUserMessage, FriendlyError } from "./MonadTypes.js"
 
