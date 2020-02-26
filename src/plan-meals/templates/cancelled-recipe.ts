@@ -1,6 +1,6 @@
 import { CancelledRecipeTemplate, CancelledRecipeTemplateId } from "./_cancelled-recipe.html.js"
 import template from "../../utils/template.js"
-import { ISODate } from "../../utils/utils.js"
+import { ISODate } from "../../utils/database.js"
 
 interface CancelledRecipeOptions {
    date: ISODate

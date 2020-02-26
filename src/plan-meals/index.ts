@@ -3,9 +3,9 @@ import { recipeCancelMeal, recipeNextMeal, recipePreviousMeal, CreateRecipe, Rec
 import { addRecipe, CancelledRecipe, CreateCancelledRecipe } from "./templates/cancelled-recipe.js"
 import { random, range } from "./util/util.js"
 import { getRecipes, setRecipeDate, getRecipeDates, getActiveRecipes, setMealPlannerSettings, getMealPlannerSettings } from "./store/store.js"
-import { TypeOrDeleted, isDeleted } from "../utils/database.js"
-import { run, ISODate, debounce } from "../utils/utils.js"
-import { RecipeDomain, RecipeDateDomain, RecipeAndDateDomain } from "./Domain/DomainTypes"
+import { TypeOrDeleted, isDeleted, ISODate } from "../utils/database.js"
+import { run, debounce } from "../utils/utils.js"
+import { RecipeDomain, RecipeDateDomain, RecipeAndDateDomain } from "./Domain/DomainTypes.js"
 
 var page : Page = {
    mealSelectionsId: "_meal-selections",

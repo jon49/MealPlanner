@@ -1,9 +1,6 @@
-import * as debounce1 from "debounce"
-import ISODate from "./ISODate.js"
+import { debounce } from "ts-debounce"
 import Run from "./Run.js"
 import { EventValue, SpecialEvent, ErrorWithUserMessage, FriendlyError } from "./MonadTypes.js"
-
-const debounce = <typeof debounce1>(<any>debounce1).default
 
 const run = async (f: () => Generator<any, any, any>): Promise<any> => {
    const r = new Run(f)
@@ -34,7 +31,6 @@ const run = async (f: () => Generator<any, any, any>): Promise<any> => {
 export {
    run,
    debounce,
-   ISODate,
    EventValue,
    SpecialEvent,
    ErrorWithUserMessage,

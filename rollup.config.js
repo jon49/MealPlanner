@@ -1,60 +1,58 @@
 import resolve from "@rollup/plugin-node-resolve"
-import commonjs from "@rollup/plugin-commonjs"
+import typescript from "@rollup/plugin-typescript"
+
+var external = ["./utils.js", "./utils/utils.js", "../utils/utils.js", "../../utils/utils.js", "../../../utils/utils.js",
+   "./utils/template.js", "../utils/template.js", "../../utils/template.js", "../../../utils/template.js",
+   "./utils/database.js", "../utils/database.js", "../../utils/database.js", "../../../utils/database.js",
+   ]
+
+const tscOptions = {
+   module: "ES2015"
+}
 
 var pages = [
    "plan-meals"
-].map(x => [{
-   input: `./build/${x}/index.js`,
+].map(x => ({
+   input: `./src/${x}/index.ts`,
    output: {
       file: `./public/${x}/index.js`,
       format: "esm"
    },
-   external: ["./utils.js", "./utils/utils.js", "../utils/utils.js", "../../utils/utils.js", "../../../utils/utils.js",
-   "./utils/template.js", "../utils/template.js", "../../utils/template.js", "../../../utils/template.js",
-   "./utils/database.js", "../utils/database.js", "../../utils/database.js", "../../../utils/database.js",
-   ]
-}, {
-   input: `./build/${x}/index.html.js`,
-   output: {
-      file: `./build/${x}/__index.html.js`,
-      format: "cjs"
-   }
-} ])
-.flat()
+   plugins: [
+      typescript(tscOptions),
+      resolve()
+   ],
+   external
+} ))
 
 export default [{
-  input: "./build/utils/utils.js",
+  input: "./src/utils/utils.ts",
   output: {
     file: "./public/utils/utils.js",
     format: "esm"
   },
   plugins: [
-     resolve(),
-     commonjs()
+     typescript(tscOptions),
+     resolve()
   ]
 }, {
-   input: "./build/utils/template.js",
+   input: "./src/utils/template.ts",
    output: {
       file: "./public/utils/template.js",
       format: "esm"
    },
    plugins: [
+      typescript(tscOptions),
       resolve()
    ]
 }, {
-   input: "./build/utils/database.js",
+   input: "./src/utils/database.ts",
    output: {
       file: "./public/utils/database.js",
       format: "esm"
    },
    plugins: [
+      typescript(tscOptions),
       resolve()
-   ],
-   external: ["./utils.js"]
-}, {
-   input: "./build/index.html.js",
-   output: {
-      file: "./build/__index.html.js",
-      format: "cjs"
-   }
-} ].concat(pages)
+   ]
+}].concat(pages)

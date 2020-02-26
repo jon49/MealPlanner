@@ -1,5 +1,9 @@
 import { openDB, DBSchema } from "idb"
-import { ISODate } from "./utils.js"
+import ISODate from "./ISODate.js"
+
+export {
+   ISODate
+}
 
 interface Tracking {
    lastUpdated: number

@@ -8,7 +8,7 @@
     "test": "npx ava build/**/*.spec.js",
     "test:watch": "npx ava --watch build/**/*.spec.js",
     "start:node": "nodemon ./dist/",
-    "start": "echo doh!",
+    "start": "npm run watch",
     "start:lambda": "netlify-lambda serve functions",
     "build:lambda": "netlify-lambda build functions",
     "tsc:watch": "npx tsc -w",
@@ -25,10 +25,10 @@
   "license": "ISC",
   "dependencies": {
     "aws-sdk": "^2.610.0",
-    "debounce": "^1.2.0",
     "glob": "^7.1.6",
     "idb": "^5.0.1",
-    "stage0": "0.0.25"
+    "stage0": "0.0.25",
+    "ts-debounce": "^2.0.1"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^11.0.2",

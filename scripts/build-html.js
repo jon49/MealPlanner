@@ -10,7 +10,7 @@ var fileLocation = process.argv[3]
 if (fileLocation && fileLocation.indexOf("__") > -1) {
    GenerateHTML(fileLocation)
 } else {
-   glob("./build/**/__*.html.js", (err, matches) => {
+   glob("./build/**/index.html.js", (err, matches) => {
       if (err) {
          console.error(err)
          return
