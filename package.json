@@ -27,8 +27,7 @@
     "aws-sdk": "^2.610.0",
     "glob": "^7.1.6",
     "idb": "^5.0.1",
-    "stage0": "0.0.25",
-    "ts-debounce": "^2.0.1"
+    "stage0": "0.0.25"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^11.0.2",

@@ -5,17 +5,21 @@
 export type Procedure = (...args: any[]) => void;
 
 export type Options = {
-  isImmediate: boolean,
+  isImmediate: boolean
+  runImmediatelyFirstTimeOnly: boolean
 }
 
 export default function debounce<F extends Procedure>(
   func: F,
   waitMilliseconds = 50,
-  options: Options = {
-    isImmediate: false
-  },
+  option?: Partial<Options>
 ): (this: ThisParameterType<F>, ...args: Parameters<F>) => void {
   let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+  const options: Options = Object.assign({
+    isImmediate: false,
+    runImmediatelyFirstTimeOnly: false
+  }, option)
 
   return function(this: ThisParameterType<F>, ...args: Parameters<F>) {
     const context = this;
@@ -27,7 +31,8 @@ export default function debounce<F extends Procedure>(
       }
     }
 
-    const shouldCallNow = options.isImmediate && timeoutId === undefined;
+    const shouldCallNow = (options.isImmediate || options.runImmediatelyFirstTimeOnly) && timeoutId === undefined;
+    options.runImmediatelyFirstTimeOnly = false
 
     if (timeoutId !== undefined) {
       clearTimeout(timeoutId);

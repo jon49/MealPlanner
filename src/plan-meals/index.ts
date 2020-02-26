@@ -19,7 +19,7 @@ var actions = {
    addRecipe,
 }
 
-var mealSelections = document.getElementById(page.mealSelectionsId)
+var mealSelections = <HTMLDivElement>document.getElementById(page.mealSelectionsId)
 var startDate = <HTMLInputElement>document.getElementById(page.startDateFormId)
 
 type RecipeAndRecipeDate = { recipe: TypeOrDeleted<RecipeDomain>, date: RecipeDateDomain }
@@ -76,10 +76,10 @@ async function handleDateChange(e: Event) {
          lastUpdated: x.date.lastUpdated
       })))
 
-      mealSelections && (mealSelections.innerHTML = "")
+      mealSelections.innerHTML = ""
       currentRecipesAddedDates.forEach(x => {
          var recipeNode = getRecipe(x.date.date, x.recipe)
-         mealSelections && mealSelections.appendChild(recipeNode.nodes.root)
+         mealSelections.appendChild(recipeNode.nodes.root)
       })
    }
 }
@@ -87,9 +87,9 @@ async function handleDateChange(e: Event) {
 startDate.addEventListener("change", debounce(function(e: Event) {
       e.preventDefault()
       handleDateChange(e)
-   }, 200))
+   }, 250, { runImmediatelyFirstTimeOnly: true }))
 
-mealSelections && mealSelections.addEventListener("click", debounce(function(e: Event) {
+mealSelections.addEventListener("click", debounce(function(e: Event) {
    e.preventDefault()
    var $button = e.target
    if ($button instanceof HTMLButtonElement) {
@@ -107,7 +107,7 @@ mealSelections && mealSelections.addEventListener("click", debounce(function(e: 
          run(() => PreviousRecipe(<Recipe>toPreviousRecipe))
       }
    }
-}, 100))
+}, 100, { isImmediate: true }))
 
 function* CancelRecipe(oldRecipe: Recipe) {
    var cancelledRecipe = CreateCancelledRecipe({ date: oldRecipe.date })
