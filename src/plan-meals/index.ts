@@ -22,53 +22,78 @@ var actions = {
 var mealSelections = <HTMLDivElement>document.getElementById(page.mealSelectionsId)
 var startDate = <HTMLInputElement>document.getElementById(page.startDateFormId)
 
-type RecipeAndRecipeDate = { recipe: TypeOrDeleted<RecipeDomain>, date: RecipeDateDomain }
-async function handleDateChange(e: Event) {
-   if (e.target instanceof HTMLInputElement) {
-      var start = new ISODate(e.target.value)
-      await setMealPlannerSettings({startDate: start})
-      var recipeDates = await getRecipeDates(start, 1)
-      var recipes = await getRecipes()
-      var currentIds = recipeDates.map(x => x.recipeId.value)
-      var currentRecipes : RecipeAndRecipeDate[] = []
-      var unUsedRecipes : RecipeDomain[] = []
-      var shouldAddNewRecipes = currentIds.length !== 7
-      for (var recipe of recipes) {
-         var idx = currentIds.indexOf(recipe.id.value)
-         if (idx > -1) {
-            currentRecipes.push({ recipe, date: recipeDates[idx] })
-         } else if(shouldAddNewRecipes && !isDeleted(recipe)) {
-            unUsedRecipes.push(recipe)
+function parseRecipes(recipes: TypeOrDeleted<RecipeDomain>[], recipeDates: TypeOrDeleted<RecipeDateDomain>[]) {
+   var currentIds = recipeDates.map(x => x.recipeId.value)
+   var currentRecipes : RecipeAndRecipeDate[] = []
+   var unUsedRecipes : RecipeDomain[] = []
+   var shouldAddNewRecipes = currentIds.length !== 7
+   for (var recipe of recipes) {
+      var idx = currentIds.indexOf(recipe.id.value)
+      if (idx > -1) {
+         currentRecipes.push({ recipe, date: recipeDates[idx] })
+      } else if(shouldAddNewRecipes && !isDeleted(recipe)) {
+         unUsedRecipes.push(recipe)
+      }
+   }
+   return { currentRecipes, unUsedRecipes }
+}
+
+interface GetCurrentRecipesOptions {
+   currentRecipes: RecipeAndRecipeDate[]
+   unUsedRecipes: RecipeDomain[] 
+   start: ISODate
+}
+function getCurrentRecipes({ currentRecipes, unUsedRecipes, start }: GetCurrentRecipesOptions) {
+   var currentRecipesAddedDates : RecipeAndRecipeDate[] = []
+   if (currentRecipes.length !== 7) {
+      var currentDate = start
+      range(0, 7)
+      .forEach(_ => {
+         var r = currentRecipes.find(x => currentDate.equals(x.date.date))
+         if (r) {
+            currentRecipesAddedDates.push(r)
+         } else {
+            var newRecipe = unUsedRecipes[random(0, unUsedRecipes.length - 1)]
+            currentRecipesAddedDates.push({
+               recipe: newRecipe,
+               date: {
+                  categoryId: { isCategoryId: true, value: 1 },
+                  date: currentDate,
+                  lastUpdated: 0,
+                  quantity: 1,
+                  recipeId: newRecipe.id
+               }
+            })
          }
-      }
-      var currentRecipesAddedDates : RecipeAndRecipeDate[] = []
-      if (currentRecipes.length !== 7) {
-         var currentDate = start
-         range(0, 7)
-         .forEach(_ => {
-            var r = currentRecipes.find(x => currentDate.equals(x.date.date))
-            if (r) {
-               currentRecipesAddedDates.push(r)
-            } else {
-               var newRecipe = unUsedRecipes[random(0, unUsedRecipes.length - 1)]
-               currentRecipesAddedDates.push({
-                  recipe: newRecipe,
-                  date: {
-                     categoryId: { isCategoryId: true, value: 1 },
-                     date: currentDate,
-                     lastUpdated: 0,
-                     quantity: 1,
-                     recipeId: newRecipe.id
-                  }
-               })
-            }
-            currentDate = currentDate.addDays(1)
-         })
-      } else {
-         currentRecipes.sort((a, b) => a.date.date < b.date.date ? -1 : 1)
-         currentRecipesAddedDates = currentRecipes
-      }
-      await setRecipeDate(currentRecipesAddedDates.map(x => ({
+         currentDate = currentDate.addDays(1)
+      })
+   } else {
+      currentRecipes.sort((a, b) => a.date.date < b.date.date ? -1 : 1)
+      currentRecipesAddedDates = currentRecipes
+   }
+
+   return { currentRecipesAddedDates }
+}
+
+// * Create a central recipe picker which takes into account 0 recipes, < 7 recipes, above 7 recipes
+//   Also, takes into account current recipes chosen and current recipes chosen for specific widget
+// * Be able to search recipes
+// * What else was I thinking of here :-)
+
+type RecipeAndRecipeDate = { recipe: TypeOrDeleted<RecipeDomain>, date: RecipeDateDomain }
+function* handleDateChange(e: Event) {
+   if (e.target instanceof HTMLInputElement) {
+      // Still need to deal with the amount of recipes under 7 and 0 recipes
+      // Yield here as we don't know the target is the correct value
+      // Perhaps a ISODate.Create which returns => ISODate | ErrorWithUserMessage
+      var start = new ISODate(e.target.value)
+      yield setMealPlannerSettings({startDate: start})
+      var recipeDates = yield getRecipeDates(start, 1)
+      var recipes = yield getRecipes()
+      const { currentRecipes, unUsedRecipes } = parseRecipes(recipes, recipeDates)
+      // extract random from getCurrentRecipes, perhaps a different implementation?
+      const { currentRecipesAddedDates } = getCurrentRecipes({ currentRecipes, unUsedRecipes, start })
+      yield setRecipeDate(currentRecipesAddedDates.map(x => ({
          recipeId: x.date.recipeId,
          date: x.date.date,
          categoryId: x.date.categoryId,
@@ -86,7 +111,7 @@ async function handleDateChange(e: Event) {
 
 startDate.addEventListener("change", debounce(function(e: Event) {
       e.preventDefault()
-      handleDateChange(e)
+      run(() => handleDateChange(e))
    }, 250, { runImmediatelyFirstTimeOnly: true }))
 
 mealSelections.addEventListener("click", debounce(function(e: Event) {
