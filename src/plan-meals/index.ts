@@ -78,7 +78,7 @@ function getCurrentRecipes({ currentRecipes, unUsedRecipes, start }: GetCurrentR
 // * Create a central recipe picker which takes into account 0 recipes, < 7 recipes, above 7 recipes
 //   Also, takes into account current recipes chosen and current recipes chosen for specific widget
 // * Be able to search recipes
-// * What else was I thinking of here :-)
+// * Drag and drop recipes
 
 type RecipeAndRecipeDate = { recipe: TypeOrDeleted<RecipeDomain>, date: RecipeDateDomain }
 function* handleDateChange(e: Event) {
