@@ -39,7 +39,7 @@ var _default = ({ main, header, currentPage, afterMain, head } : DefaultOptions)
             title: "Home",
             isCurrentPage: currentPage === "Home"
          }, {
-            href: "/plan-meals",
+            href: "/meal-plans",
             title: "Plan Meals",
             isCurrentPage: currentPage === "Plan Meals"
          }])
