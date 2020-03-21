@@ -1,6 +1,9 @@
 import html from './util.js'
 
-type CurrentPageTitle = "Home" | "Plan Meals" 
+type CurrentPageTitle
+   = "Home"
+   | "Plan Meals" 
+   | "Meal Plan Search"
 
 interface DefaultOptions {
    currentPage : CurrentPageTitle

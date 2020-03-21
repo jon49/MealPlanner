@@ -20,7 +20,7 @@
     "tsc": "npx tsc",
     "rollup": "npx rollup -c",
     "build:html": "node ./scripts/build-html.js",
-    "build:static": "cd ./src; find . -name '*.js' | cpio -pdm ../build; cd ..;",
+    "build:static": "cd ./src; find . -name '*.js' | cpio -pdm ../public; cd ..;",
     "build": "npm-run-all -s clean tsc rollup build:html build:static test"
   },
   "author": "",

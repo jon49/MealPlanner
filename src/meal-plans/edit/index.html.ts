@@ -9,9 +9,9 @@ export interface Page {
 }
 
 var head = html`
-<script async src="../utils/utils.js" type="module"></script>
-<script async src="../utils/template.js" type="module"></script>
-<script async src="../utils/database.js" type="module"></script>
+<script async src="/utils/utils.js" type="module"></script>
+<script async src="/utils/template.js" type="module"></script>
+<script async src="/utils/database.js" type="module"></script>
 `
 
 var main = html`

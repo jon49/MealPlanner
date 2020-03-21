@@ -219,7 +219,12 @@
          this.label = this.dataset.label || "Search"
          this.placeholder = this.dataset.placeholder || ""
          this.emptyMessage = this.dataset.emptyMessage || "Awaiting data."
-         const style = this.dataset.style || document.getElementById("my-style") || ""
+         let style = this.dataset.style || document.getElementById("my-style")
+         if (!style) {
+            const $style = document.createElement("style")
+            $style.innerHTML = ".highlight, li:hover { background-color: pink; } li { cursor: pointer; }"
+            style = $style
+         }
          this.attachShadow({mode: 'open'})
 
          if (style instanceof HTMLStyleElement) {
