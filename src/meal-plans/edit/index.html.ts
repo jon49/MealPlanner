@@ -24,7 +24,7 @@ var main = html`
 var afterMain = html`
 ${recipeTemplate}
 ${cancelledRecipeTemplate}
-<script src="/meal-plans/index.js" async type="module"></script>`
+<script src="/meal-plans/edit/index.js" async type="module"></script>`
 
 const page = _default({
    head,
