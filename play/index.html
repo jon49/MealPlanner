@@ -9,6 +9,12 @@
       .highlight {
          background-color: pink;
       }
+      li:hover {
+         background-color: green;
+      }
+      li:focus {
+         background-color: orange;
+      }
    </style>
 </head>
 <body>
@@ -27,17 +33,18 @@
          , { value: "Strawberry", id: 4 }
          , { value: "Vanilla", id: 5 } ]
       var searchList = list.map(x => ({ compareValue: x.value.toLowerCase(), value: x.value, id: x.id }))
-      const createLI = ({ value, id }) => {
+      const createLI = ({ value, id }, idx) => {
          const li = document.createElement("li")
          li.innerText = value
          li.dataset.id = id
+         li.tabIndex = 0
          return li
       }
       const createULList = (list, options) => {
          var ul = document.createElement("ul")
          list.some((data, index) => {
             if (data.similarity === 0) return true
-            ul.append(createLI(data))
+            ul.append(createLI(data, index))
             return index === options.limit
          })
          var appendTo = options.appendTo
@@ -68,17 +75,19 @@
                   form.search.dispatchEvent(new KeyboardEvent("keydown", { key: key.escape }))
                   return
                }
-               var currentChosen = ulOptions.appendTo.querySelector("li.highlight")
-               var nextChosen
-               if (currentChosen) {
-                  currentChosen.classList.remove("highlight")
-                  nextChosen = currentChosen.nextSibling || ulOptions.appendTo.querySelector("li:first-child")
-               } else {
-                  nextChosen = ulOptions.appendTo.querySelector("li:first-child")
-               }
-               if (nextChosen) {
-                  nextChosen.classList.add("highlight")
-               }
+               var nextChosen = ulOptions.appendTo.querySelector("li:first-child")
+               nextChosen.focus()
+               // var currentChosen = ulOptions.appendTo.querySelector("li.highlight")
+               // var nextChosen
+               // if (currentChosen) {
+               //    currentChosen.classList.remove("highlight")
+               //    nextChosen = currentChosen.nextSibling || ulOptions.appendTo.querySelector("li:first-child")
+               // } else {
+               //    nextChosen = ulOptions.appendTo.querySelector("li:first-child")
+               // }
+               // if (nextChosen) {
+               //    nextChosen.classList.add("highlight")
+               // }
             }
             if (e.key === key.arrowUp || (e.shiftKey && e.key === key.tab)) {
                var currentChosen = ulOptions.appendTo.querySelector("li.highlight")
@@ -107,9 +116,9 @@
          }
       })
 
-      form.search.addEventListener("blur", e => {
-         ulOptions.appendTo.innerHTML = ""
-      })
+      // form.search.addEventListener("blur", e => {
+      //    ulOptions.appendTo.innerHTML = ""
+      // })
 
       form.search.addEventListener("focus", e => {
          const search = e.target
