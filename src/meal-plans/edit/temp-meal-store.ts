@@ -1,4 +1,4 @@
-import getDb, { Location } from "../utils/database.js"
+import getDb, { Location } from "../../utils/database.js"
 
 function getLocation(location: string) : Location {
    location = location.trim()

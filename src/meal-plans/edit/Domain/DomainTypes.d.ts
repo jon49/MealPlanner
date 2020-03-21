@@ -1,5 +1,5 @@
-import { Location } from "../../utils/database.js";
-import { ISODate } from "../../utils/utils.js";
+import { Location } from "../../../utils/database.js";
+import { ISODate } from "../../../utils/utils.js";
 
 export interface RecipeDomain {
    id: RecipeId

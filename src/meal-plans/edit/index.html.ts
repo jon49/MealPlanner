@@ -1,5 +1,5 @@
-import html from '../layouts/util.js'
-import _default from "../layouts/_default.html.js"
+import html from '../../layouts/util.js'
+import _default from "../../layouts/_default.html.js"
 import { recipeTemplate } from './templates/_recipe.html.js'
 import { cancelledRecipeTemplate } from './templates/_cancelled-recipe.html.js'
 

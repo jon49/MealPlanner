@@ -1,7 +1,7 @@
-import template from "../../utils/template.js"
+import template from "../../../utils/template.js"
 import { RecipeTemplate, MealPlanTemplateId } from "./_recipe.html.js"
 import { RecipeId, RecipeAndDateDomain } from "../Domain/DomainTypes.js"
-import { Location, ISODate } from "../../utils/database.js"
+import { Location, ISODate } from "../../../utils/database.js"
 import { anchor } from "../util/util.js"
 
 var recipeView = template.get<MealPlanTemplateId>("_recipe-template")

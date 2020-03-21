@@ -1,6 +1,6 @@
-import getDb, { RecipeDateData, TypeOrDeleted, isDeleted } from "../../utils/database.js"
+import getDb, { RecipeDateData, TypeOrDeleted, isDeleted } from "../../../utils/database.js"
 import { RecipeDomain, RecipeDateDomain } from "../Domain/DomainTypes.js";
-import getDB, { ISODate } from "../../utils/database.js";
+import getDB, { ISODate } from "../../../utils/database.js";
 
 const not = <T>(f: (val: T) => boolean) => (val: T) => !f(val)
 
