@@ -115,9 +115,9 @@ startDate.addEventListener("change", debounce(function(e: Event) {
    }, 250, { runImmediatelyFirstTimeOnly: true }))
 
 mealSelections.addEventListener("click", debounce(function(e: Event) {
-   e.preventDefault()
    var $button = e.target
    if ($button instanceof HTMLButtonElement) {
+      e.preventDefault()
       var changeRecipe: Recipe | undefined,
           cancelledRecipe: Recipe | undefined,
           toNewRecipe: CancelledRecipe | undefined,
