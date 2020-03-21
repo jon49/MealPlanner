@@ -75,6 +75,8 @@ function getCurrentRecipes({ currentRecipes, unUsedRecipes, start }: GetCurrentR
    return { currentRecipesAddedDates }
 }
 
+// * Add functionality to be able to click as fast as the app will allow instead of debounce. clickAndWait?
+// * Make the Monad more robust, add an applicative for validation and use in database calls
 // * Create a central recipe picker which takes into account 0 recipes, < 7 recipes, above 7 recipes
 //   Also, takes into account current recipes chosen and current recipes chosen for specific widget
 // * Be able to search recipes
