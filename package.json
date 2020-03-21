@@ -13,13 +13,15 @@
     "build:lambda": "netlify-lambda build functions",
     "tsc:watch": "npx tsc -w",
     "html:watch": "npx chokidar --initial \"./build/**/*.html.js\" -c \"node ./scripts/build-html.js {path}\"",
+    "static:watch": "npx chokidar \"./src/**/*.js\" -c \"npm run build:static\"",
     "rollup:watch": "npx rollup -c -w",
-    "watch": "npm-run-all -s build -p tsc:watch rollup:watch html:watch test:watch",
+    "watch": "npm-run-all -s build -p tsc:watch rollup:watch html:watch static:watch test:watch",
     "serve": "http-server -p 8080 -c-1 -g ./public",
     "tsc": "npx tsc",
     "rollup": "npx rollup -c",
     "build:html": "node ./scripts/build-html.js",
-    "build": "npm-run-all -s clean tsc rollup build:html test"
+    "build:static": "cd ./src; find . -name '*.js' | cpio -pdm ../build; cd ..;",
+    "build": "npm-run-all -s clean tsc rollup build:html build:static test"
   },
   "author": "",
   "license": "ISC",
