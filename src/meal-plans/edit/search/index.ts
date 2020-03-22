@@ -13,6 +13,7 @@ getActiveRecipes()
    const $main = <HTMLDivElement>document.getElementById("_main")
    if ($main) {
       $main.append($fuzzySearch)
+      $fuzzySearch.focus()
    }
 })
 
@@ -37,4 +38,7 @@ function selected(e: CustomEvent) {
       recipeId: { isRecipeId: true, value: id }
    }
    setRecipeDate([data])
+   .then(() => {
+      location.href = `/meal-plans/edit#${recipeDate.toString()}`
+   })
 }
