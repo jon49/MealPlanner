@@ -6,6 +6,9 @@ import { getRecipes, setRecipeDate, getRecipeDates, getActiveRecipes, setMealPla
 import { TypeOrDeleted, isDeleted, ISODate } from "../../utils/database.js"
 import { run, debounce } from "../../utils/utils.js"
 import { RecipeDomain, RecipeDateDomain, RecipeAndDateDomain } from "./Domain/DomainTypes.js"
+import start from "./temp-meal-store.js"
+
+start()
 
 var page : Page = {
    mealSelectionsId: "_meal-selections",

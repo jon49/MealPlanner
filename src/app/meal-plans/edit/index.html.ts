@@ -9,9 +9,9 @@ export interface Page {
 }
 
 var head = html`
-<script async src="/utils/utils.js" type="module"></script>
-<script async src="/utils/template.js" type="module"></script>
-<script async src="/utils/database.js" type="module"></script>
+<script async src="/app/utils/utils.js" type="module"></script>
+<script async src="/app/utils/template.js" type="module"></script>
+<script async src="/app/utils/database.js" type="module"></script>
 `
 
 var main = html`
@@ -19,7 +19,7 @@ var main = html`
       <label for="start-date"> Start Date: </label>
       <input id="_start-date" name="start-date" type="date" required />
    </form>
-   <div id="_meal-selections"></div>`
+   <section id="_meal-selections"></section>`
 
 var afterMain = html`
 ${recipeTemplate}

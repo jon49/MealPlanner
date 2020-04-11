@@ -498,4 +498,6 @@ function getLocation(location: string) : Location {
    }
 })
 
-export default recipeInfo
+function start(){}
+
+export default start

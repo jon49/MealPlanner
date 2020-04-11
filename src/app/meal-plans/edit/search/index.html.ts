@@ -2,7 +2,7 @@ import html from '../../../layouts/util.js'
 import _default from "../../../layouts/_default.html.js"
 
 var head = html`
-<script async src="/utils/fuzzy-search.js"></script>
+<script async src="/app/utils/fuzzy-search.js"></script>
 `
 
 var afterMain = html`

@@ -9,11 +9,11 @@ export interface CancelledRecipeTemplate {
 
 export const cancelledRecipeTemplate = html`
 <template id="_cancelled-recipe-template">
-   <div #root>
-      <p><small>#date</small></p>
+   <aside #root>
+      <p>#date</p>
+      <h2 class="text-2xl">No Recipe Chosen</h2>
       <button #add-recipe>Add Recipe</button>
-      <h2>No Recipe Chosen</h2>
-   </div>
+   </aside>
 </template>
 `
 
