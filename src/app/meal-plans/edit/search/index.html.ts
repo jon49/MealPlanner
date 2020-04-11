@@ -6,7 +6,7 @@ var head = html`
 `
 
 var afterMain = html`
-<script src="/meal-plans/edit/search/index.js" async type="module"></script>`
+<script src="/app/meal-plans/edit/search/index.js" async type="module"></script>`
 
 const page = _default({
    head,

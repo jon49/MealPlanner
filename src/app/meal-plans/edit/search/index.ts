@@ -39,6 +39,6 @@ function selected(e: CustomEvent) {
    }
    setRecipeDate([data])
    .then(() => {
-      location.href = `/meal-plans/edit#${recipeDate.toString()}`
+      location.href = `/app/meal-plans/edit#${recipeDate.toString()}`
    })
 }

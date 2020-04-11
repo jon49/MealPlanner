@@ -21,7 +21,7 @@
    /**** EVENTS ****/
 
    /**
-    * @param {{$list: HTMLDivElement, $input: HTMLInputElement, $fuzzySearch: FuzzySearch }} param0
+    * @param {{$list: HTMLUListElement, $input: HTMLInputElement, $fuzzySearch: FuzzySearch }} param0
     * @returns {(KeyboardEvent) => (false|undefined|void)}
     */
    const handleKeyDown =
@@ -77,7 +77,7 @@
 
    /**
     * Handles Blur Event
-    * @param {HTMLDivElement} $list
+    * @param {HTMLUListElement} $list
     * @returns {(e: Event) => void}
     */
    const handleBlur =
@@ -102,7 +102,7 @@
 
    /**
     * Handles Keyup event
-    * @param {{ searchList: Search[], limit: number, $list: HTMLDivElement }} param0 
+    * @param {{ searchList: Search[], limit: number, $list: HTMLUListElement }} param0 
     * @returns {(e: KeyboardEvent) => void | undefined}
     */
    const handleKeyup =
@@ -129,7 +129,7 @@
       }
 
    /**
-    * @param {HTMLDivElement} $list 
+    * @param {HTMLUListElement} $list 
     * @returns {() => void}
     */
    const handleMouseEnter =
@@ -142,7 +142,7 @@
       }
 
    /**
-    * @param {{ $input: HTMLInputElement, $list: HTMLDivElement, $fuzzySearch: FuzzySearch }} param0
+    * @param {{ $input: HTMLInputElement, $list: HTMLUListElement, $fuzzySearch: FuzzySearch }} param0
     * @returns {(e: Event) => void}
     */
    const handleClick =
@@ -158,7 +158,7 @@
    /**
     * @param {HTMLLIElement} li 
     * @param {HTMLInputElement} $input
-    * @param {HTMLDivElement} $list
+    * @param {HTMLUListElement} $list
     * @param {FuzzySearch} $fuzzySearch
     */
    function selectValue(li, $input, $list, $fuzzySearch) {
@@ -185,24 +185,24 @@
 
    /**
     * @param {{ similarity: number, value: string, id: string | number }[]} list 
-    * @param {{ limit: number, $list: HTMLDivElement }} options 
+    * @param {{ limit: number, $list: HTMLUListElement }} options 
     */
    function createULList(list = [], { limit, $list }) {
-      var ul = document.createElement("ul")
+      let items = document.createDocumentFragment()
       let index = 0
       while (true) {
          const data = list[index]
          if (!data || data.similarity === 0 || index === limit)
             break
          index++
-         ul.append(createLI(data))
+         items.append(createLI(data))
       }
 
       $list.innerHTML = ""
       if (index === 0) {
          $list.innerHTML = "<p>No items found.</p>"
       } else {
-         $list.append(ul)
+         $list.append(items)
       }
    }
 
@@ -283,7 +283,7 @@
          $input.setAttribute("placeholder", this.placeholder)
          $input.setAttribute("name", name)
 
-         const $list = document.createElement("div")
+         const $list = document.createElement("ul")
 
          const handleKeyDownBound = handleKeyDown({ $input, $list, $fuzzySearch: this })
          const handleBlurBound = handleBlur($list)

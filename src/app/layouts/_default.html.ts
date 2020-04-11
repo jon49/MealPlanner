@@ -38,11 +38,11 @@ var _default = ({ main, header, currentPage, afterMain, head } : DefaultOptions)
    <nav>
       ${
          (<Link[]>[{
-            href: "/",
+            href: "/app",
             title: "Home",
             isCurrentPage: currentPage === "Home"
          }, {
-            href: "/meal-plans/edit",
+            href: "/app/meal-plans/edit",
             title: "Plan Meals",
             isCurrentPage: currentPage === "Plan Meals"
          }])

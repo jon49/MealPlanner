@@ -30,7 +30,7 @@ export class Recipe {
       this.nodes = nodes
       this.recipes.push(o)
       this._update(o)
-      nodes["search-meal"].href = `/meal-plans/edit/search?recipeDate=${this.date.toString()}`
+      nodes["search-meal"].href = `/app/meal-plans/edit/search?recipeDate=${this.date.toString()}`
    }
 
    _update(o: RecipeAndDateDomain) {

@@ -11,8 +11,8 @@ const tscOptions = {
 }
 
 var pages = [
-   "meal-plans/edit",
-   "meal-plans/edit/search"
+   "app/meal-plans/edit",
+   "app/meal-plans/edit/search"
 ].map(x => ({
    input: `./src/${x}/index.ts`,
    output: {
@@ -27,9 +27,9 @@ var pages = [
 } ))
 
 export default [{
-  input: "./src/utils/utils.ts",
+  input: "./src/app/utils/utils.ts",
   output: {
-    file: "./public/utils/utils.js",
+    file: "./public/app/utils/utils.js",
     format: "esm"
   },
   plugins: [
@@ -37,9 +37,9 @@ export default [{
      resolve()
   ]
 }, {
-   input: "./src/utils/template.ts",
+   input: "./src/app/utils/template.ts",
    output: {
-      file: "./public/utils/template.js",
+      file: "./public/app/utils/template.js",
       format: "esm"
    },
    plugins: [
@@ -47,9 +47,9 @@ export default [{
       resolve()
    ]
 }, {
-   input: "./src/utils/database.ts",
+   input: "./src/app/utils/database.ts",
    output: {
-      file: "./public/utils/database.js",
+      file: "./public/app/utils/database.js",
       format: "esm"
    },
    plugins: [
