@@ -37,6 +37,7 @@ var _default = ({ main, header, currentPage, afterMain, head } : DefaultOptions)
    <h1>${header}</h1>
 
    <nav>
+      <ul>
       ${
          (<Link[]>[{
             href: "/app",
@@ -47,8 +48,9 @@ var _default = ({ main, header, currentPage, afterMain, head } : DefaultOptions)
             title: "Plan Meals",
             isCurrentPage: currentPage === "Plan Meals"
          }])
-         .map(createLink).join("")
+         .map(x => `<li>${createLink(x)}</li>`).join("|")
       }
+      </ul>
    </nav>
 
    <main id="_main">${main}</main>
