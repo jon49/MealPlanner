@@ -34,9 +34,11 @@ var _default = ({ main, header, currentPage, afterMain, head } : DefaultOptions)
    ${head}
 </head>
 <body>
-   <h1>${header}</h1>
-
    <nav>
+      <a href="/app">
+         <img alt="Meal Planner Logo" src="/images/meal-planner-logo.svg" height="50" width="300">
+         <!-- <object type="image/svg+xml" data="/images/meal-planner-logo.svg" height="70"></object> -->
+      </a>
       <ul>
       ${
          (<Link[]>[{
