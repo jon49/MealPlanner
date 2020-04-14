@@ -115,10 +115,12 @@ var firstPageView = true
 startDate.addEventListener("change", debounce(function(e: Event) {
       e.preventDefault()
       run(() => handleDateChange(e))
-      if (firstPageView && location.hash) {
-         location.href = location.hash
-      }
-      firstPageView = false
+      .then(() => {
+         if (firstPageView && location.hash) {
+            location.href = location.hash
+         }
+         firstPageView = false
+      })
    }, 250, { runImmediatelyFirstTimeOnly: true }))
 
 mealSelections.addEventListener("click", defer(function(e: Event) {
