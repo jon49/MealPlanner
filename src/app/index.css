@@ -160,9 +160,12 @@ input[type="checkbox"]:focus {
   outline: 1px dotted #338618; }
 
 label, legend, fieldset {
-  display: block;
   margin-bottom: .5rem;
   font-weight: 600; }
+
+label::after {
+  content: "\00a0";
+}
 
 /**
 MVP CSS
