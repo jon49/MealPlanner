@@ -1,0 +1,42 @@
+/**
+    TABS
+*/
+[data-tab] {
+  display: none;
+}
+
+[data-tab] + label {
+  cursor: pointer;
+  background: #eee;
+  padding: 0.25em;
+  border: 1px solid #ccc;
+}
+
+[data-tab]:checked + label {
+  border-bottom: solid white 1px;
+  background-color: white;
+}
+
+[data-tab="1"]:checked ~ [data-tab="1"],
+[data-tab="2"]:checked ~ [data-tab="2"],
+[data-tab="3"]:checked ~ [data-tab="3"] {
+  padding: 1em;
+  display: block;
+  border: solid #ccc 1px;
+}
+
+/**
+    VALIDATION
+*/
+
+.error {
+  display: none;
+}
+
+input:required:placeholder-shown + .error,
+input:invalid:focus + .error {
+  display: block;
+  font-size: 0.8em;
+  color: coral;
+  margin-top: 0;
+}

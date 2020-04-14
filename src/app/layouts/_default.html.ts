@@ -4,6 +4,7 @@ type CurrentPageTitle
    = "Home"
    | "Plan Meals" 
    | "Meal Plan Search"
+   | "Add Meal"
 
 interface DefaultOptions {
    currentPage : CurrentPageTitle
@@ -49,6 +50,10 @@ var _default = ({ main, currentPage, afterMain, head } : DefaultOptions) => html
             href: "/app/meal-plans/edit",
             title: "Plan Meals",
             isCurrentPage: currentPage === "Plan Meals"
+         }, {
+            href: "/app/meals/add",
+            title: "Add Meal",
+            isCurrentPage: currentPage == "Add Meal"
          }])
          .map(x => `<li>${createLink(x)}</li>`).join("|")
       }

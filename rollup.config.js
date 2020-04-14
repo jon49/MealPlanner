@@ -12,7 +12,8 @@ const tscOptions = {
 
 var pages = [
    "app/meal-plans/edit",
-   "app/meal-plans/edit/search"
+   "app/meal-plans/edit/search",
+   "app/meals/add"
 ].map(x => ({
    input: `./src/${x}/index.ts`,
    output: {
