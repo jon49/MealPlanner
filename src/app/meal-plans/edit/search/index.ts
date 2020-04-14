@@ -5,8 +5,8 @@ import ISODate from "../../../utils/ISODate.js";
 getActiveRecipes()
 .then(recipes => {
    const $fuzzySearch = document.createElement("fuzzy-search")
-   $fuzzySearch.dataset.limit = "10"
-   $fuzzySearch.dataset.emptyMessage = "No meals available."
+   $fuzzySearch.setAttribute("limit", "10")
+   $fuzzySearch.setAttribute("empty-message", "No meals available.")
    $fuzzySearch.setAttribute("autofocus", "")
    ;(<any>$fuzzySearch).searchList = recipes.map(x => ({ value: x.name, id: x.id.value }))
    $fuzzySearch.addEventListener("selected", selected as EventListener)

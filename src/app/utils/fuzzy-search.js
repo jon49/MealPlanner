@@ -212,22 +212,22 @@
    class FuzzySearch extends HTMLElement {
       constructor() {
          super()
-         this.limit =
-            (isNaN(+this.dataset.limit))
-               ? 10
-            : +this.dataset.limit
-         this.label = this.dataset.label || "Search"
-         this.placeholder = this.dataset.placeholder || ""
-         this.emptyMessage = this.dataset.emptyMessage || "Awaiting data."
+         this.$input = document.createElement("input")
       }
 
       connectedCallback() {
          if (this.hasAttribute("autofocus")) {
-            var $input = this.querySelector("input")
-            if ($input) {
-               $input.focus()
-            }
+            this.$input.focus()
          }
+      }
+
+      get emptyMessage() { return this.getAttribute("empty-message") || "Awaiting data." }
+      get placeholder() { return this.getAttribute("placeholder") || "" }
+      get label() { return this.getAttribute("label") || "Search" }
+      get limit() {
+         return (isNaN(+this.getAttribute("limit")))
+            ? 10
+         : +this.getAttribute("limit")
       }
 
       /**
@@ -285,7 +285,7 @@
          $label.textContent = this.label
          $label.setAttribute("for", name)
 
-         const $input = document.createElement("input")
+         const $input = this.$input
          $input.setAttribute("autocomplete", "off")
          $input.setAttribute("placeholder", this.placeholder)
          $input.setAttribute("name", name)
