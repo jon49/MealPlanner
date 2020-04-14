@@ -1,8 +1,7 @@
 import template from "../../../utils/template.js"
 import { RecipeTemplate, MealPlanTemplateId } from "./_recipe.html.js"
 import { RecipeId, RecipeAndDateDomain } from "../Domain/DomainTypes.js"
-import { Location, ISODate } from "../../../utils/database.js"
-import { anchor } from "../util/util.js"
+import { ISODate } from "../../../utils/database.js"
 
 var recipeView = template.get<MealPlanTemplateId>("_recipe-template")
 
@@ -10,14 +9,6 @@ export var
    recipeCancelMeal = new WeakMap<HTMLButtonElement, Recipe>(),
    recipeNextMeal = new WeakMap<HTMLButtonElement, Recipe>(),
    recipePreviousMeal = new WeakMap<HTMLButtonElement, Recipe>()
-
-function getLocationElement(location: Location) : string | HTMLAnchorElement {
-   return (typeof location === "string")
-         ? location
-      : ("book" in location)
-         ? `${location.book} (${location.page})`
-      : anchor(location.url, location.title)
-}
 
 export class Recipe {
    nodes: RecipeTemplate
@@ -39,13 +30,16 @@ export class Recipe {
       this.date = o.date
       this.nodes.name.nodeValue = o.name
 
-      var location = getLocationElement(o.location)
-      var locationNode = this.nodes["recipe-location"]
-      locationNode.textContent = ""
-      if (location instanceof HTMLAnchorElement) {
-         locationNode.append(location)
+      this.nodes["recipe-url"].href = ""
+      this.nodes["recipe-url"].textContent = ""
+      if (typeof o.location === "string") {
+         this.nodes["recipe-location"].nodeValue = o.location || "Unknown"
+      } else if ("book" in o.location) {
+         this.nodes["recipe-location"].nodeValue = `${o.location.book} (${o.location.page})`
       } else {
-         locationNode.textContent = location || "Unknown"
+         this.nodes["recipe-location"].nodeValue = ""
+         this.nodes["recipe-url"].href = o.location.url
+         this.nodes["recipe-url"].textContent = o.location.title
       }
 
       this.nodes["recipe-date"].nodeValue = o.date.getDate().toLocaleDateString()

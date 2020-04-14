@@ -22,7 +22,7 @@ interface Link {
 const createLink = (o : Link) =>
    html`<a href="${o.isCurrentPage ? "#" : o.href}">${o.title}</a>`
 
-var _default = ({ main, header, currentPage, afterMain, head } : DefaultOptions) => html`
+var _default = ({ main, currentPage, afterMain, head } : DefaultOptions) => html`
 <!DOCTYPE html>
 <html lang="en">
 <head>

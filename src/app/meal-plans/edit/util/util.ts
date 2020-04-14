@@ -8,11 +8,3 @@ export function range(start : number, count : number) {
     array[i - start] = i
   return array
 }
-
-export function anchor(link : string, text :string ) : HTMLAnchorElement {
-   var a = document.createElement("a")
-   var href = !link.startsWith("http") && link[0] !== "/" ? `//${link}` : link
-   a.href = href
-   a.textContent = text
-   return a
-}
