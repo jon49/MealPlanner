@@ -219,17 +219,14 @@
          this.label = this.dataset.label || "Search"
          this.placeholder = this.dataset.placeholder || ""
          this.emptyMessage = this.dataset.emptyMessage || "Awaiting data."
-         let style = this.dataset.style || document.getElementById("my-style")
-         if (!style) {
-            const $style = document.createElement("style")
-            $style.innerHTML = ".highlight, li:hover { background-color: pink; } li { cursor: pointer; }"
-            style = $style
-         }
-         this.attachShadow({mode: 'open'})
+      }
 
-         if (style instanceof HTMLStyleElement) {
-            this.__style = style
-            this.shadowRoot.appendChild(style)
+      connectedCallback() {
+         if (this.hasAttribute("autofocus")) {
+            var $input = this.querySelector("input")
+            if ($input) {
+               $input.focus()
+            }
          }
       }
 
@@ -259,16 +256,26 @@
       noList() {
          const $p = document.createElement("p")
          $p.textContent = this.emptyMessage
-         this.shadowRoot.innerHTML = ""
-         this.shadowRoot.appendChild($p)
+         this.innerHTML = ""
+         this.appendChild($p)
       }
 
       __setup() {
          if (this.__destroy) {
             this.__destroy()
          }
-         this.shadowRoot.innerHTML = ""
-         this.shadowRoot.appendChild(this.__style)
+         this.innerHTML = ""
+         let style = this.dataset.style || document.getElementById("my-style")
+         if (!style) {
+            const $style = document.createElement("style")
+            $style.innerHTML = ".highlight, li:hover { background-color: pink; } li { cursor: pointer; }"
+            style = $style
+         }
+
+         if (style instanceof HTMLStyleElement) {
+            this.__style = style
+            this.appendChild(style)
+         }
 
          const name = `__search${this.id || ""}`
 
@@ -301,7 +308,7 @@
          $form.appendChild($label)
          $form.appendChild($input)
          $form.appendChild($list)
-         this.shadowRoot.appendChild($form)
+         this.appendChild($form)
 
          this.__destroy = () => {
             $input.removeEventListener("keydown", handleKeyDownBound)

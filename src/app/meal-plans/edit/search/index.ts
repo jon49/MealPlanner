@@ -6,14 +6,14 @@ getActiveRecipes()
 .then(recipes => {
    const $fuzzySearch = document.createElement("fuzzy-search")
    $fuzzySearch.dataset.limit = "10"
-   $fuzzySearch.dataset.emptyMessage = "No meals available.";
-   (<any>$fuzzySearch).searchList = recipes.map(x => ({ value: x.name, id: x.id.value }))
+   $fuzzySearch.dataset.emptyMessage = "No meals available."
+   $fuzzySearch.setAttribute("autofocus", "")
+   ;(<any>$fuzzySearch).searchList = recipes.map(x => ({ value: x.name, id: x.id.value }))
    $fuzzySearch.addEventListener("selected", selected as EventListener)
 
    const $main = <HTMLDivElement>document.getElementById("_main")
    if ($main) {
       $main.append($fuzzySearch)
-      $fuzzySearch.focus()
    }
 })
 
