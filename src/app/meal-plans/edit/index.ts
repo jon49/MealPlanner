@@ -4,11 +4,8 @@ import { addRecipe, CancelledRecipe, CreateCancelledRecipe } from "./templates/c
 import { random, range } from "./util/util.js"
 import { getRecipes, setRecipeDate, getRecipeDates, getActiveRecipes, setMealPlannerSettings, getMealPlannerSettings } from "./store/store.js"
 import { TypeOrDeleted, isDeleted, ISODate } from "../../utils/database.js"
-import { run, debounce } from "../../utils/utils.js"
+import { run, debounce, defer } from "../../utils/utils.js"
 import { RecipeDomain, RecipeDateDomain, RecipeAndDateDomain } from "./Domain/DomainTypes.js"
-import start from "./temp-meal-store.js"
-
-start()
 
 var page : Page = {
    mealSelectionsId: "_meal-selections",
@@ -124,7 +121,7 @@ startDate.addEventListener("change", debounce(function(e: Event) {
       firstPageView = false
    }, 250, { runImmediatelyFirstTimeOnly: true }))
 
-mealSelections.addEventListener("click", debounce(function(e: Event) {
+mealSelections.addEventListener("click", defer(function(e: Event) {
    var $button = e.target
    if ($button instanceof HTMLButtonElement) {
       e.preventDefault()
@@ -132,17 +129,19 @@ mealSelections.addEventListener("click", debounce(function(e: Event) {
           cancelledRecipe: Recipe | undefined,
           toNewRecipe: CancelledRecipe | undefined,
           toPreviousRecipe: Recipe | undefined
-      if (cancelledRecipe = actions.recipeCancelMeal.get($button)) {
-         run(() => CancelRecipe(<Recipe>cancelledRecipe))
-      } else if (toNewRecipe = actions.addRecipe.get($button)) {
-         run(() => CancelledRecipeToNewRecipe(<CancelledRecipe>toNewRecipe))
-      } else if (changeRecipe = actions.recipeNextMeal.get($button)) {
-         run(() => NextRecipe(<Recipe>changeRecipe))
-      } else if (toPreviousRecipe = actions.recipePreviousMeal.get($button)) {
-         run(() => PreviousRecipe(<Recipe>toPreviousRecipe))
-      }
+      return (cancelledRecipe = actions.recipeCancelMeal.get($button))
+         ? run(() => CancelRecipe(<Recipe>cancelledRecipe))
+      : (toNewRecipe = actions.addRecipe.get($button))
+         ? run(() => CancelledRecipeToNewRecipe(<CancelledRecipe>toNewRecipe))
+      : (changeRecipe = actions.recipeNextMeal.get($button))
+         ? run(() => NextRecipe(<Recipe>changeRecipe))
+      : (toPreviousRecipe = actions.recipePreviousMeal.get($button))
+         ? run(() => PreviousRecipe(<Recipe>toPreviousRecipe))
+      : Promise.resolve()
+   } else {
+      return Promise.resolve()
    }
-}, 100, { isImmediate: true }))
+}))
 
 function* CancelRecipe(oldRecipe: Recipe) {
    var cancelledRecipe = CreateCancelledRecipe({ date: oldRecipe.date })
@@ -158,8 +157,9 @@ function* CancelRecipe(oldRecipe: Recipe) {
 }
 
 function* CancelledRecipeToNewRecipe(cancelledRecipe: CancelledRecipe) {
-   var recipes = <RecipeDomain[]>(yield getActiveRecipes())
    var date = cancelledRecipe.date
+   // var currentRecipe = <TypeOrDeleted<RecipeDateDomain>>(yield getRecipeDates(date, 1))
+   var recipes = <RecipeDomain[]>(yield getActiveRecipes())
    let newRecipe = getRecipe(date, recipes[random(0, recipes.length - 1)])
    cancelledRecipe.nodes.root.replaceWith(newRecipe.nodes.root)
    newRecipe.nodes["next-meal"].focus()

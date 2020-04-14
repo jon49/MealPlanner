@@ -27,7 +27,7 @@ export const recipeTemplate = html`
       <div>
          <button #cancel-meal>Cancel</button>&nbsp;
          <a #search-meal>Search</a>&nbsp;
-         <button #previous-meal>&laquo;</button>&nbsp;
+         <button #previous-meal>&laquo; Back</button>&nbsp;
          <button #next-meal>Next &raquo;</button>
       </div>
    </aside>
