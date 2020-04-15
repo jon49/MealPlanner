@@ -13,8 +13,8 @@
 }
 
 [data-tab]:checked + label {
-  border-bottom: solid white 1px;
-  background-color: white;
+  border-bottom: solid #f9f9f9 1px;
+  background-color: #f9f9f9;
 }
 
 [data-tab="1"]:checked ~ [data-tab="1"],
@@ -33,10 +33,13 @@
   display: none;
 }
 
-input:required:placeholder-shown + .error,
 input:invalid:focus + .error {
   display: block;
   font-size: 0.8em;
   color: coral;
   margin-top: 0;
+}
+
+input:required:placeholder-shown {
+    border-left: solid coral 2px;
 }

@@ -25,8 +25,8 @@ const main = html`
                 <p class="error">Please enter the page for the book.</p>
                 <br>
                 <label for="source-book-page">Book Page:</label>
-                <input id="source-book-page" name="book-page" type="text" placeholder="125" data-required>
-                <p class="error">Please enter a page for the book.</p>
+                <input id="source-book-page" name="book-page" type="number" placeholder="125" data-required>
+                <p class="error">Please enter a page number for the book.</p>
             </div>
             <div data-tab="3">
                 <label for="source-other">Other:</label>
