@@ -43,10 +43,6 @@ var _default = ({ main, currentPage, afterMain, head } : DefaultOptions) => html
       <ul>
       ${
          (<Link[]>[{
-            href: "/app",
-            title: "Home",
-            isCurrentPage: currentPage === "Home"
-         }, {
             href: "/app/meal-plans/edit",
             title: "Plan Meals",
             isCurrentPage: currentPage === "Plan Meals"
