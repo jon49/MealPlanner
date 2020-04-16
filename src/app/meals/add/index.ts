@@ -93,6 +93,10 @@ const submit = (e: Event) => {
 }
 
 $form.addEventListener("submit", defer(submit))
+$form.addEventListener("reset", () => {
+    setTimeout(toggleDisabled, 1)
+    return true
+})
 
 class LocationUrlValidation {
     readonly url: Either<string[], String100>
