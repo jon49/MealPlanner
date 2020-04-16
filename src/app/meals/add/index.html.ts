@@ -6,8 +6,8 @@ const head = html`<link rel="stylesheet" type="text/css" href="/app/form.css">`
 const main = html`
     <form id="_add-recipe">
         <label for="name">Recipe:</label>
-        <input id="name" type="text" placeholder="Recipe Name" name="recipe-name" required>
-        <p class="error">Your recipe must have a name.</p>
+        <input id="name" type="text" placeholder="Spaghetti with Meatballs" name="recipe-name" required>
+        <p class="error">The name of your recipe, e.g.,&nbsp;<em>Spaghetti with Meatballs</em></p>
         <fieldset>
             <legend>Recipe Source</legend>
             <input class="tab" type="radio" id="radio-url" name="source" value="url" data-tab="1" checked>
@@ -23,7 +23,7 @@ const main = html`
                 <br>
                 <label for="source-title">Title:</label>
                 <input type="text" id="source-title" name="url-title" placeholder="My Recipe" required disabled>
-                <p class="error">The title for your URL, e.g.,&nbsp;<a href="https://example.com">Link to my favorite recipe</a></p>
+                <p class="error">The title for your URL, e.g.,&nbsp;<a href="https://example.com">My Recipe</a></p>
                 <br>
                 <input type="checkbox" id="source-title-url" name="use-url-as-title" disabled>
                 <label for="source-title-url">Use the URL as the title</label>
