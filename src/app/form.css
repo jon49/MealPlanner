@@ -30,16 +30,30 @@
 */
 
 .error {
-  display: none;
+  display: hidden;
+  font-size: 0.8em;
+  margin: 0;
+  line-height: 0;
+  font-weight: normal;
+}
+
+input:focus + .error,
+input:invalid:focus + .error {
+  display: block;
 }
 
 input:invalid:focus + .error {
-  display: block;
-  font-size: 0.8em;
   color: coral;
-  margin-top: 0;
 }
 
 input:required:placeholder-shown {
     border-left: solid coral 2px;
+}
+
+/**
+  FORM
+*/
+
+fieldset {
+  margin-top: 0.5em;
 }

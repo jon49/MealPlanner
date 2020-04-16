@@ -29,5 +29,5 @@ export {
    EventValue,
    SpecialEvent,
    ErrorWithUserMessage,
-   FriendlyError
+   FriendlyError,
 }

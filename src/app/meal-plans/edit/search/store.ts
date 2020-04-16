@@ -1,4 +1,4 @@
-import getDb, { isDeleted, RecipeDateData } from "../../../utils/database.js"
+import getDb, { isDeleted, DatabaseType } from "../../../utils/database.js"
 import { RecipeDomain, RecipeDateDomain } from "../Domain/DomainTypes.js";
 
 export async function getActiveRecipes() : Promise<RecipeDomain[]> {
@@ -17,7 +17,7 @@ export async function setRecipeDate(data: RecipeDateDomain[]) {
    var tx = db.transaction("recipe-date", "readwrite")
    var lastUpdated = Date.now()
    for (var d of data) {
-      var o : RecipeDateData = {
+      var o : DatabaseType.RecipeDateData = {
          categoryId: d.categoryId.value,
          date: d.date.toString(),
          quantity: d.quantity,

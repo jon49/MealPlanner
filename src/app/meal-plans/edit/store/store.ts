@@ -1,11 +1,10 @@
-import getDb, { RecipeDateData, TypeOrDeleted, isDeleted } from "../../../utils/database.js"
 import { RecipeDomain, RecipeDateDomain } from "../Domain/DomainTypes.js";
-import getDB, { ISODate } from "../../../utils/database.js";
+import getDB, { ISODate, DatabaseType, TypeOrDeleted, isDeleted } from "../../../utils/database.js";
 
 const not = <T>(f: (val: T) => boolean) => (val: T) => !f(val)
 
 export async function getRecipes() : Promise<TypeOrDeleted<RecipeDomain>[]> {
-   var db = await getDb()
+   var db = await getDB()
    var recipes = await db.getAll("recipe")
    return recipes.map(x => (
       { location: x.location
@@ -29,7 +28,7 @@ export async function getMealPlannerSettings() : Promise<MealPlannerStoreSetting
 }
 
 export async function setMealPlannerSettings(mealPlannerSettings: MealPlannerStoreSettings) {
-   var db = await getDb()
+   var db = await getDB()
    var settings = await db.get("settings", 1)
    if (settings) {
       settings.mealPlanner.startDate = mealPlannerSettings.startDate.toString()
@@ -38,7 +37,7 @@ export async function setMealPlannerSettings(mealPlannerSettings: MealPlannerSto
 }
 
 export async function getRecipeDates(startDate: ISODate, categoryId: number) : Promise<TypeOrDeleted<RecipeDateDomain>[]> {
-   var db = await getDb()
+   var db = await getDB()
    var start = startDate.toString()
    var end = startDate.addDays(7).toString()
    var recipeDates = await db.getAll("recipe-date", IDBKeyRange.bound([start, categoryId], [end, categoryId]))
@@ -53,11 +52,11 @@ export async function getRecipeDates(startDate: ISODate, categoryId: number) : P
 }
 
 export async function setRecipeDate(data: TypeOrDeleted<RecipeDateDomain>[]) {
-   var db = await getDb()
+   var db = await getDB()
    var tx = db.transaction("recipe-date", "readwrite")
    var lastUpdated = Date.now()
    for (var d of data) {
-      var o : RecipeDateData = {
+      var o : DatabaseType.RecipeDateData = {
          categoryId: d.categoryId.value,
          date: d.date.toString(),
          quantity: d.quantity,

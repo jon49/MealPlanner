@@ -4,6 +4,8 @@ import typescript from "@rollup/plugin-typescript"
 var external = ["./utils.js", "./utils/utils.js", "../utils/utils.js", "../../utils/utils.js", "../../../utils/utils.js",
    "./utils/template.js", "../utils/template.js", "../../utils/template.js", "../../../utils/template.js",
    "./utils/database.js", "../utils/database.js", "../../utils/database.js", "../../../utils/database.js",
+   "./utils/fp.js", "../utils/fp.js", "../../utils/fp.js", "../../../utils/fp.js",
+   "./utils/CommonDomainTypes.js", "../utils/CommonDomainTypes.js", "../../utils/CommonDomainTypes.js", "../../../utils/CommonDomainTypes.js",
    ]
 
 const tscOptions = {
@@ -51,6 +53,26 @@ export default [{
    input: "./src/app/utils/database.ts",
    output: {
       file: "./public/app/utils/database.js",
+      format: "esm"
+   },
+   plugins: [
+      typescript(tscOptions),
+      resolve()
+   ]
+}, {
+   input: "./src/app/utils/CommonDomainTypes.ts",
+   output: {
+      file: "./public/app/utils/CommonDomainTypes.js",
+      format: "esm"
+   },
+   plugins: [
+      typescript(tscOptions),
+      resolve()
+   ]
+}, {
+   input: "./src/app/utils/fp.ts",
+   output: {
+      file: "./public/app/utils/fp.js",
       format: "esm"
    },
    plugins: [

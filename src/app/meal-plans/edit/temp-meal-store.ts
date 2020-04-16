@@ -1,6 +1,6 @@
-import getDb, { Location } from "../../utils/database.js"
+import getDb, { DatabaseType } from "../../utils/database.js"
 
-function getLocation(location: string) : Location {
+function getLocation(location: string) : DatabaseType.Location {
    location = location.trim()
    if (!location) {
       return ""
