@@ -168,7 +168,7 @@ function toggleDisabled() {
     const tabNumber = $source.dataset.tab
     Array.from($form.querySelectorAll("[data-tab]"))
     .forEach(x => {
-        if (x instanceof HTMLElement) {
+        if (x instanceof HTMLElement && !(x instanceof HTMLInputElement)) {
             if (x.dataset.tab === tabNumber) {
                 x.removeAttribute("disabled")
             } else {
