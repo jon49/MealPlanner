@@ -16,33 +16,33 @@ const main = html`
             <label for="radio-book">Book</label>
             <input class="tab" type="radio" id="radio-other" name="source" value="other" data-tab="3">
             <label for="radio-other">Other</label>
-            <div data-tab="1">
+            <fieldset data-tab="1" disabled>
                 <label for="source-url">Website:</label>
-                <input type="url" id="source-url" name="url" placeholder="https://example.com" required disabled>
+                <input type="url" id="source-url" name="url" placeholder="https://example.com" required>
                 <p class="error">Please enter the URL for the website.</p>
                 <br>
                 <label for="source-title">Title:</label>
-                <input type="text" id="source-title" name="url-title" placeholder="My Recipe" required disabled>
+                <input type="text" id="source-title" name="url-title" placeholder="My Recipe" required>
                 <p class="error">The title for your URL, e.g.,&nbsp;<a href="https://example.com">My Recipe</a></p>
                 <br>
-                <input type="checkbox" id="source-title-url" name="use-url-as-title" disabled>
+                <input type="checkbox" id="source-title-url" name="use-url-as-title">
                 <label for="source-title-url">Use the URL as the title</label>
                 <p class="error">E.g.,&nbsp;<a href="https://example.com">https://example.com</a></p>
-            </div>
-            <div data-tab="2">
+            </fieldset>
+            <fieldset data-tab="2" disabled>
                 <label for="source-book">Book:</label>
-                <input id="source-book" name="book" type="text" placeholder="My Favorite Recipe Book" required disabled>
+                <input id="source-book" name="book" type="text" placeholder="My Favorite Recipe Book" required>
                 <p class="error">The name of the recipe book, e.g.,&nbsp;<em>My Favorite Recipe Book</em>.</p>
                 <br>
                 <label for="source-book-page">Book Page:</label>
-                <input id="source-book-page" name="book-page" type="number" placeholder="125" required disabled>
+                <input id="source-book-page" name="book-page" type="number" placeholder="125" required>
                 <p class="error">The page number of your book, e.g., 125.</p>
-            </div>
-            <div data-tab="3">
+            </fieldset>
+            <fieldset data-tab="3" disabled>
                 <label for="source-other">Other:</label>
-                <input id="source-other" name="other" type="text" placeholder="I made this recipe!" required disabled>
+                <input id="source-other" name="other" type="text" placeholder="I made this recipe!" required>
                 <p class="error">Where your recipe came from.</p>
-            </div>
+            </fieldset>
         </fieldset>
         <input type="reset" value="Clear">&nbsp;
         <input id="save-once" type="submit" value="Save">&nbsp;

@@ -5,9 +5,7 @@ import { createRecipe } from "./store.js"
 import { defer } from "../../utils/utils.js"
 import template from "../../utils/template.js"
 
-type AddRecipeFormField = "recipe-name" | "source" | typeof sourceFields[number]
-type SourceFields = typeof sourceFields[number]
-const sourceFields = [ "book", "book-page", "url", "other", "url-title", "use-url-as-title" ] as const
+type AddRecipeFormField = "recipe-name" | "source" | "book" | "book-page" | "url" | "other" | "url-title" | "use-url-as-title"
 type SourceValue = "url" | "book" | "other"
 interface Page {
     addRecipeFormId: "_add-recipe"
@@ -23,8 +21,6 @@ var page : Page = {
 }
 
 const $form = <HTMLAddRecipeForm>document.getElementById(page.addRecipeFormId)
-
-const $sourceFields = sourceFields.map(x => $form[x])
 
 toggleDisabled()
 
@@ -177,21 +173,15 @@ function toggleUrlCheckbox($urlTitle: HTMLInputElement) {
 }
 
 function toggleDisabled() {
-    let inputNames : SourceFields[]
-    switch (<SourceValue>$form.source.value) {
-        case "book":
-            inputNames = [ "book", "book-page" ]
-            break;
-        case "other":
-            inputNames = [ "other" ]
-            break;
-        case "url":
-            inputNames = [ "url", "url-title", "use-url-as-title" ]
-            break;
-    }
-    const inputs = inputNames.map(x => $form[x])
-    inputs.forEach(x => x.removeAttribute("disabled"))
-    $sourceFields
-        .filter(x => !inputs.find(i => i === x))
-        .forEach(x => x.setAttribute("disabled", ""))
+    const tabNumber = $form.source.dataset.tab
+    Array.from($form.querySelectorAll("[data-tab]"))
+    .forEach(x => {
+        if (x instanceof HTMLFieldSetElement) {
+            if (x.dataset.tab === tabNumber) {
+                x.removeAttribute("disabled")
+            } else {
+                x.setAttribute("disabled", "")
+            }
+        }
+    })
 }
