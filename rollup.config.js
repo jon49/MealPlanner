@@ -4,8 +4,8 @@ import typescript from "@rollup/plugin-typescript"
 var external = ["./utils.js", "./utils/utils.js", "../utils/utils.js", "../../utils/utils.js", "../../../utils/utils.js",
    "./utils/template.js", "../utils/template.js", "../../utils/template.js", "../../../utils/template.js",
    "./utils/database.js", "../utils/database.js", "../../utils/database.js", "../../../utils/database.js",
-   "./utils/fp.js", "../utils/fp.js", "../../utils/fp.js", "../../../utils/fp.js",
-   "./utils/CommonDomainTypes.js", "../utils/CommonDomainTypes.js", "../../utils/CommonDomainTypes.js", "../../../utils/CommonDomainTypes.js",
+   "./fp.js", "./utils/fp.js", "../utils/fp.js", "../../utils/fp.js", "../../../utils/fp.js",
+   "./utils/common-domain-types.js", "../utils/common-domain-types.js", "../../utils/common-domain-types.js", "../../../utils/common-domain-types.js",
    ]
 
 const tscOptions = {
@@ -60,15 +60,16 @@ export default [{
       resolve()
    ]
 }, {
-   input: "./src/app/utils/CommonDomainTypes.ts",
+   input: "./src/app/utils/common-domain-types.ts",
    output: {
-      file: "./public/app/utils/CommonDomainTypes.js",
+      file: "./public/app/utils/common-domain-types.js",
       format: "esm"
    },
    plugins: [
       typescript(tscOptions),
       resolve()
-   ]
+   ],
+   external
 }, {
    input: "./src/app/utils/fp.ts",
    output: {

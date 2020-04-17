@@ -1,4 +1,4 @@
-import { String100, String50, PositiveWholeNumber, createString100, createString50, createPositiveWholeNumber } from "../../utils/CommonDomainTypes.js"
+import { String100, String50, PositiveWholeNumber, createString100, createString50, createPositiveWholeNumber } from "../../utils/common-domain-types.js"
 import { Do, validateForm, Either, right, taskEither, fromEither, pipe, mapLeft, fold } from "../../utils/fp.js"
 import { Domain } from "../../utils/database-domain-types.js"
 import { createRecipe } from "./store.js"
@@ -32,11 +32,11 @@ $form.addEventListener("change", e => {
     }
 })
 
-const saveRecipe = () =>
+const saveRecipe =
     Do(taskEither)
     .bind("data", pipe(validateAddMealForm(), mapLeft(x => x.join("\n")), fromEither))
     .bindL("result", ({ data }) => createRecipe(data))
-    .done()()
+    .done()
 
 const submitOnce = () =>
     saveRecipe()
