@@ -4,20 +4,11 @@ import { Domain } from "../../utils/database-domain-types.js"
 import { createRecipe } from "./store.js"
 import { defer } from "../../utils/utils.js"
 import template from "../../utils/template.js"
-
-type AddRecipeFormField = "recipe-name" | "source" | "book" | "book-page" | "url" | "other" | "url-title" | "use-url-as-title"
-type SourceValue = "url" | "book" | "other"
-interface Page {
-    addRecipeFormId: "_add-recipe"
-}
-
-type FormField_ = { [K in AddRecipeFormField]: HTMLInputElement }
-interface HTMLAddRecipeForm extends HTMLFormElement, FormField_
-{
-}
+import { Page, HTMLAddRecipeForm, SourceValue } from "./index.html.js"
 
 var page : Page = {
-    addRecipeFormId: "_add-recipe"
+    addRecipeFormId: "_add-recipe",
+    previousRecipes: "_previous-recipes"
 }
 
 const $form = <HTMLAddRecipeForm>document.getElementById(page.addRecipeFormId)
@@ -27,7 +18,7 @@ toggleDisabled()
 $form.addEventListener("change", e => {
     var target = e.target
     if (target instanceof HTMLInputElement) {
-        switch (<AddRecipeFormField>target.name) {
+        switch (<keyof HTMLAddRecipeForm>target.name) {
             case "source":
                 toggleDisabled()
                 break
@@ -65,7 +56,7 @@ interface PreviousRecipeTemplate {
 }
 type PreviousRecipeTemplateId = "_previous-recipe"
 var previousRecipeView = template.get<PreviousRecipeTemplateId>("_previous-recipe")
-const previousRecipesList = <HTMLDivElement>document.getElementById("_previous-recipes")
+const previousRecipesList = <HTMLDivElement>document.getElementById(page.previousRecipes)
 const saveAndAdd = () =>
     saveRecipe()
     .then(fold(x => {
@@ -173,10 +164,11 @@ function toggleUrlCheckbox($urlTitle: HTMLInputElement) {
 }
 
 function toggleDisabled() {
-    const tabNumber = $form.source.dataset.tab
+    const $source = <HTMLInputElement>Array.from($form.source).find(x => (<HTMLInputElement>x).value === $form.source.value)
+    const tabNumber = $source.dataset.tab
     Array.from($form.querySelectorAll("[data-tab]"))
     .forEach(x => {
-        if (x instanceof HTMLFieldSetElement) {
+        if (x instanceof HTMLElement) {
             if (x.dataset.tab === tabNumber) {
                 x.removeAttribute("disabled")
             } else {

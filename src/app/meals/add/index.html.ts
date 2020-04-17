@@ -3,6 +3,18 @@ import _default from "../../layouts/_default.html.js"
 
 const head = html`<link rel="stylesheet" type="text/css" href="/app/form.css">`
 
+type AddRecipeFormField = "recipe-name" | "book" | "book-page" | "url" | "other" | "url-title" | "use-url-as-title"
+export type SourceValue = "url" | "book" | "other"
+export interface Page {
+    addRecipeFormId: "_add-recipe"
+    previousRecipes: "_previous-recipes"
+}
+
+type FormField_ = { [K in AddRecipeFormField]: HTMLInputElement }
+export interface HTMLAddRecipeForm extends HTMLFormElement, FormField_ {
+    source: RadioNodeList
+}
+
 const main = html`
     <form id="_add-recipe">
         <label for="name">Recipe:</label>
