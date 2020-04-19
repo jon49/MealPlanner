@@ -13,15 +13,10 @@ var page : Page = {
 
 const $form = <HTMLAddRecipeForm>document.getElementById(page.addRecipeFormId)
 
-toggleDisabled()
-
 $form.addEventListener("change", e => {
     var target = e.target
     if (target instanceof HTMLInputElement) {
         switch (<keyof HTMLAddRecipeForm>target.name) {
-            case "source":
-                toggleDisabled()
-                break
             case "use-url-as-title":
                 toggleUrlTitle(target)
                 break
@@ -34,7 +29,7 @@ $form.addEventListener("change", e => {
 
 const saveRecipe =
     Do(taskEither)
-    .bind("data", pipe(validateAddMealForm(), mapLeft(x => x.join("\n")), fromEither))
+    .bindL("data", () => pipe(validateAddMealForm(), mapLeft(x => x.join("\n")), fromEither))
     .bindL("result", ({ data }) => createRecipe(data))
     .done()
 
@@ -80,10 +75,6 @@ const submit = (e: Event) => {
 }
 
 $form.addEventListener("submit", defer(submit))
-$form.addEventListener("reset", () => {
-    setTimeout(toggleDisabled, 1)
-    return true
-})
 
 class LocationUrlValidation {
     readonly url: Either<string[], String100>
@@ -161,19 +152,4 @@ function toggleUrlCheckbox($urlTitle: HTMLInputElement) {
         useURL.checked = false
         $urlTitle.setAttribute("required", "")
     }
-}
-
-function toggleDisabled() {
-    const $source = <HTMLInputElement>Array.from($form.source).find(x => (<HTMLInputElement>x).value === $form.source.value)
-    const tabNumber = $source.dataset.tab
-    Array.from($form.querySelectorAll("[data-tab]"))
-    .forEach(x => {
-        if (x instanceof HTMLElement && !(x instanceof HTMLInputElement)) {
-            if (x.dataset.tab === tabNumber) {
-                x.removeAttribute("disabled")
-            } else {
-                x.setAttribute("disabled", "")
-            }
-        }
-    })
 }

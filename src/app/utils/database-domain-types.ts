@@ -8,7 +8,7 @@ export namespace Domain.Recipe {
     export type Location = LocationBook | LocationUrl | LocationOther
 
     export interface Recipe {
-    name: String100
-    location: Location
+        name: String100
+        location: Location
     }
 }

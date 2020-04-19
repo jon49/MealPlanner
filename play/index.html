@@ -4,139 +4,101 @@
    <meta charset="UTF-8">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
    <title>Yay!</title>
-   <script src="./fuzzySearch.js"></script>
+   <!-- <script src="./fuzzySearch.js"></script> -->
+   <script src="../src/app/utils/form-tabs.js"></script>
    <style>
-      .highlight {
-         background-color: pink;
-      }
-      li:hover {
-         background-color: green;
-      }
-      li:focus {
-         background-color: orange;
+      p {
+         color: orangered;
       }
    </style>
 </head>
 <body>
-   <form autocomplete="off">
-      <label for="search">Search for something totally awesome!</label>
-      <input data-list="search-list" data-limit="3" name="search" autocomplete="off" placeholder="Search for something!">
-      <div id="search-list"></div>
-      <input type="text" value="I love pizza">
-   </form>
+
+   <form-tabs>
+      <fieldset slot="tabs">
+            <legend>Recipe Source</legend>
+            <input class="tab" type="radio" id="radio-url" name="source" value="url" data-tab="1" checked>
+            <label for="radio-url">Website</label>
+            <input class="tab" type="radio" id="radio-book" name="source" value="book" data-tab="2">
+            <label for="radio-book">Book</label>
+            <input class="tab" type="radio" id="radio-other" name="source" value="other" data-tab="3">
+            <label for="radio-other">Other</label>
+            <fieldset data-tab="1" disabled>
+                <label for="source-url">Website:</label>
+                <input type="url" id="source-url" name="url" placeholder="https://example.com" required>
+                <p class="error">Please enter the URL for the website.</p>
+                <br>
+                <label for="source-title">Title:</label>
+                <input type="text" id="source-title" name="url-title" placeholder="My Recipe" required>
+                <p class="error">The title for your URL, e.g.,&nbsp;<a href="https://example.com">My Recipe</a></p>
+                <br>
+                <input type="checkbox" id="source-title-url" name="use-url-as-title">
+                <label for="source-title-url">Use the URL as the title</label>
+                <p class="error">E.g.,&nbsp;<a href="https://example.com">https://example.com</a></p>
+            </fieldset>
+            <fieldset data-tab="2" disabled>
+                <label for="source-book">Book:</label>
+                <input id="source-book" name="book" type="text" placeholder="My Favorite Recipe Book" required>
+                <p class="error">The name of the recipe book, e.g.,&nbsp;<em>My Favorite Recipe Book</em>.</p>
+                <br>
+                <label for="source-book-page">Book Page:</label>
+                <input id="source-book-page" name="book-page" type="number" placeholder="125" required>
+                <p class="error">The page number of your book, e.g., 125.</p>
+            </fieldset>
+            <fieldset data-tab="3" disabled>
+                <label for="source-other">Other:</label>
+                <input id="source-other" name="other" type="text" placeholder="I made this recipe!" required>
+                <p class="error">Where your recipe came from.</p>
+            </fieldset>
+        </fieldset>      
+   </form-tabs>
+
+   <my-paragraph></my-paragraph>
+
+   <my-paragraph>
+      <p slot="my-text">Let's have some different text!</p>
+      <p slot="my-text">Doh!</p>
+      <div slot="my-text">
+         <p>Yep</p>
+         <p>Nope</p>
+      </div>
+   </my-paragraph>
+
+   <my-paragraph>
+      <ul slot="my-text">
+         <li>Let's have some different text!</li>
+         <li>In a list!</li>
+      </ul>
+   </my-paragraph>
+
+   <template id="my-paragraph">
+      <style>
+         [name="my-text"] {
+            background-color: #666;
+            padding: 5px;
+         }
+      </style>
+      <slot name="my-text"><span style="color:coral">Default text</span></slot>
+   </template>
 
    <script>
-      var list =
-         [ { value: "Chocolate", id: 1 }
-         , { value: "Coconut", id: 2 }
-         , { value: "Mint", id: 3 }
-         , { value: "Strawberry", id: 4 }
-         , { value: "Vanilla", id: 5 } ]
-      var searchList = list.map(x => ({ compareValue: x.value.toLowerCase(), value: x.value, id: x.id }))
-      const createLI = ({ value, id }, idx) => {
-         const li = document.createElement("li")
-         li.innerText = value
-         li.dataset.id = id
-         li.tabIndex = 0
-         return li
-      }
-      const createULList = (list, options) => {
-         var ul = document.createElement("ul")
-         list.some((data, index) => {
-            if (data.similarity === 0) return true
-            ul.append(createLI(data, index))
-            return index === options.limit
-         })
-         var appendTo = options.appendTo
-         appendTo.innerHTML = ""
-         appendTo.append(ul)
-      }
+      const $style = document.createElement("style")
+      $style.innerHTML =
+         `my-paragraph p + p {
+            color: plum !important;
+         }`
+      document.head.append($style)
+      customElements.define('my-paragraph',
+      class extends HTMLElement {
+         constructor() {
+            super();
+            let template = document.getElementById('my-paragraph');
+            let templateContent = template.content;
 
-      var form = document.forms[0]
-      var options = form.search.dataset
-      var searchListId = options.list // Or error
-      const $searchList = document.getElementById(searchListId)
-      var limit = +(options.limit || 5) - 1
-      var ulOptions = { limit, appendTo: $searchList }
-
-      const tab = "Tab"
-         , arrowUp = "ArrowUp"
-         , arrowDown = "ArrowDown"
-         , enter = "Enter"
-         , shift = "Shift"
-         , escape = "Escape"
-      const key = { tab, arrowUp, arrowDown, enter, shift, escape }
-      const commandKeys = [ tab, arrowUp, arrowDown, enter ]
-
-      form.search.addEventListener("keydown", e => {
-         if (commandKeys.some(x => e.key === x)) {
-            if (!e.shiftKey && [key.tab, key.arrowDown].some(x => x === e.key)) {
-               if (!ulOptions.appendTo.innerHTML.trim()) {
-                  form.search.dispatchEvent(new KeyboardEvent("keydown", { key: key.escape }))
-                  return
-               }
-               var nextChosen = ulOptions.appendTo.querySelector("li:first-child")
-               nextChosen.focus()
-               // var currentChosen = ulOptions.appendTo.querySelector("li.highlight")
-               // var nextChosen
-               // if (currentChosen) {
-               //    currentChosen.classList.remove("highlight")
-               //    nextChosen = currentChosen.nextSibling || ulOptions.appendTo.querySelector("li:first-child")
-               // } else {
-               //    nextChosen = ulOptions.appendTo.querySelector("li:first-child")
-               // }
-               // if (nextChosen) {
-               //    nextChosen.classList.add("highlight")
-               // }
-            }
-            if (e.key === key.arrowUp || (e.shiftKey && e.key === key.tab)) {
-               var currentChosen = ulOptions.appendTo.querySelector("li.highlight")
-               var nextChosen
-               if (currentChosen) {
-                  currentChosen.classList.remove("highlight")
-                  nextChosen = currentChosen.previousSibling || ulOptions.appendTo.querySelector("li:last-child")
-               } else {
-                  nextChosen = ulOptions.appendTo.querySelector("li:last-child")
-               }
-               if (nextChosen) {
-                  nextChosen.classList.add("highlight")
-               }
-            }
-            if (e.key === key.enter) {
-               var currentChosen = ulOptions.appendTo.querySelector("li.highlight")
-               if (currentChosen) {
-                  var id = currentChosen.dataset.id
-                  form.search.value = currentChosen.textContent
-                  form.search.dataset.id = id
-                  ulOptions.appendTo.innerHTML = ""
-               }
-            }
-            e.preventDefault()
-            return false
+            const shadowRoot = this.attachShadow({mode: 'open'})
+            .appendChild(templateContent.cloneNode(true));
          }
-      })
-
-      // form.search.addEventListener("blur", e => {
-      //    ulOptions.appendTo.innerHTML = ""
-      // })
-
-      form.search.addEventListener("focus", e => {
-         const search = e.target
-         if (search.value.length > 0) {
-            search.select()
-            search.dispatchEvent(new KeyboardEvent("keyup"))
-         }
-      })
-
-      form.search.addEventListener("keyup", e => {
-         if (commandKeys.some(x => e.key === x) || e.key === key.shift) {
-            return
-         }
-         const value = e.target.value.toLowerCase()
-         var fuzzy = searchList.map(x => ({ ...fuzzySearch(value, x.compareValue), value: x.value, id: x.id }))
-         fuzzy.sort((a, b) => a.similarity > b.similarity ? -1 : 1)
-         createULList(fuzzy, ulOptions)
-      })
+      });
    </script>
 
 </body>
