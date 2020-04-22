@@ -6,6 +6,7 @@ import { getMonoid } from "fp-ts/es6/Array"
 
 const validateForm = () => getValidation(getMonoid<string>())
 
+export type Validation<T> = Either<string[], T>
 export {
     Do,
     Either,

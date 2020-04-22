@@ -1,5 +1,5 @@
 import { String100, String50, PositiveWholeNumber, createString100, createString50, createPositiveWholeNumber } from "../../utils/common-domain-types.js"
-import { Do, validateForm, Either, right, taskEither, fromEither, pipe, mapLeft, fold } from "../../utils/fp.js"
+import { Do, validateForm, Either, right, taskEither, fromEither, pipe, mapLeft, fold, Validation } from "../../utils/fp.js"
 import { Domain } from "../../utils/database-domain-types.js"
 import { createRecipe } from "./store.js"
 import { defer } from "../../utils/utils.js"
@@ -13,19 +13,7 @@ var page : Page = {
 
 const $form = <HTMLAddRecipeForm>document.getElementById(page.addRecipeFormId)
 
-$form.addEventListener("change", e => {
-    var target = e.target
-    if (target instanceof HTMLInputElement) {
-        switch (<keyof HTMLAddRecipeForm>target.name) {
-            case "use-url-as-title":
-                toggleUrlTitle(target)
-                break
-            case "url-title":
-                toggleUrlCheckbox(target)
-                break
-        }
-    }
-})
+/** Form submit **/
 
 const saveRecipe =
     Do(taskEither)
@@ -87,9 +75,10 @@ class LocationUrlValidation {
     }
 }
 
-type LocationBookValidation = { _kind: Either<string[], "book">, book: Either<string[], String50>, page: Either<string[], PositiveWholeNumber> } 
-type LocationUrlValidationType = { _kind: Either<string[], "url">, title: Either<string[], String50>, url: Either<string[], String100> }
-type LocationOtherValidation = { _kind: Either<string[], "other">, other: Either<string[], String100> }
+type EitherSourceValue<T extends SourceValue> = Validation<T>
+type LocationBookValidation = { _kind: EitherSourceValue<"book">, book: Validation<String50>, page: Validation<PositiveWholeNumber> } 
+type LocationUrlValidationType = { _kind: EitherSourceValue<"url">, title: Validation<String50>, url: Validation<String100> }
+type LocationOtherValidation = { _kind: EitherSourceValue<"other">, other: Validation<String100> }
 export type LocationValidation = LocationBookValidation | LocationUrlValidationType | LocationOtherValidation
 
 function validateAddMealForm() {
@@ -136,6 +125,8 @@ function validateAddMealForm() {
     })
 }
 
+/** Toggle URL Title with Checkbox **/
+
 function toggleUrlTitle($checkbox: HTMLInputElement) {
     const $urlTitle = $form["url-title"]
     if ($checkbox.checked) {
@@ -153,3 +144,17 @@ function toggleUrlCheckbox($urlTitle: HTMLInputElement) {
         $urlTitle.setAttribute("required", "")
     }
 }
+
+$form.addEventListener("change", e => {
+    var target = e.target
+    if (target instanceof HTMLInputElement) {
+        switch (<keyof HTMLAddRecipeForm>target.name) {
+            case "use-url-as-title":
+                toggleUrlTitle(target)
+                break
+            case "url-title":
+                toggleUrlCheckbox(target)
+                break
+        }
+    }
+})
