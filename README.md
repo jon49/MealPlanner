@@ -8,6 +8,7 @@ An offline first minimalist web app for organizing your meal planning needs.
 
 ## TODO
 
+- [ ] Add Recipe form needs type of recipe, like dinner, etc.
 - [ ] Service worker
 - [ ] Use service worker to sync to S3 with the AWS Lambda function
 - [ ] Use Netlify's user/password to start working on this.

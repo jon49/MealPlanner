@@ -273,6 +273,10 @@ nav ul li ul li a {
 Custom
 */
 
+body {
+  padding-bottom: 50%;
+}
+
 .highlight { background-color: coral; }
 
 .text-2xl {
