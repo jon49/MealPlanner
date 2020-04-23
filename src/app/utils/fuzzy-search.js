@@ -8,84 +8,86 @@
     * @property {string | number } id
     */
 
-   const tab = "Tab"
-      , arrowUp = "ArrowUp"
+   const arrowUp = "ArrowUp"
       , arrowDown = "ArrowDown"
       , enter = "Enter"
       , shift = "Shift"
       , _escape = "Escape"
-   const key = { tab, arrowUp, arrowDown, enter, shift, _escape }
+      , key = { arrowUp, arrowDown, enter, shift, _escape }
+      , commandKeys = [ arrowUp, arrowDown, enter ]
+      , $input = document.createElement("input")
+      , $list = document.createElement("ul")
 
-   const commandKeys = [ tab, arrowUp, arrowDown, enter ]
+   /** @type {HTMLLIElement|undefined} $currentSelected */
+   let $currentSelected,
+       ignoreMouse = true
 
    /**** EVENTS ****/
 
    /**
-    * @param {{$list: HTMLUListElement, $input: HTMLInputElement, $fuzzySearch: FuzzySearch }} param0
-    * @returns {(KeyboardEvent) => (false|undefined|void)}
+    * @param {HTMLLIElement} target 
+    */
+   const selectNew =
+      target => {
+         if (target !== $currentSelected) {
+            if ($currentSelected) {
+               $currentSelected.classList.remove("highlight")
+               $currentSelected.removeAttribute("aria-selected")
+            }
+            $currentSelected = target
+            $currentSelected.classList.add("highlight")
+            $currentSelected.setAttribute("aria-selected", "true")
+            $input.setAttribute("aria-activedescendant", $currentSelected.id)
+            $input.value = $currentSelected.textContent
+         }
+      }
+
+   /**
+    * @param {{ $fuzzySearch: FuzzySearch }} param0
+    * @returns {(arg0: KeyboardEvent) => (false|undefined|void)}
     */
    const handleKeyDown =
-      ({ $list, $input, $fuzzySearch }) =>
+      ({ $fuzzySearch }) =>
       e => {
          if (commandKeys.some(x => e.key === x)) {
-            if (!e.shiftKey && [key.tab, key.arrowDown].some(x => x === e.key)) {
+            if (!e.shiftKey && key.arrowDown === e.key) {
                if (!$list.firstElementChild) {
                   $input.dispatchEvent(new KeyboardEvent("keydown", { key: key.escape }))
                   return
                }
-               var currentChosen = $list.querySelector("li.highlight")
                /**
                 * @type {Element | undefined | null}
                 */
                let nextChosen
-               if (currentChosen) {
-                  currentChosen.classList.remove("highlight")
-                  nextChosen = (currentChosen.nextElementSibling || $list.querySelector("li:first-child"))
+               if ($currentSelected) {
+                  nextChosen = ($currentSelected.nextElementSibling || $list.querySelector("li:first-child"))
                } else {
                   nextChosen = $list.querySelector("li:first-child")
                }
-               if (nextChosen) {
-                  nextChosen.classList.add("highlight")
-               }
+               if (nextChosen instanceof HTMLLIElement)
+                  selectNew(nextChosen)
             }
-            if (e.key === key.arrowUp || (e.shiftKey && e.key === key.tab)) {
-               var currentChosen = $list.querySelector("li.highlight")
+            if (e.key === key.arrowUp) {
                /**
                 * @type {(Element | undefined | null)}
                 */
                let nextChosen
-               if (currentChosen) {
-                  currentChosen.classList.remove("highlight")
-                  nextChosen = (currentChosen.previousElementSibling || $list.querySelector("li:last-child"))
+               if ($currentSelected) {
+                  nextChosen = ($currentSelected.previousElementSibling || $list.querySelector("li:last-child"))
                } else {
                   nextChosen = $list.querySelector("li:last-child")
                }
-               if (nextChosen) {
-                  nextChosen.classList.add("highlight")
-               }
+               if (nextChosen instanceof HTMLLIElement)
+                  selectNew(nextChosen)
             }
             if (e.key === key.enter) {
-               var currentChosen = $list.querySelector("li.highlight")
-               if (currentChosen && currentChosen instanceof HTMLLIElement) {
-                  selectValue(currentChosen, $input, $list, $fuzzySearch)
+               if ($currentSelected && $currentSelected instanceof HTMLLIElement) {
+                  selectValue($currentSelected, $fuzzySearch)
                }
             }
             e.preventDefault()
             return false
          }
-      }
-
-   /**
-    * Handles Blur Event
-    * @param {HTMLUListElement} $list
-    * @returns {(e: Event) => void}
-    */
-   const handleBlur =
-      $list =>
-      e => {
-         setTimeout(() => {
-            $list.innerHTML = ""
-         }, 2e2)
       }
 
    /**
@@ -102,11 +104,11 @@
 
    /**
     * Handles Keyup event
-    * @param {{ searchList: Search[], limit: number, $list: HTMLUListElement }} param0 
+    * @param {{ searchList: Search[], limit: number }} param0 
     * @returns {(e: KeyboardEvent) => void | undefined}
     */
    const handleKeyup =
-      ({ $list, searchList, limit }) =>
+      ({ searchList, limit }) =>
       e => {
          if (commandKeys.some(x => e.key === x) || e.key === key.shift) {
             return
@@ -121,47 +123,29 @@
                   , value: x.value
                   , id: x.id }))
             fuzzy.sort((a, b) => a.similarity > b.similarity ? -1 : 1)
-            createULList(fuzzy, {
-               limit: limit,
-               $list: $list
-            })
+            createULList(fuzzy, { limit })
          }
       }
 
    /**
-    * @param {HTMLUListElement} $list 
-    * @returns {() => void}
-    */
-   const handleMouseEnter =
-      $list =>
-      () => {
-         var currentChosen = $list.querySelector("li.highlight")
-         if (currentChosen) {
-            currentChosen.classList.remove("highlight")
-         }
-      }
-
-   /**
-    * @param {{ $input: HTMLInputElement, $list: HTMLUListElement, $fuzzySearch: FuzzySearch }} param0
+    * @param {{ $fuzzySearch: FuzzySearch }} param0
     * @returns {(e: Event) => void}
     */
    const handleClick =
-      ({ $input, $list, $fuzzySearch }) =>
+      ({ $fuzzySearch }) =>
       e => {
          e.preventDefault()
          var target = e.target
          if (target instanceof HTMLLIElement) {
-            selectValue(target, $input, $list, $fuzzySearch)
+            selectValue(target, $fuzzySearch)
          }
       }
 
    /**
     * @param {HTMLLIElement} li 
-    * @param {HTMLInputElement} $input
-    * @param {HTMLUListElement} $list
     * @param {FuzzySearch} $fuzzySearch
     */
-   function selectValue(li, $input, $list, $fuzzySearch) {
+   function selectValue(li, $fuzzySearch) {
       var id = li.dataset.id
       $input.value = li.textContent || ""
       $list.innerHTML = ""
@@ -170,24 +154,43 @@
       }))
    }
 
+   /**
+    * @param {MouseEvent} e
+    */
+   const liMouseEnter =
+      e => {
+         if (ignoreMouse) {
+            ignoreMouse = false
+            return
+         }
+         e.target instanceof HTMLLIElement && selectNew(e.target)
+      }
+
    /**** HTML CREATION ****/
 
    /**
     * Create <li> tag
-    * @param {{ value: string, id: string | number }} param0 
+    * @param {(e: MouseEvent) => void} mouseOverEvent
+    * @param {{ value: string, id: string | number }} param1
     */
-   function createLI({ value, id }) {
+   function createLI(mouseOverEvent, { value, id }) {
       const li = document.createElement("li")
       li.innerText = value
       li.dataset.id = "" + id
+      ;[["role", "option"]
+      , ["id", "_" + id]
+      , ["aria-label", value]
+      ].forEach(x => li.setAttribute(x[0], x[1]))
+      li.addEventListener("mouseenter", mouseOverEvent)
+      li.classList.add("cursor-pointer")
       return li
    }
 
    /**
     * @param {{ similarity: number, value: string, id: string | number }[]} list 
-    * @param {{ limit: number, $list: HTMLUListElement }} options 
+    * @param {{ limit: number }} options 
     */
-   function createULList(list = [], { limit, $list }) {
+   function createULList(list = [], { limit }) {
       let items = document.createDocumentFragment()
       let index = 0
       while (true) {
@@ -195,13 +198,21 @@
          if (!data || data.similarity === 0 || index === limit)
             break
          index++
-         items.append(createLI(data))
+         items.append(createLI(liMouseEnter, data))
       }
 
-      $list.innerHTML = ""
+      if ($list.children.length > 0) {
+         for (let li of $list.children) {
+            if (li instanceof HTMLLIElement) {
+               li.removeEventListener("mouseenter", liMouseEnter)
+            }
+         }
+      }
       if (index === 0) {
          $list.innerHTML = "<p>No items found.</p>"
       } else {
+         $list.innerHTML = ""
+         ignoreMouse = true
          $list.append(items)
       }
    }
@@ -212,12 +223,11 @@
    class FuzzySearch extends HTMLElement {
       constructor() {
          super()
-         this.$input = document.createElement("input")
       }
 
       connectedCallback() {
          if (this.hasAttribute("autofocus")) {
-            this.$input.focus()
+            $input.focus()
          }
       }
 
@@ -265,44 +275,45 @@
             this.__destroy()
          }
          this.innerHTML = ""
-         let style = this.dataset.style || document.getElementById("my-style")
-         if (!style) {
-            const $style = document.createElement("style")
-            $style.innerHTML = ".highlight, li:hover { background-color: pink; } li { cursor: pointer; }"
-            style = $style
-         }
 
-         if (style instanceof HTMLStyleElement) {
-            this.__style = style
-            this.appendChild(style)
-         }
-
-         const name = `__search${this.id || ""}`
+         const searchId = `q${this.id || ""}`
+         const listId = `s_${this.id || ""}`
 
          const $form = document.createElement("form")
          $form.setAttribute("autocomplete", "off")
          const $label = document.createElement("label")
          $label.textContent = this.label
-         $label.setAttribute("for", name)
+         $label.setAttribute("for", searchId)
 
-         const $input = this.$input
-         $input.setAttribute("autocomplete", "off")
-         $input.setAttribute("placeholder", this.placeholder)
-         $input.setAttribute("name", name)
+         ;[["name", "q"]
+         , ["id", searchId]
+         , ["type", "search"]
+         , ["maxlength", "1000"]
+         , ["autocapitalize", "off"]
+         , ["autocomplete", "off"]
+         , ["spellcheck", "false"]
+         , ["title", this.placeholder]
+         , ["placeholder", this.placeholder]
+         , ["autofocus", "autofocus"]
+         , ["aria-controls", listId]
+         , ["aria-autocomplete", "both"]
+         , ["aria-owns", "sw_as"]
+         ].forEach(x => $input.setAttribute(x[0], x[1]))
 
-         const $list = document.createElement("ul")
+         ;[["id", listId]
+         , ["aria-expanded", "true"]
+         , ["role", "combobox"]
+         , ["aria-label", "Suggestions"]
+         , ["aria-live", "polite"]
+         ].forEach(x => $list.setAttribute(x[0], x[1]))
 
-         const handleKeyDownBound = handleKeyDown({ $input, $list, $fuzzySearch: this })
-         const handleBlurBound = handleBlur($list)
-         const handleKeyupBound = handleKeyup({ $list, limit: this.limit, searchList: this.__searchList })
-         const handleMouseEnterBound = handleMouseEnter($list)
-         const handleClickBound = handleClick({ $list, $input, $fuzzySearch: this })
+         const handleKeyDownBound = handleKeyDown({ $fuzzySearch: this })
+         const handleKeyupBound = handleKeyup({ limit: this.limit, searchList: this.__searchList })
+         const handleClickBound = handleClick({ $fuzzySearch: this })
 
          $input.addEventListener("keydown", handleKeyDownBound)
-         $input.addEventListener("blur", handleBlurBound)
          $input.addEventListener("focus", handleFocus)
          $input.addEventListener("keyup", handleKeyupBound)
-         $list.addEventListener("mouseenter", handleMouseEnterBound)
          $list.addEventListener("click", handleClickBound)
 
          $form.appendChild($label)
@@ -312,10 +323,8 @@
 
          this.__destroy = () => {
             $input.removeEventListener("keydown", handleKeyDownBound)
-            $input.removeEventListener("blur", handleBlurBound)
             $input.removeEventListener("focus", handleFocus)
             $input.removeEventListener("keyup", handleKeyupBound)
-            $list.removeEventListener("mouseenter", handleMouseEnterBound)
             $list.removeEventListener("click", handleClickBound)
          }
       }

@@ -273,6 +273,12 @@ nav ul li ul li a {
 Custom
 */
 
+.highlight { background-color: coral; }
+
 .text-2xl {
-    font-size: 1.5em;
+  font-size: 1.5em;
+}
+
+.cursor-pointer {
+  cursor: pointer;
 }
