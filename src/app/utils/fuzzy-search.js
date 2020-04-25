@@ -177,6 +177,11 @@
          var target = e.target
          if (target instanceof HTMLLIElement) {
             selectValue(target, $fuzzySearch)
+         } else if (target instanceof HTMLElement) {
+            const li = target.closest("li")
+            if (li instanceof HTMLLIElement) {
+               selectValue(li, $fuzzySearch)
+            }
          }
       }
 
