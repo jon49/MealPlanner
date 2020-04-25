@@ -20,57 +20,54 @@ A: Client A
 B: Client B  
 S: Server
 
+Rather than using a timestamp on the server use an incrementing number. Also, do full deletes.
+
 - Tracking fields:
     + `Table` name
     + Record `ID`
-        * Timestamp of when the record was originally made created by the
-          client
+        * Timestamp of when the record was originally made
         * Created on the client side
     + `LastUpdated`
         * Timestamp of when the record was modified by the client
         * Created on the client side
-    + `ServerSync`
-        * Timestamp of when the record was synced to the server
+    + `ClientServerUpdatedId`
+        * This will correspond to when it was updated on the server and will be
+          set to 0 when it was updated on the client.
+    + `ServerUpdatedId`
+        * The last time the item was updated the with an autoincrementing ID
         * Created on the server
-    + `ETag`
-        + The file created from the `ServerSync` value which exists on a CDN
-          which negates the client from having to know the `ServerSync` value.
-          The server would need to know past `ServerSync` values in this
-          scenario then.
-    + `Deleted`
+        * If it was deleted then it should have a column for such.
 
-On the client a timestamp (`ClientSync`) will be created which corresponds to
-the last time it was updated with the server. Including the `ServerSync` value.
+For simplicity if there are conflicts between clients then last write wins. If
+I wanted to make it more robust I could compare last updated values and have
+the clients do a manual check if there is a conflict.
+
 E.g.,
 
-```
-LastSync: `ServerSync` `ClientSync`
-```
+`ServerUpdatedId` → S
+`ClientServerUpdatedId` ­→ C
 
-+------+----------------+-----------------------------+------------------+
-| Case | `ServerSync`   | `ClientSync`                | Sync with Server |
-+======+================+=============================+==================+
-| 1    | Same           | > All `LastUpdated`         | false            |
-+------+----------------+-----------------------------+------------------+
-| 2    | Same           | <= at least 1 `LastUpdated` | true             |
-+------+----------------+-----------------------------+------------------+
-| 3    | < Server Value | > All `LastUpdated`         | true             |
-+------+----------------+-----------------------------+------------------+
-| 4    | < Server Value | <= at least 1 `LastUpdated` | true             |
-+------+----------------+-----------------------------+------------------+
+| Case | Logic | Sync with Server              |
+| ---- | ----- | ----------------              |
+| 1    | C = 0 | Update to Server from Client  |
+| 2    | S = C | Already synced                |
+| 3    | S > C | Update client with new values |
 
-Case 1: Abandon sync with the server.
+The client saves the last updated value in a setting. And is updated after a
+server update.
 
-Case 2: Send the server all the values which are greater than `LastUpdated` to
-        be synced. The server will not send back any items since it is already
-        up-to-date.
+Case 1: This is the list on the client of items which have been updated since
+        the last sync.
 
-Case 3: The client will not send any values to the server but will request the
-        latest data and the last `LastUpdated` value.
+Case 2: This means that the client and server are already synced. This means no
+        update is needed. This value can be saved in a file on the CDN that the
+        client pulls when the user wishes to check for udpates.
 
-Case 4: The client will send up the latest data it contains and the server will
-        send the latest data back to the client, including possible overrides of
-        what the client just sent up.
+Case 3: If the server value is higher that means the server was updated by a
+        different client and the current client needs to be udpated. This could
+        simply be done with the ETag value of the file then a `HEAD` Http call
+        could be made rather than downloading the file. But the file will be
+        really small so I doubt it should matter.
 
 Rather than call a server directly the server could also update a file that is
 placed on a CDN with the latest saved server sync information. This would have
