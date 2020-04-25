@@ -44,7 +44,7 @@ the clients do a manual check if there is a conflict.
 
 E.g.,
 
-`ServerUpdatedId` → S
+`ServerUpdatedId` → S  
 `ClientServerUpdatedId` ­→ C
 
 | Case | Logic | Sync with Server              |
