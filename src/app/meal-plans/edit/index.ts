@@ -11,7 +11,7 @@ start()
 
 var page : Page = {
    mealSelectionsId: "_meal-selections",
-   startDateFormId: "_start-date"
+   startDateFormId: "start-date"
 }
 
 var actions = {

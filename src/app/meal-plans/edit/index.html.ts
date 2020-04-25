@@ -5,7 +5,7 @@ import { cancelledRecipeTemplate } from './templates/_cancelled-recipe.html.js'
 
 export interface Page {
    mealSelectionsId: "_meal-selections"
-   startDateFormId: "_start-date"
+   startDateFormId: "start-date"
 }
 
 var head = html`
@@ -17,7 +17,7 @@ var head = html`
 var main = html`
    <form>
       <label for="start-date"> Start Date: </label>
-      <input id="_start-date" name="start-date" type="date" required />
+      <input id="start-date" name="start-date" type="date" required />
    </form>
    <section id="_meal-selections"></section>`
 
