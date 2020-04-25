@@ -8,6 +8,11 @@
     * @property {string | number } id
     */
 
+   /**
+    * @type {DocumentFragment|undefined}
+    */
+   let $content
+
    const $style = document.createElement("style")
    $style.setAttribute("type", "text/css")
    $style.innerHTML = `
@@ -72,7 +77,7 @@
             $currentSelected.classList.add("highlight")
             $currentSelected.setAttribute("aria-selected", "true")
             $input.setAttribute("aria-activedescendant", $currentSelected.id)
-            $input.value = $currentSelected.textContent
+            $input.value = $currentSelected.dataset.title
          }
       }
 
@@ -205,11 +210,28 @@
    /**
     * Create <li> tag
     * @param {(e: MouseEvent) => void} mouseOverEvent
-    * @param {{ value: string, id: string | number }} param1
+    * @param {{ value: any, id: string | number }} param1
     */
    function createLI(mouseOverEvent, { value, id }) {
       const li = document.createElement("li")
-      li.innerText = value
+      if (typeof value === "string") {
+         li.innerText = value
+         li.dataset.title = value
+      } else if ($content instanceof DocumentFragment) {
+         const content = $content.cloneNode(true)
+         if (content instanceof DocumentFragment) {
+            Object.keys(value).forEach(key => {
+               const el = content.querySelector(`[name=${key}]`)
+               if (value[key]) {
+                  el.textContent = value[key]
+               }
+            })
+            li.dataset.title = value.title
+            li.appendChild(content)
+         }
+      } else {
+         throw new Error("Value is not string and the template is not set.")
+      }
       li.dataset.id = "" + id
       ;[["role", "option"]
       , ["id", "_" + id]
@@ -221,7 +243,7 @@
    }
 
    /**
-    * @param {{ similarity: number, value: string, id: string | number }[]} list 
+    * @param {{ similarity: number, value: any, id: string | number }[]} list 
     * @param {{ limit: number }} options 
     */
    function createULList(list = [], { limit }) {
@@ -275,12 +297,26 @@
       }
 
       /**
-       * @param {{ value: string, id: string | number, compareValue: string }[]?} list
+       * @param {string} query
+       */
+      set template(query) {
+         if (!(query?.length > 0)) {
+            throw new Error("Query string has no value.")
+         }
+         const template = document.querySelector(query)
+         if (!(template instanceof HTMLTemplateElement)) {
+            throw new Error("Could not find template!")
+         }
+         $content = template.content
+      }
+
+      /**
+       * @param {{ value: any, id: string | number, compareValue: string }[]?} list
        */
       set searchList(list) {
          if (list instanceof Array && list.length > 0
             && list[0].id
-            && list[0].value?.length > 0
+            && list[0].value
             && list[0].compareValue?.length > 0) {
             /**
              * @type {Search[]}

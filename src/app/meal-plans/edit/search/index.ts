@@ -2,16 +2,32 @@ import { getActiveRecipes, setRecipeDate } from "./store.js"
 import { RecipeDateDomain } from "../Domain/DomainTypes.js";
 import ISODate from "../../../utils/ISODate.js";
 
+interface FuzzySearch extends HTMLElement {
+   template: string
+   searchList: {
+      value: string | { title: string, [key: string]: string },
+      id: string|number,
+      compareValue: string }[]
+}
+
 getActiveRecipes()
 .then(recipes => {
-   const $fuzzySearch = document.createElement("fuzzy-search")
+   const $fuzzySearch = <FuzzySearch>document.createElement("fuzzy-search")
    $fuzzySearch.setAttribute("limit", "10")
    $fuzzySearch.setAttribute("empty-message", "No meals available.")
    $fuzzySearch.setAttribute("autofocus", "")
-   ;(<any>$fuzzySearch).searchList = recipes.map(x => ({
-      value: x.name,
-      id: x.id.value,
-      compareValue: x.name.toLowerCase() }))
+   $fuzzySearch.template = "#_template"
+   $fuzzySearch.searchList = recipes.map(x => {
+      const location =
+         typeof x.location === "string"
+            ? x.location
+         : "book" in x.location
+            ? `${x.location.book} - ${x.location.page}`
+         : x.location.url
+      return {
+         value: { title: x.name, location },
+         id: x.id.value,
+         compareValue: x.name.toLowerCase() }})
    $fuzzySearch.addEventListener("selected", selected as EventListener)
 
    const $main = <HTMLDivElement>document.getElementById("_main")
