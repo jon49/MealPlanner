@@ -8,6 +8,40 @@
     * @property {string | number } id
     */
 
+   const $style = document.createElement("style")
+   $style.setAttribute("type", "text/css")
+   $style.innerHTML = `
+   fuzzy-search .search-box {
+      display: flex;
+      border: solid gray 1px;
+      border-radius: 1em 1em 0 0;
+      margin: 0 0 -1px 0;
+      padding: 0.5em;
+   }
+   fuzzy-search .search-box > * {
+    background-color: inherit;
+    margin: 0;
+   }
+   fuzzy-search input {
+    width: 100%;
+    border: none !important;
+    min-width: 20em;
+   }
+   fuzzy-search ul {
+      width: 100%;
+      border: gray solid 1px;
+      border-radius: 0 0 1em 1em;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      overflow: hidden;
+   }
+   fuzzy-search li {
+      width: 100%;
+      padding: 0.5em;
+   }`
+   document.head.append($style)
+
    const arrowUp = "ArrowUp"
       , arrowDown = "ArrowDown"
       , enter = "Enter"
@@ -281,6 +315,7 @@
 
          const $form = document.createElement("form")
          $form.setAttribute("autocomplete", "off")
+         $form.classList.add("fuzzy-search")
          const $label = document.createElement("label")
          $label.textContent = this.label
          $label.setAttribute("for", searchId)
@@ -316,8 +351,11 @@
          $input.addEventListener("keyup", handleKeyupBound)
          $list.addEventListener("click", handleClickBound)
 
-         $form.appendChild($label)
-         $form.appendChild($input)
+         const $div = document.createElement("div")
+         $div.classList.add("search-box")
+         $div.appendChild($label)
+         $div.appendChild($input)
+         $form.appendChild($div)
          $form.appendChild($list)
          this.appendChild($form)
 
