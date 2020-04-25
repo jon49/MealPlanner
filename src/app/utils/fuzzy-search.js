@@ -2,10 +2,17 @@
 
 ;(function() {
    /**
+    * @typedef SearchValue
+    * @type {string|{title: string, [key: string]: string}}
+    */
+   /**
     * @typedef Search
     * @property {string} compareValue
-    * @property {string} value
+    * @property {string|SearchValue} value
     * @property {string | number } id
+    */
+   /**
+    * @typedef {Search & {similarity: number}} SearchParsed
     */
 
    /**
@@ -215,13 +222,15 @@
    /**
     * Create <li> tag
     * @param {(e: MouseEvent) => void} mouseOverEvent
-    * @param {{ value: any, id: string | number }} param1
+    * @param {{ value: SearchValue, id: string | number }} param1
     */
    function createLI(mouseOverEvent, { value, id }) {
       const li = document.createElement("li")
+      let title
       if (typeof value === "string") {
          li.innerText = value
-         li.dataset.title = value
+         title = value
+         li.dataset.title = title
       } else if ($content instanceof DocumentFragment) {
          const content = $content.cloneNode(true)
          if (content instanceof DocumentFragment) {
@@ -231,7 +240,8 @@
                   el.textContent = value[key]
                }
             })
-            li.dataset.title = value.title
+            title = value.title
+            li.dataset.title = title
             li.appendChild(content)
          }
       } else {
@@ -240,15 +250,15 @@
       li.dataset.id = "" + id
       ;[["role", "option"]
       , ["id", "_" + id]
-      , ["aria-label", value]
-      ].forEach(x => li.setAttribute(x[0], x[1]))
+      , ["aria-label", title]
+      ].forEach(xs => li.setAttribute(xs[0], xs[1]))
       li.addEventListener("mouseenter", mouseOverEvent)
       li.classList.add("cursor-pointer")
       return li
    }
 
    /**
-    * @param {{ similarity: number, value: any, id: string | number }[]} list 
+    * @param {SearchParsed[]} list 
     * @param {{ limit: number }} options 
     */
    function createULList(list = [], { limit }) {
@@ -316,7 +326,7 @@
       }
 
       /**
-       * @param {{ value: any, id: string | number, compareValue: string }[]?} list
+       * @param {Search[]?} list
        */
       set searchList(list) {
          if (list instanceof Array && list.length > 0

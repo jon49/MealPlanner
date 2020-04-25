@@ -1,6 +1,6 @@
 # Meal Planner
 
-[toc]
+[[_TOC_]]
 
 ## About
 
@@ -26,9 +26,6 @@ Rather than using a timestamp on the server use an incrementing number. Also, do
     + `Table` name
     + Record `ID`
         * Timestamp of when the record was originally made
-        * Created on the client side
-    + `LastUpdated`
-        * Timestamp of when the record was modified by the client
         * Created on the client side
     + `ClientServerUpdatedId`
         * This will correspond to when it was updated on the server and will be
