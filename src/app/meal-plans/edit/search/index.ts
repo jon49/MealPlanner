@@ -8,7 +8,10 @@ getActiveRecipes()
    $fuzzySearch.setAttribute("limit", "10")
    $fuzzySearch.setAttribute("empty-message", "No meals available.")
    $fuzzySearch.setAttribute("autofocus", "")
-   ;(<any>$fuzzySearch).searchList = recipes.map(x => ({ value: x.name, id: x.id.value }))
+   ;(<any>$fuzzySearch).searchList = recipes.map(x => ({
+      value: x.name,
+      id: x.id.value,
+      compareValue: x.name.toLowerCase() }))
    $fuzzySearch.addEventListener("selected", selected as EventListener)
 
    const $main = <HTMLDivElement>document.getElementById("_main")

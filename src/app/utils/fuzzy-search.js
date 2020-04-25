@@ -275,25 +275,20 @@
       }
 
       /**
-       * @param {{ value: string, id: string | number }[]?} list
+       * @param {{ value: string, id: string | number, compareValue: string }[]?} list
        */
       set searchList(list) {
          if (list instanceof Array && list.length > 0
             && list[0].id
-            && list[0].value && list[0].value.length > 0) {
+            && list[0].value?.length > 0
+            && list[0].compareValue?.length > 0) {
             /**
              * @type {Search[]}
              */
-            this.__searchList = []
-            for (var item of list) {
-               if (item.id && item.value && item.value.length > 0) {
-                  var newItem = { id: item.id, value: item.value, compareValue: item.value.toLowerCase() }
-                  this.__searchList.push(newItem)
-               }
-            }
+            this.__searchList = list
             this.__setup()
          } else {
-            this.noList()
+            throw new Error("Search list was not created correctly.")
          }
       }
 
