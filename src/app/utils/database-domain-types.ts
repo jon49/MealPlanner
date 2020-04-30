@@ -11,4 +11,5 @@ export namespace Domain.Recipe {
         name: String100
         location: Location
     }
+
 }

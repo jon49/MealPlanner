@@ -7,13 +7,13 @@ async function createRecipe_(recipe: Domain.Recipe.Recipe) {
     let location: DatabaseType.Location
     switch (recipe.location._kind) {
         case "book":
-            location = { book: recipe.location.book.value, page: recipe.location.page.value }
+            location = { _kind: "book", book: recipe.location.book.value, page: recipe.location.page.value }
             break
         case "url":
-            location = { url: recipe.location.url.value, title: recipe.location.title.value }
+            location = { _kind: "url", url: recipe.location.url.value, title: recipe.location.title.value }
             break
         case "other":
-            location = recipe.location.other.value
+            location = {_kind: "other", other: recipe.location.other.value } 
             break
     }
     const timestamp = Date.now()
@@ -21,7 +21,7 @@ async function createRecipe_(recipe: Domain.Recipe.Recipe) {
         id: timestamp,
         name: recipe.name.value,
         location,
-        lastUpdated: timestamp
+        categories: [1]
     })
 }
 

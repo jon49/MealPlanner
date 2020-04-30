@@ -3,7 +3,7 @@ import { recipeCancelMeal, recipeNextMeal, recipePreviousMeal, CreateRecipe, Rec
 import { addRecipe, CancelledRecipe, CreateCancelledRecipe } from "./templates/cancelled-recipe.js"
 import { random, range } from "./util/util.js"
 import { getRecipes, setRecipeDate, getRecipeDates, getActiveRecipes, setMealPlannerSettings, getMealPlannerSettings } from "./store/store.js"
-import { TypeOrDeleted, isDeleted, ISODate } from "../../utils/database.js"
+import { ISODate } from "../../utils/database.js"
 import { run, debounce, defer } from "../../utils/utils.js"
 import { RecipeDomain, RecipeDateDomain, RecipeAndDateDomain } from "./Domain/DomainTypes.js"
 import start from "./temp-meal-store.js"
@@ -24,7 +24,7 @@ var actions = {
 var mealSelections = <HTMLDivElement>document.getElementById(page.mealSelectionsId)
 var startDate = <HTMLInputElement>document.getElementById(page.startDateFormId)
 
-function parseRecipes(recipes: TypeOrDeleted<RecipeDomain>[], recipeDates: TypeOrDeleted<RecipeDateDomain>[]) {
+function parseRecipes(recipes: RecipeDomain[], recipeDates: RecipeDateDomain[]) {
    var currentIds = recipeDates.map(x => x.recipeId.value)
    var currentRecipes : RecipeAndRecipeDate[] = []
    var unUsedRecipes : RecipeDomain[] = []
@@ -33,7 +33,7 @@ function parseRecipes(recipes: TypeOrDeleted<RecipeDomain>[], recipeDates: TypeO
       var idx = currentIds.indexOf(recipe.id.value)
       if (idx > -1) {
          currentRecipes.push({ recipe, date: recipeDates[idx] })
-      } else if(shouldAddNewRecipes && !isDeleted(recipe)) {
+      } else if(shouldAddNewRecipes) {
          unUsedRecipes.push(recipe)
       }
    }
@@ -59,9 +59,8 @@ function getCurrentRecipes({ currentRecipes, unUsedRecipes, start }: GetCurrentR
             currentRecipesAddedDates.push({
                recipe: newRecipe,
                date: {
-                  categoryId: { isCategoryId: true, value: 1 },
+                  categoryId: { _id: "category", value: 1 },
                   date: currentDate,
-                  lastUpdated: 0,
                   quantity: 1,
                   recipeId: newRecipe.id
                }
@@ -82,7 +81,7 @@ function getCurrentRecipes({ currentRecipes, unUsedRecipes, start }: GetCurrentR
 //   Also, takes into account current recipes chosen and current recipes chosen for specific widget
 // * Drag and drop recipes
 
-type RecipeAndRecipeDate = { recipe: TypeOrDeleted<RecipeDomain>, date: RecipeDateDomain }
+type RecipeAndRecipeDate = { recipe: RecipeDomain, date: RecipeDateDomain }
 function* handleDateChange(e: Event) {
    if (e.target instanceof HTMLInputElement) {
       // Still need to deal with the amount of recipes under 7 and 0 recipes
@@ -100,7 +99,6 @@ function* handleDateChange(e: Event) {
          date: x.date.date,
          categoryId: x.date.categoryId,
          quantity: x.date.quantity,
-         lastUpdated: x.date.lastUpdated
       })))
 
       mealSelections.innerHTML = ""
@@ -150,17 +148,14 @@ function* CancelRecipe(oldRecipe: Recipe) {
    yield setRecipeDate([
       { date: oldRecipe.date
       , recipeId: oldRecipe.id
-      , categoryId: { isCategoryId: true, value: 1 }
-      , lastUpdated: 0
-      , quantity: 1
-      , isDeleted: true }])
+      , categoryId: { value: 1, _id: "category" as const }
+      , quantity: 1 }])
    oldRecipe.nodes.root.replaceWith(cancelledRecipe.nodes.root)
    cancelledRecipe.nodes["add-recipe"].focus()
 }
 
 function* CancelledRecipeToNewRecipe(cancelledRecipe: CancelledRecipe) {
    var date = cancelledRecipe.date
-   // var currentRecipe = <TypeOrDeleted<RecipeDateDomain>>(yield getRecipeDates(date, 1))
    var recipes = <RecipeDomain[]>(yield getActiveRecipes())
    let newRecipe = getRecipe(date, recipes[random(0, recipes.length - 1)])
    cancelledRecipe.nodes.root.replaceWith(newRecipe.nodes.root)
@@ -184,8 +179,7 @@ function* PreviousRecipe(oldRecipe: Recipe) {
 async function setNewRecipe(o: RecipeAndDateDomain) {
    var recipe: RecipeDateDomain =
       { date: o.date
-      , categoryId: { isCategoryId: true, value: 1 }
-      , lastUpdated: 0
+      , categoryId: { _id: "category", value: 1 }
       , quantity: 1
       , recipeId: o.id }
    await setRecipeDate([recipe])

@@ -1,11 +1,11 @@
 import { Location } from "../../../utils/database.js";
 import { ISODate } from "../../../utils/utils.js";
+import { IDType } from "../../../utils/common-domain-types.js"
 
 export interface RecipeDomain {
    id: RecipeId
    name: string
    location: Location
-   lastUpdated: number
 }
 
 export interface RecipeDateDomain {
@@ -13,16 +13,13 @@ export interface RecipeDateDomain {
    categoryId: CategoryId
    recipeId: RecipeId
    quantity: number
-   lastUpdated: number
 }
 
-export interface CategoryId {
-   isCategoryId: true
+export interface CategoryId extends IDType<"category"> {
    value: number
 }
 
-export interface RecipeId {
-   isRecipeId: true
+export interface RecipeId extends IDType<"recipe"> {
    value: number
 }
 

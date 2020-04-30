@@ -26,6 +26,8 @@ class PositiveWholeNumber_ {
 export type String100 = String100_
 export type String50 = String50_
 export type PositiveWholeNumber = PositiveWholeNumber_
+export type TableType = string
+export type IDType<T extends TableType> = { _id: T, value: number }
 
 const notFalsey = (error: string, val: string | undefined) =>
     (!val) ? left([error]) : right(val)

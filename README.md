@@ -8,6 +8,7 @@ An offline first minimalist web app for organizing your meal planning needs.
 
 ## TODO
 
+- [ ] Have a central place for creating/updating/deleting database so that I can update the change table
 - [ ] Add Recipe form needs type of recipe, like dinner, etc.
 - [ ] Service worker
 - [ ] Use service worker to sync to S3 with the AWS Lambda function

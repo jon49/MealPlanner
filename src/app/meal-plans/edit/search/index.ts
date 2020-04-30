@@ -50,11 +50,10 @@ function selected(e: CustomEvent) {
       return
    }
    const data: RecipeDateDomain = {
-      categoryId: { isCategoryId: true, value: catId || 1 },
+      categoryId: { _id: "category", value: catId || 1 },
       date: new ISODate(recipeDate),
-      lastUpdated: Date.now(),
       quantity: 1,
-      recipeId: { isRecipeId: true, value: id }
+      recipeId: { _id: "recipe", value: id }
    }
    setRecipeDate([data])
    .then(() => {

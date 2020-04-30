@@ -3,17 +3,17 @@ import getDb, { DatabaseType } from "../../utils/database.js"
 function getLocation(location: string) : DatabaseType.Location {
    location = location.trim()
    if (!location) {
-      return ""
+      return { _kind: "other", other: "" }
    }
    if (/(\.com|\.net|\.org)/.test(location)) {
-      return { url: location, title: location }
+      return { _kind: "url", url: location, title: location }
    }
    var match : RegExpMatchArray | null;
    var bookRgx = /(.*) (\d+)$/
    if (match = location.match(bookRgx)) {
-      return { book: match[1], page: +match[2] }
+      return { _kind: "book", book: match[1], page: +match[2] }
    }
-   return location
+   return { _kind: "other", other: location }
 }
 
 [
@@ -485,12 +485,11 @@ function getLocation(location: string) : DatabaseType.Location {
    if (!window.localStorage["db-created"]) {
       getDb().then(db => {
          var id = i + 1
-         var lastUpdated = +(new Date())
          db.put("recipe", {
             id,
             name: recipe.recipe,
             location: getLocation(recipe.location),
-            lastUpdated
+            categories: [1]
          })
       }).then(_ => {
          localStorage.setItem("db-created", "yep")
