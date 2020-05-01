@@ -9,6 +9,7 @@ export type SourceValue = "url" | "book" | "other"
 export interface Page {
     addRecipeFormId: "_add-recipe"
     previousRecipes: "_previous-recipes"
+    mealTime: "meal-time"
 }
 
 type FormField_ = { [K in AddRecipeFormField]: HTMLInputElement }
@@ -59,6 +60,9 @@ const main = html`
                 </fieldset>
             </fieldset>
         </form-tabs>
+        <fieldset id="meal-time">
+        <legend>Meal Time</legend>
+        </fieldset>
         <input type="reset" value="Clear">&nbsp;
         <input id="save-once" type="submit" value="Save">&nbsp;
         <input id="save-and-add" type="submit" value="Save & Add Another">

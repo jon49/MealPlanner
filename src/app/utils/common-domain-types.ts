@@ -23,9 +23,17 @@ class PositiveWholeNumber_ {
     }
 }
 
+class IdNumber_ {
+    readonly value: number
+    constructor (value: number) {
+        this.value = value
+    }
+}
+
 export type String100 = String100_
 export type String50 = String50_
 export type PositiveWholeNumber = PositiveWholeNumber_
+export type IdNumber = IdNumber_
 export type TableType = string
 export type IDType<T extends TableType> = { _id: T, value: number }
 
@@ -56,3 +64,9 @@ export const createPositiveWholeNumber = (name: string, val: number) : Either<st
     .do(val < 0 ? left([`'${name}' must be 0 or greater. But was given '${val}'.`]) : right(val))
     .do(isInteger(val) ? right(val) : left([`${name} must be a whole number. But was given '${val}' and was expecting '${val|0}'.`]))
     .return(() => new PositiveWholeNumber_(val))
+
+export const createIdNumber = (name: string, val: number) : Either<string[], IdNumber> =>
+    Do(either)
+    .do(isInteger(val) ? right(val) : left([`${name} must be a whole number. But was given '${val}' and was expecting '${val|0}'.`]))
+    .do(val < 1 ? left([`'${name}' must be 1 or greater. But was given '${val}'.`]) : right(val))
+    .return(() => new IdNumber_(val))

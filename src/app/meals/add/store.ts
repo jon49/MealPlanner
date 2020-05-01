@@ -1,4 +1,4 @@
-import getDB, { DatabaseType } from "../../utils/database.js"
+import getDB, { getReadOnlyDb, DatabaseType } from "../../utils/database.js"
 import { Domain } from "../../utils/database-domain-types.js"
 import { tryCatch } from "../../utils/fp.js"
 
@@ -29,6 +29,14 @@ async function createRecipe_(recipe: Domain.Recipe.Recipe) {
 
 const createRecipe = (recipe: Domain.Recipe.Recipe) => tryCatch(() => createRecipe_(recipe), String)
 
+async function GetMealTimes() {
+    const db = await getReadOnlyDb(["meal-time"])
+    return await db["meal-time"].getAll()
+}
+
+const getMealTimes = () => tryCatch(() => GetMealTimes(), String)
+
 export {
-    createRecipe
+    createRecipe,
+    getMealTimes
 }

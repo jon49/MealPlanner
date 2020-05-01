@@ -1,4 +1,4 @@
-import { String50, PositiveWholeNumber, String100 } from "./common-domain-types.js"
+import { String50, PositiveWholeNumber, String100, IdNumber } from "./common-domain-types.js"
 
 export namespace Domain.Recipe {
     export type LocationKind = "book" | "url" | "other"
@@ -10,6 +10,7 @@ export namespace Domain.Recipe {
     export interface Recipe {
         name: String100
         location: Location
+        mealTimeIds: IdNumber[]
     }
 
 }

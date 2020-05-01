@@ -1,17 +1,50 @@
-import { String100, String50, PositiveWholeNumber, createString100, createString50, createPositiveWholeNumber } from "../../utils/common-domain-types.js"
-import { Do, validateForm, Either, right, taskEither, fromEither, pipe, mapLeft, fold, Validation } from "../../utils/fp.js"
+import { String100, String50, PositiveWholeNumber, createString100, createString50, createPositiveWholeNumber, createIdNumber } from "../../utils/common-domain-types.js"
+import { Do, validateForm, Either, either, right, left, taskEither, fromEither, pipe, mapLeft, fold, Validation, tryCatch, array } from "../../utils/fp.js"
 import { Domain } from "../../utils/database-domain-types.js"
-import { createRecipe } from "./store.js"
+import { createRecipe, getMealTimes } from "./store.js"
 import { defer } from "../../utils/utils.js"
 import template from "../../utils/template.js"
 import { Page, HTMLAddRecipeForm, SourceValue } from "./index.html.js"
+import { DatabaseType } from "../../utils/database.js"
 
 var page : Page = {
     addRecipeFormId: "_add-recipe",
-    previousRecipes: "_previous-recipes"
+    previousRecipes: "_previous-recipes",
+    mealTime: "meal-time"
 }
 
 const $form = <HTMLAddRecipeForm>document.getElementById(page.addRecipeFormId)
+const $mealTime = <HTMLFieldSetElement>document.getElementById(page.mealTime)
+
+/** Add Meal Time Choices */
+
+const makeEl = (s: string) => document.createElement(s)
+function addMealTimes({mealTimes}: {mealTimes: DatabaseType.MealTimeData[]}) {
+    const times = document.createDocumentFragment()
+    mealTimes.forEach(x => {
+        const $input = makeEl("input")
+        const $label = makeEl("label")
+        const id = `meal-time-${x.id}`
+        ;[["type", "checkbox"]
+        , ["id", id]
+        , ["name", `meal-time-${x.id}`]
+        , ["value", ""+x.id] ]
+        .forEach(xs => $input.setAttribute(xs[0], xs[1]))
+        $label.setAttribute("for", id)
+        $label.textContent = x.name || "Unknown"
+        times.append($input, $label, makeEl("br"))
+    })
+    $mealTime.append(times)
+    return Promise.resolve()
+}
+
+Do(taskEither)
+.bind("mealTimes", getMealTimes())
+.doL(x => tryCatch(() => addMealTimes(x), String))
+.done()()
+.then(fold(error => {
+    document.dispatchEvent(new CustomEvent("Error", { detail: error }))
+}, _ => {}))
 
 /** Form submit **/
 
@@ -99,11 +132,23 @@ function validateAddMealForm() {
             break
     }
 
+    const validateMealTimeIds = () => {
+        const rawMealTimes = []
+        for (const input of $form.querySelectorAll("[name^=meal-time-]")) {
+            if (input instanceof HTMLInputElement && input.checked) rawMealTimes.push({id: input.value, name: input.dataset.name})
+        }
+        return array.traverse(either)(rawMealTimes, x => createIdNumber(x.name || "Unknown", +x.id))
+    }
+
     return Do(validateForm())
     .sequenceS({
         recipeName: createString100("Recipe Name", $form["recipe-name"].value),
-        ...location
+        ...location,
+        mealTimes: validateMealTimeIds()
     })
+    .bindL("mealTimeLength", ({mealTimes}) =>
+        mealTimes.length > 0 ? right(mealTimes) : left(["Meal times need to have at least one checked."])
+    )
     .return(o => {
         let location: Domain.Recipe.Location
         switch (o._kind) {
@@ -118,9 +163,10 @@ function validateAddMealForm() {
                 break
         }
 
-        const result : Domain.Recipe.Recipe = {
-            name: o.recipeName,
-            location }
+        const result : Domain.Recipe.Recipe =
+            { name: o.recipeName
+            , location
+            , mealTimeIds: o.mealTimes }
         return result
     })
 }
