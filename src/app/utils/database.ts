@@ -12,16 +12,16 @@ export namespace DatabaseType {
    export type Location = LocationBook | LocationUrl | LocationOther
 
    /** E.g., Dinner, Lunch, etc */
-   export interface CategoryData {
+   export interface MealTimeData {
       // int
       id: number
-      /** name of category */
+      /** name of meal time */
       name: string 
    }
 
    export interface RecipeDateData {
       date: string
-      categoryId: number
+      mealTimeId: number
       recipeId: number
       /** Number of meals */
       quantity: number
@@ -49,7 +49,7 @@ export namespace DatabaseType {
    }
 }
 
-interface CategorySchema { key: number; value: DatabaseType.CategoryData }
+interface MealTimeSchema { key: number; value: DatabaseType.MealTimeData }
 interface RecipeDateSchema { key: number; value: DatabaseType.RecipeDateData }
 interface RecipeSchema { key: number; value: DatabaseType.RecipeData }
 type SettingsKey = keyof DatabaseType.SettingsData
@@ -58,7 +58,7 @@ interface ChangeLogSchema { key: number, value: DatabaseType.ChangeLog }
 
 export interface MealPlanner_ {
    recipe: RecipeSchema
-   category: CategorySchema
+   "meal-time": MealTimeSchema
    "recipe-date": RecipeDateSchema
    settings: SettingsSchema
 }
@@ -87,16 +87,16 @@ class RecipeStore {
    }
 }
 
-class CategoryStore {
+class MealTimeStore {
    private changeLog: ChangeLogObjectStore
-   private categoryStore: IDBPObjectStore<MealPlanner, AllTableNames[], "category">
+   private store: IDBPObjectStore<MealPlanner, AllTableNames[], "meal-time">
    constructor(tx: MealPlannerTransaction, changeLog: ChangeLogObjectStore) {
       this.changeLog = changeLog
-      this.categoryStore = tx.objectStore("category")
+      this.store = tx.objectStore("meal-time")
    }
-   async get(id: number) { return await this.categoryStore.get(id) }
-   async put(o: DatabaseType.CategoryData) {
-      const result = await Promise.all([this.categoryStore.put(o), this.changeLog.put({tableName: "category", recordId: [o.id]})])
+   async get(id: number) { return await this.store.get(id) }
+   async put(o: DatabaseType.MealTimeData) {
+      const result = await Promise.all([this.store.put(o), this.changeLog.put({tableName: "meal-time", recordId: [o.id]})])
       return result[0]
    }
 }
@@ -111,7 +111,7 @@ class RecipeDateStore {
    async get(id: number) { return await this.recipeDateStore.get(id) }
    async getAll(range: IDBKeyRange) { return await this.recipeDateStore.getAll(range) }
    async put(o: DatabaseType.RecipeDateData) {
-      const result = await Promise.all([this.recipeDateStore.put(o), this.changeLog.put({tableName: "recipe-date", recordId: [o.date, o.categoryId]})])
+      const result = await Promise.all([this.recipeDateStore.put(o), this.changeLog.put({tableName: "recipe-date", recordId: [o.date, o.mealTimeId, o.recipeId]})])
       return result[0]
    }
 }
@@ -142,7 +142,7 @@ export default async function getDB<T extends MealPlannerTable>(tables: T[]) {
    const changeLog = tx.objectStore("change-log")
    const update = {
       recipe: RecipeStore,
-      category: CategoryStore,
+      "meal-time": MealTimeStore,
       "recipe-date": RecipeDateStore,
       settings: SettingsStore
    }
@@ -162,13 +162,13 @@ class RecipeRead {
    getAll() { return this.db.getAll("recipe") }
 }
 
-class CategoryRead {
+class MealTimeRead {
    db: IDBPDatabase<MealPlanner>
    constructor(db: IDBPDatabase<MealPlanner>) {
       this.db = db
    }
-   get(id: number) { return this.db.get("category", id) }
-   getAll() { return this.db.getAll("category") }
+   get(id: number) { return this.db.get("meal-time", id) }
+   getAll() { return this.db.getAll("meal-time") }
 }
 
 class RecipeDateRead {
@@ -176,7 +176,7 @@ class RecipeDateRead {
    constructor(db: IDBPDatabase<MealPlanner>) {
       this.db = db
    }
-   getRange(start: string, end: string, categoryId: number) { return this.db.getAll("recipe-date", IDBKeyRange.bound([start, categoryId], [end, categoryId])) }
+   getRange(start: string, end: string, mealTimeId: number) { return this.db.getAll("recipe-date", IDBKeyRange.bound([start, mealTimeId], [end, mealTimeId])) }
 }
 
 class SettingsRead {
@@ -200,7 +200,7 @@ export async function getReadOnlyDb<T extends AllTableNames>(tables: T[]) {
    const db = await getDB_()
    const readOnly = {
       recipe: RecipeRead,
-      category: CategoryRead,
+      "meal-time": MealTimeRead,
       "recipe-date": RecipeDateRead,
       settings: SettingsRead,
       "change-log": ChangeLogRead,
@@ -213,11 +213,12 @@ export async function getReadOnlyDb<T extends AllTableNames>(tables: T[]) {
 }
 
 async function getDB_() {
-   return openDB<MealPlanner>("meal-planner", 15, {
-      async upgrade(db, oldVersion, newVersion, tx) {
+   return openDB<MealPlanner>("meal-planner", 17, {
+      async upgrade(db, _, __, tx) {
          var stores = db.objectStoreNames
-         if (!stores.contains("category")) {
-            db.createObjectStore("category", { keyPath: "id" })
+         if (!stores.contains("meal-time")) {
+            db.createObjectStore("meal-time", { keyPath: "id" })
+            tx.objectStore("meal-time").put({ id: 1, name: "Dinner" })
          }
 
          if (!stores.contains("settings")) {
@@ -227,7 +228,7 @@ async function getDB_() {
          }
 
          if (!stores.contains("recipe-date")) {
-            db.createObjectStore("recipe-date", { keyPath: ["date", "categoryId"] })
+            db.createObjectStore("recipe-date", { keyPath: ["date", "mealTimeId", "recipeId"] })
          }
 
          if (!stores.contains("recipe")) {
@@ -238,39 +239,6 @@ async function getDB_() {
             db.createObjectStore("change-log", { keyPath: ["tableName", "recordId"] })
          }
 
-         if (oldVersion !== newVersion && newVersion === 10) {
-            {
-               let cursor = await tx.objectStore("recipe").openCursor()
-               while(cursor) {
-                  let newValue = { ...cursor.value }
-                  await cursor.update(newValue)
-                  cursor = await cursor.continue()
-               }
-            }
-            {
-               let cursor = await tx.objectStore("category").openCursor()
-               if (!cursor) {
-                  let newValue: DatabaseType.CategoryData = {
-                     id: 1,
-                     name: "Dinner"
-                  }
-                  tx.objectStore("category").put(newValue)
-               }
-               while (cursor) {
-                  let newValue = { ...cursor.value }
-                  await cursor.update(newValue)
-                  cursor = await cursor.continue()
-               }
-            }
-            {
-               let cursor = await tx.objectStore("recipe-date").openCursor()
-               while (cursor) {
-                  let newValue = { ...cursor.value }
-                  await cursor.update(newValue)
-                  cursor = await cursor.continue()
-               }
-            }
-         }
       }
    })
 }

@@ -10,12 +10,12 @@ export interface RecipeDomain {
 
 export interface RecipeDateDomain {
    date: ISODate
-   categoryId: CategoryId
+   mealTimeId: MealTimeId
    recipeId: RecipeId
    quantity: number
 }
 
-export interface CategoryId extends IDType<"category"> {
+export interface MealTimeId extends IDType<"meal-time"> {
    value: number
 }
 

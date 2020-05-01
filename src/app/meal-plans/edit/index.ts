@@ -59,7 +59,7 @@ function getCurrentRecipes({ currentRecipes, unUsedRecipes, start }: GetCurrentR
             currentRecipesAddedDates.push({
                recipe: newRecipe,
                date: {
-                  categoryId: { _id: "category", value: 1 },
+                  mealTimeId: { _id: "meal-time", value: 1 },
                   date: currentDate,
                   quantity: 1,
                   recipeId: newRecipe.id
@@ -97,7 +97,7 @@ function* handleDateChange(e: Event) {
       yield setRecipeDate(currentRecipesAddedDates.map(x => ({
          recipeId: x.date.recipeId,
          date: x.date.date,
-         categoryId: x.date.categoryId,
+         mealTimeId: x.date.mealTimeId,
          quantity: x.date.quantity,
       })))
 
@@ -148,7 +148,7 @@ function* CancelRecipe(oldRecipe: Recipe) {
    yield setRecipeDate([
       { date: oldRecipe.date
       , recipeId: oldRecipe.id
-      , categoryId: { value: 1, _id: "category" as const }
+      , mealTimeId: { value: 1, _id: "meal-time" as const }
       , quantity: 1 }])
    oldRecipe.nodes.root.replaceWith(cancelledRecipe.nodes.root)
    cancelledRecipe.nodes["add-recipe"].focus()
@@ -179,7 +179,7 @@ function* PreviousRecipe(oldRecipe: Recipe) {
 async function setNewRecipe(o: RecipeAndDateDomain) {
    var recipe: RecipeDateDomain =
       { date: o.date
-      , categoryId: { _id: "category", value: 1 }
+      , mealTimeId: { _id: "meal-time", value: 1 }
       , quantity: 1
       , recipeId: o.id }
    await setRecipeDate([recipe])

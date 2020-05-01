@@ -33,14 +33,14 @@ export async function setMealPlannerSettings(mealPlannerSettings: MealPlannerSto
    await db.done
 }
 
-export async function getRecipeDates(startDate: ISODate, categoryId: number) : Promise<RecipeDateDomain[]> {
+export async function getRecipeDates(startDate: ISODate, mealTimeId: number) : Promise<RecipeDateDomain[]> {
    var db = await getReadOnlyDb(["recipe-date"])
    var start = startDate.toString()
    var end = startDate.addDays(7).toString()
-   var recipeDates = await db["recipe-date"].getRange(start, end, categoryId)
+   var recipeDates = await db["recipe-date"].getRange(start, end, mealTimeId)
    return recipeDates.map(x => (
       { date: new ISODate(x.date)
-      , categoryId: { _id: "category", value: x.categoryId }
+      , mealTimeId: { _id: "meal-time", value: x.mealTimeId }
       , recipeId: { _id: "recipe", value: x.recipeId }
       , quantity: x.quantity
       }))
@@ -50,12 +50,12 @@ export async function setRecipeDate(data: RecipeDateDomain[]) {
    var db = await getDB(["recipe-date"])
    for (var d of data) {
       var o : DatabaseType.RecipeDateData = {
-         categoryId: d.categoryId.value,
+         mealTimeId: d.mealTimeId.value,
          date: d.date.toString(),
          quantity: d.quantity,
          recipeId: d.recipeId.value
       }
-      db["recipe-date"].put(o)
+      await db["recipe-date"].put(o)
    }
    await db.done
 }

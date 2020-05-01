@@ -15,7 +15,7 @@ export async function setRecipeDate(data: RecipeDateDomain[]) {
    var db = await getDB(["recipe-date"])
    for (var d of data) {
       var o : DatabaseType.RecipeDateData = {
-         categoryId: d.categoryId.value,
+         mealTimeId: d.mealTimeId.value,
          date: d.date.toString(),
          quantity: d.quantity,
          recipeId: d.recipeId.value,

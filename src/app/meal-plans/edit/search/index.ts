@@ -41,16 +41,16 @@ function selected(e: CustomEvent) {
    const id = +e.detail.id
    const params = new URLSearchParams(location.search);
    const recipeDate = params.get("recipeDate")
-   const categoryId = params.get("categoryId")
+   const mealTimeId = params.get("mealTimeId")
    let catId: number | undefined
-   if (categoryId && !isNaN(+categoryId)) {
-      catId = +categoryId
+   if (mealTimeId && !isNaN(+mealTimeId)) {
+      catId = +mealTimeId
    }
    if (!id || !recipeDate) {
       return
    }
    const data: RecipeDateDomain = {
-      categoryId: { _id: "category", value: catId || 1 },
+      mealTimeId: { _id: "meal-time", value: catId || 1 },
       date: new ISODate(recipeDate),
       quantity: 1,
       recipeId: { _id: "recipe", value: id }
