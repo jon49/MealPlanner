@@ -1,4 +1,4 @@
-import { openDB, DBSchema, IDBPObjectStore, IDBPTransaction } from "idb"
+import { openDB, DBSchema, IDBPObjectStore, IDBPTransaction, IDBPDatabase } from "idb"
 import ISODate from "./ISODate.js"
 
 export { ISODate }
@@ -49,22 +49,21 @@ export namespace DatabaseType {
    }
 }
 
-interface CategoryStore { key: number; value: DatabaseType.CategoryData }
-interface RecipeDateStore { key: number; value: DatabaseType.RecipeDateData }
-interface RecipeStore { key: number; value: DatabaseType.RecipeData }
+interface CategorySchema { key: number; value: DatabaseType.CategoryData }
+interface RecipeDateSchema { key: number; value: DatabaseType.RecipeDateData }
+interface RecipeSchema { key: number; value: DatabaseType.RecipeData }
 type SettingsKey = keyof DatabaseType.SettingsData
-interface SettingsStore { key: SettingsKey; value: DatabaseType.SettingsData[SettingsKey]  }
-// interface SettingsStore { key: SettingsKey; value: Partial<DatabaseType.SettingsData> }
-interface ChangeLogStore { key: number, value: DatabaseType.ChangeLog }
+interface SettingsSchema { key: SettingsKey; value: DatabaseType.SettingsData[SettingsKey]  }
+interface ChangeLogSchema { key: number, value: DatabaseType.ChangeLog }
 
 export interface MealPlanner_ {
-   recipe: RecipeStore
-   category: CategoryStore
-   "recipe-date": RecipeDateStore
-   settings: SettingsStore
+   recipe: RecipeSchema
+   category: CategorySchema
+   "recipe-date": RecipeDateSchema
+   settings: SettingsSchema
 }
 interface MealPlanner__ extends MealPlanner_ {
-   "change-log": ChangeLogStore
+   "change-log": ChangeLogSchema
 }
 export interface MealPlanner extends DBSchema, MealPlanner__ {
 }
@@ -73,57 +72,148 @@ type AllTableNames = keyof MealPlanner__
 type MealPlannerTransaction = IDBPTransaction<MealPlanner, AllTableNames[]>
 type ChangeLogObjectStore = IDBPObjectStore<MealPlanner, AllTableNames[], "change-log">
 
-const createRecipePut = (tx: MealPlannerTransaction, changeLog: ChangeLogObjectStore) => {
-   const recipeStore = tx.objectStore("recipe")
-   return async (o: DatabaseType.RecipeData) => {
-      await Promise.all([recipeStore.put(o), changeLog.put({tableName: "recipe", recordId: [o.id]})])
-} }
+class RecipeStore {
+   private changeLog: ChangeLogObjectStore
+   private recipeStore: IDBPObjectStore<MealPlanner, AllTableNames[], "recipe">
+   constructor(tx: MealPlannerTransaction, changeLog: ChangeLogObjectStore) {
+      this.changeLog = changeLog
+      this.recipeStore = tx.objectStore("recipe")
+   }
+   async get(id: number) { return await this.recipeStore.get(id) }
+   async getAll() { return await this.recipeStore.getAll() }
+   async put(o: DatabaseType.RecipeData) {
+      const result = await Promise.all([this.recipeStore.put(o), this.changeLog.put({tableName: "recipe", recordId: [o.id]})])
+      return result[0]
+   }
+}
 
-const createCategoryPut = (tx: MealPlannerTransaction, changeLog: ChangeLogObjectStore) => {
-   const categoryStore = tx.objectStore("category")
-   return async (o: DatabaseType.CategoryData) => {
-      await Promise.all([categoryStore.put(o), changeLog.put({tableName: "category", recordId: [o.id]})])
-} }
+class CategoryStore {
+   private changeLog: ChangeLogObjectStore
+   private categoryStore: IDBPObjectStore<MealPlanner, AllTableNames[], "category">
+   constructor(tx: MealPlannerTransaction, changeLog: ChangeLogObjectStore) {
+      this.changeLog = changeLog
+      this.categoryStore = tx.objectStore("category")
+   }
+   async get(id: number) { return await this.categoryStore.get(id) }
+   async put(o: DatabaseType.CategoryData) {
+      const result = await Promise.all([this.categoryStore.put(o), this.changeLog.put({tableName: "category", recordId: [o.id]})])
+      return result[0]
+   }
+}
 
-const createRecipeDatePut = (tx: MealPlannerTransaction, changeLog: ChangeLogObjectStore) => {
-   const recipeDateStore = tx.objectStore("recipe-date")
-   return async (o: DatabaseType.RecipeDateData) => {
-      await Promise.all([recipeDateStore.put(o), changeLog.put({tableName: "recipe-date", recordId: [o.date, o.categoryId]})])
-} }
+class RecipeDateStore {
+   private changeLog: ChangeLogObjectStore
+   private recipeDateStore: IDBPObjectStore<MealPlanner, AllTableNames[], "recipe-date">
+   constructor(tx: MealPlannerTransaction, changeLog: ChangeLogObjectStore) {
+      this.changeLog = changeLog
+      this.recipeDateStore = tx.objectStore("recipe-date")
+   }
+   async get(id: number) { return await this.recipeDateStore.get(id) }
+   async getAll(range: IDBKeyRange) { return await this.recipeDateStore.getAll(range) }
+   async put(o: DatabaseType.RecipeDateData) {
+      const result = await Promise.all([this.recipeDateStore.put(o), this.changeLog.put({tableName: "recipe-date", recordId: [o.date, o.categoryId]})])
+      return result[0]
+   }
+}
 
-const createSettingsPut = (tx: MealPlannerTransaction, changeLog: ChangeLogObjectStore) => {
-   const settingsStore = tx.objectStore("settings")
-   return async (o: Partial<DatabaseType.SettingsData>) => {
+class SettingsStore {
+   private changeLog: ChangeLogObjectStore
+   private store: IDBPObjectStore<MealPlanner, AllTableNames[], "settings">
+   constructor(tx: MealPlannerTransaction, changeLog: ChangeLogObjectStore) {
+      this.changeLog = changeLog
+      this.store = tx.objectStore("settings")
+   }
+   async get(id: SettingsKey) { return await this.store.get(id) }
+   async put(o: Partial<DatabaseType.SettingsData>) {
       for (const key of Object.keys(o)) {
          const value = o[<SettingsKey>key]
          if (value) {
-            await Promise.all([settingsStore.put(value, <SettingsKey>key), changeLog.put({tableName: "settings", recordId: [key]})])
+            await Promise.all([this.store.put(value, <SettingsKey>key), this.changeLog.put({tableName: "settings", recordId: [key]})])
          }
       }
-} }
+   }
+}
 
-type PickFactory<T extends {[K: string]:(...args: any) => any}, S extends keyof T> = { [K in S]: ReturnType<T[K]> }
-export async function upsert<T extends MealPlannerTable>(tables: T[]) {
-   const db = await getDB()
-   const tableWithChangeLog : AllTableNames[] = tables
-   tableWithChangeLog.push("change-log")
+type PickClassFactory<T extends {[K: string]: new (...args: any) => any}, S extends keyof T> = { [K in S]: InstanceType<T[K]> }
+export default async function getDB<T extends MealPlannerTable>(tables: T[]) {
+   const db = await getDB_()
+   const tableWithChangeLog = (<AllTableNames[]>tables).concat("change-log")
    const tx = db.transaction(tableWithChangeLog, "readwrite")
    const changeLog = tx.objectStore("change-log")
    const update = {
-      recipe: createRecipePut,
-      category: createCategoryPut,
-      "recipe-date": createRecipeDatePut,
-      settings: createSettingsPut
+      recipe: RecipeStore,
+      category: CategoryStore,
+      "recipe-date": RecipeDateStore,
+      settings: SettingsStore
    }
-   const result : PickFactory<typeof update, T> = tables.reduce((acc, value) => {
-      acc[value] = update[value](tx, changeLog)
+   const result : PickClassFactory<typeof update, T> = tables.reduce((acc, value) => {
+      acc[value] = new update[value](tx, changeLog)
+      return acc
+   }, <any>{})
+   return { ...result, get done() { return tx.done } }
+}
+
+class RecipeRead {
+   db: IDBPDatabase<MealPlanner>
+   constructor(db: IDBPDatabase<MealPlanner>) {
+      this.db = db
+   }
+   get(id: number) { return this.db.get("recipe", id) }
+   getAll() { return this.db.getAll("recipe") }
+}
+
+class CategoryRead {
+   db: IDBPDatabase<MealPlanner>
+   constructor(db: IDBPDatabase<MealPlanner>) {
+      this.db = db
+   }
+   get(id: number) { return this.db.get("category", id) }
+   getAll() { return this.db.getAll("category") }
+}
+
+class RecipeDateRead {
+   db: IDBPDatabase<MealPlanner>
+   constructor(db: IDBPDatabase<MealPlanner>) {
+      this.db = db
+   }
+   getRange(start: string, end: string, categoryId: number) { return this.db.getAll("recipe-date", IDBKeyRange.bound([start, categoryId], [end, categoryId])) }
+}
+
+class SettingsRead {
+   db: IDBPDatabase<MealPlanner>
+   constructor(db: IDBPDatabase<MealPlanner>) {
+      this.db = db
+   }
+   get(id: SettingsKey) { return this.db.get("settings", id) }
+   getAll() { return this.db.getAll("settings") }
+}
+
+class ChangeLogRead {
+   db: IDBPDatabase<MealPlanner>
+   constructor(db: IDBPDatabase<MealPlanner>) {
+      this.db = db
+   }
+   getAll() { return this.db.getAll("change-log") }
+}
+
+export async function getReadOnlyDb<T extends AllTableNames>(tables: T[]) {
+   const db = await getDB_()
+   const readOnly = {
+      recipe: RecipeRead,
+      category: CategoryRead,
+      "recipe-date": RecipeDateRead,
+      settings: SettingsRead,
+      "change-log": ChangeLogRead,
+   }
+   const result : PickClassFactory<typeof readOnly, T> = tables.reduce((acc, value) => {
+      acc[value] = new readOnly[value](db)
       return acc
    }, <any>{})
    return result
 }
 
-export default async function getDB() {
-   return openDB<MealPlanner>("meal-planner", 14, {
+async function getDB_() {
+   return openDB<MealPlanner>("meal-planner", 15, {
       async upgrade(db, oldVersion, newVersion, tx) {
          var stores = db.objectStoreNames
          if (!stores.contains("category")) {

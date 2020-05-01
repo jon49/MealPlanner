@@ -16,6 +16,8 @@ function getLocation(location: string) : DatabaseType.Location {
    return { _kind: "other", other: location }
 }
 
+const db = getDb(["recipe"]);
+
 [
 "????, 1000 Veg 457",
 "Acorn squash soup, 1000 Veg 26",
@@ -481,17 +483,18 @@ function getLocation(location: string) : DatabaseType.Location {
       return { recipe, location }
    }
 })
-.forEach((recipe, i) => {
+.forEach(async (recipe, i) => {
    if (!window.localStorage["db-created"]) {
-      getDb().then(db => {
+      db.then(db => {
          var id = i + 1
-         db.put("recipe", {
+         db.recipe.put({
             id,
             name: recipe.recipe,
             location: getLocation(recipe.location),
             categories: [1]
          })
-      }).then(_ => {
+      }).then(async _ => {
+         await (await db).done
          localStorage.setItem("db-created", "yep")
       })
    }
