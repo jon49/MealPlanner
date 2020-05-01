@@ -30,7 +30,7 @@
       margin: 0 0 -1px 0;
       padding: 0.5em;
    }
-   fuzzy-search .search-box > * {
+   fuzzy-search .search-box * {
     background-color: inherit;
     margin: 0;
    }
@@ -38,6 +38,10 @@
     width: 100%;
     border: none !important;
     min-width: 20em;
+   }
+   fuzzy-search label {
+      display: flex;
+      width: 100%;
    }
    fuzzy-search ul {
       width: 100%;
@@ -245,7 +249,7 @@
             li.appendChild(content)
          }
       } else {
-         throw new Error("Value is not string and the template is not set.")
+         throw new Error("Value is not a string and the template is not set.")
       }
       li.dataset.id = "" + id
       ;[["role", "option"]
@@ -400,7 +404,7 @@
          const $div = document.createElement("div")
          $div.classList.add("search-box")
          $div.appendChild($label)
-         $div.appendChild($input)
+         $label.appendChild($input)
          $form.appendChild($div)
          $form.appendChild($list)
          this.appendChild($form)
