@@ -32,13 +32,14 @@ var _default = ({ main, currentPage, afterMain, head } : DefaultOptions) => html
    <meta http-equiv="X-UA-Compatible" content="ie=edge">
    <title>${currentPage}</title>
    <link rel="stylesheet" type="text/css" href="/app/index.css">
+   <script async src="/app/utils/snack-bar.js"></script>
+   <script async src="/app/index.js"></script>
    ${head}
 </head>
 <body>
    <nav>
       <a href="/app">
          <img alt="Meal Planner Logo" src="/images/meal-planner-logo.svg" height="50" width="300">
-         <!-- <object type="image/svg+xml" data="/images/meal-planner-logo.svg" height="70"></object> -->
       </a>
       <ul>
       ${
@@ -59,6 +60,11 @@ var _default = ({ main, currentPage, afterMain, head } : DefaultOptions) => html
    <main id="_main">${main}</main>
 
    ${afterMain}
+
+   <template id="error-message-template">
+      <snack-bar class=show><p slot="message"></p></snack-bar>
+   </template>
+   <div id="error-message"></div>
 
 </body>
 </html>

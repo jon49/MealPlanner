@@ -4,101 +4,40 @@
    <meta charset="UTF-8">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
    <title>Yay!</title>
-   <!-- <script src="./fuzzySearch.js"></script> -->
-   <script src="../src/app/utils/form-tabs.js"></script>
+   <script src="../src/app/utils/snack-bar.js"></script>
    <style>
-      p {
-         color: orangered;
+      :root {
+         --snack-bar-duration: 1;
+      }
+      #error-message {
+        min-width: 250px;
+        margin-left: -125px;
+        position: fixed;
+        left: 50%;
+        bottom: 30px;
+        z-index: 1;
+      }
+      snack-bar p {
+         background-color: #aaa;
+         color: #ccc;
+         padding: 3em;
       }
    </style>
 </head>
 <body>
 
-   <form-tabs>
-      <fieldset slot="tabs">
-            <legend>Recipe Source</legend>
-            <input class="tab" type="radio" id="radio-url" name="source" value="url" data-tab="1" checked>
-            <label for="radio-url">Website</label>
-            <input class="tab" type="radio" id="radio-book" name="source" value="book" data-tab="2">
-            <label for="radio-book">Book</label>
-            <input class="tab" type="radio" id="radio-other" name="source" value="other" data-tab="3">
-            <label for="radio-other">Other</label>
-            <fieldset data-tab="1" disabled>
-                <label for="source-url">Website:</label>
-                <input type="url" id="source-url" name="url" placeholder="https://example.com" required>
-                <p class="error">Please enter the URL for the website.</p>
-                <br>
-                <label for="source-title">Title:</label>
-                <input type="text" id="source-title" name="url-title" placeholder="My Recipe" required>
-                <p class="error">The title for your URL, e.g.,&nbsp;<a href="https://example.com">My Recipe</a></p>
-                <br>
-                <input type="checkbox" id="source-title-url" name="use-url-as-title">
-                <label for="source-title-url">Use the URL as the title</label>
-                <p class="error">E.g.,&nbsp;<a href="https://example.com">https://example.com</a></p>
-            </fieldset>
-            <fieldset data-tab="2" disabled>
-                <label for="source-book">Book:</label>
-                <input id="source-book" name="book" type="text" placeholder="My Favorite Recipe Book" required>
-                <p class="error">The name of the recipe book, e.g.,&nbsp;<em>My Favorite Recipe Book</em>.</p>
-                <br>
-                <label for="source-book-page">Book Page:</label>
-                <input id="source-book-page" name="book-page" type="number" placeholder="125" required>
-                <p class="error">The page number of your book, e.g., 125.</p>
-            </fieldset>
-            <fieldset data-tab="3" disabled>
-                <label for="source-other">Other:</label>
-                <input id="source-other" name="other" type="text" placeholder="I made this recipe!" required>
-                <p class="error">Where your recipe came from.</p>
-            </fieldset>
-        </fieldset>      
-   </form-tabs>
-
-   <my-paragraph></my-paragraph>
-
-   <my-paragraph>
-      <p slot="my-text">Let's have some different text!</p>
-      <p slot="my-text">Doh!</p>
-      <div slot="my-text">
-         <p>Yep</p>
-         <p>Nope</p>
-      </div>
-   </my-paragraph>
-
-   <my-paragraph>
-      <ul slot="my-text">
-         <li>Let's have some different text!</li>
-         <li>In a list!</li>
-      </ul>
-   </my-paragraph>
-
-   <template id="my-paragraph">
-      <style>
-         [name="my-text"] {
-            background-color: #666;
-            padding: 5px;
-         }
-      </style>
-      <slot name="my-text"><span style="color:coral">Default text</span></slot>
+   <template id="my-snack-bar">
+      <snack-bar class=show><p slot="message">I love lizards!</p></snack-bar>
    </template>
 
-   <script>
-      const $style = document.createElement("style")
-      $style.innerHTML =
-         `my-paragraph p + p {
-            color: plum !important;
-         }`
-      document.head.append($style)
-      customElements.define('my-paragraph',
-      class extends HTMLElement {
-         constructor() {
-            super();
-            let template = document.getElementById('my-paragraph');
-            let templateContent = template.content;
+   <div id="error-message">
+   </div>
 
-            const shadowRoot = this.attachShadow({mode: 'open'})
-            .appendChild(templateContent.cloneNode(true));
-         }
-      });
+   <script>
+      setInterval(() => {
+         const message = document.getElementById("my-snack-bar").content.cloneNode(true)
+         document.getElementById("error-message").appendChild(message)
+      }, 3e3)
    </script>
 
 </body>

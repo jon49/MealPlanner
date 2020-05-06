@@ -19,7 +19,7 @@ export interface HTMLAddRecipeForm extends HTMLFormElement, FormField_ {
 
 const main = html`
     <form id="_add-recipe">
-        <label for="name">Recipe:</label>
+        <label for="name">Recipe Name:</label>
         <input id="name" type="text" placeholder="Spaghetti with Meatballs" name="recipe-name" autofocus required>
         <p class="error">The name of your recipe, e.g.,&nbsp;<em>Spaghetti with Meatballs</em></p>
         <form-tabs>

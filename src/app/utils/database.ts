@@ -81,9 +81,9 @@ class RecipeStore {
    }
    async get(id: number) { return await this.recipeStore.get(id) }
    async getAll() { return await this.recipeStore.getAll() }
-   async put(o: DatabaseType.RecipeData) {
-      const result = await Promise.all([this.recipeStore.put(o), this.changeLog.put({tableName: "recipe", recordId: [o.id]})])
-      return result[0]
+   put(o: DatabaseType.RecipeData) {
+      this.changeLog.put({tableName: "recipe", recordId: [o.id]})
+      return this.recipeStore.put(o)
    }
 }
 
@@ -95,9 +95,9 @@ class MealTimeStore {
       this.store = tx.objectStore("meal-time")
    }
    async get(id: number) { return await this.store.get(id) }
-   async put(o: DatabaseType.MealTimeData) {
-      const result = await Promise.all([this.store.put(o), this.changeLog.put({tableName: "meal-time", recordId: [o.id]})])
-      return result[0]
+   put(o: DatabaseType.MealTimeData) {
+      this.changeLog.put({tableName: "meal-time", recordId: [o.id]})
+      return this.store.put(o)
    }
 }
 
@@ -110,9 +110,9 @@ class RecipeDateStore {
    }
    async get(id: number) { return await this.recipeDateStore.get(id) }
    async getAll(range: IDBKeyRange) { return await this.recipeDateStore.getAll(range) }
-   async put(o: DatabaseType.RecipeDateData) {
-      const result = await Promise.all([this.recipeDateStore.put(o), this.changeLog.put({tableName: "recipe-date", recordId: [o.date, o.mealTimeId, o.recipeId]})])
-      return result[0]
+   put(o: DatabaseType.RecipeDateData) {
+      this.changeLog.put({tableName: "recipe-date", recordId: [o.date, o.mealTimeId]})
+      return this.recipeDateStore.put(o)
    }
 }
 
@@ -124,11 +124,12 @@ class SettingsStore {
       this.store = tx.objectStore("settings")
    }
    async get(id: SettingsKey) { return await this.store.get(id) }
-   async put(o: Partial<DatabaseType.SettingsData>) {
+   put(o: Partial<DatabaseType.SettingsData>) {
       for (const key of Object.keys(o)) {
          const value = o[<SettingsKey>key]
          if (value) {
-            await Promise.all([this.store.put(value, <SettingsKey>key), this.changeLog.put({tableName: "settings", recordId: [key]})])
+            this.store.put(value, <SettingsKey>key)
+            this.changeLog.put({tableName: "settings", recordId: [key]})
          }
       }
    }
@@ -213,7 +214,7 @@ export async function getReadOnlyDb<T extends AllTableNames>(tables: T[]) {
 }
 
 async function getDB_() {
-   return openDB<MealPlanner>("meal-planner", 17, {
+   return openDB<MealPlanner>("meal-planner", 18, {
       async upgrade(db, _, __, tx) {
          var stores = db.objectStoreNames
          if (!stores.contains("meal-time")) {
@@ -228,7 +229,7 @@ async function getDB_() {
          }
 
          if (!stores.contains("recipe-date")) {
-            db.createObjectStore("recipe-date", { keyPath: ["date", "mealTimeId", "recipeId"] })
+            db.createObjectStore("recipe-date", { keyPath: ["date", "mealTimeId"] })
          }
 
          if (!stores.contains("recipe")) {
