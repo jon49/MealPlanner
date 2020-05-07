@@ -305,7 +305,7 @@ body {
   margin-left: -125px;
   position: fixed;
   left: 50%;
-  bottom: 30px;
+  bottom: 0.5em;
   z-index: 1;
 }
 #error-message p {
