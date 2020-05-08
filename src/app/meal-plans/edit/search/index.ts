@@ -1,6 +1,7 @@
 import { getActiveRecipes, setRecipeDate } from "./store.js"
 import { RecipeDateDomain } from "../Domain/DomainTypes.js";
 import ISODate from "../../../utils/ISODate.js";
+import { fold, handleError } from "../../../utils/fp.js"
 
 interface FuzzySearch extends HTMLElement {
    template: string
@@ -11,7 +12,7 @@ interface FuzzySearch extends HTMLElement {
 }
 
 getActiveRecipes()
-.then(recipes => {
+.then(fold(handleError, recipes => {
    const $fuzzySearch = <FuzzySearch>document.createElement("fuzzy-search")
    $fuzzySearch.setAttribute("limit", "10")
    $fuzzySearch.setAttribute("empty-message", "No meals available.")
@@ -34,7 +35,7 @@ getActiveRecipes()
    if ($main) {
       $main.append($fuzzySearch)
    }
-})
+}))
 
 function selected(e: CustomEvent) {
    e.preventDefault()
@@ -55,8 +56,6 @@ function selected(e: CustomEvent) {
       quantity: 1,
       recipeId: { _id: "recipe", value: id }
    }
-   setRecipeDate([data])
-   .then(() => {
-      location.href = `/app/meal-plans/edit#${recipeDate.toString()}`
-   })
+   setRecipeDate([data])()
+   .then(fold(handleError, () => { location.href = `/app/meal-plans/edit#${recipeDate.toString()}` }))
 }

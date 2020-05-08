@@ -2,11 +2,12 @@ import { Page } from "./index.html"
 import { recipeCancelMeal, recipeNextMeal, recipePreviousMeal, CreateRecipe, Recipe } from "./templates/recipe.js"
 import { addRecipe, CancelledRecipe, CreateCancelledRecipe } from "./templates/cancelled-recipe.js"
 import { random, range } from "./util/util.js"
-import { getRecipes, setRecipeDate, getRecipeDates, getActiveRecipes, setMealPlannerSettings, getMealPlannerSettings } from "./store/store.js"
+import { getRecipes, setRecipeDate, getRecipeDates, setMealPlannerSettings, getMealPlannerSettings } from "./store/store.js"
 import { ISODate } from "../../utils/database.js"
-import { run, debounce, defer } from "../../utils/utils.js"
+import { debounce, defer } from "../../utils/utils.js"
 import { RecipeDomain, RecipeDateDomain, RecipeAndDateDomain } from "./Domain/DomainTypes.js"
 import start from "./temp-meal-store.js"
+import { Do, Either, taskEither, tryCatch, handleError, fold, tryCatchArgs, TE, TaskEither, right } from "../../utils/fp.js"
 start()
 
 var page : Page = {
@@ -82,44 +83,106 @@ function getCurrentRecipes({ currentRecipes, unUsedRecipes, start }: GetCurrentR
 // * Drag and drop recipes
 
 type RecipeAndRecipeDate = { recipe: RecipeDomain, date: RecipeDateDomain }
-function* handleDateChange(e: Event) {
-   if (e.target instanceof HTMLInputElement) {
-      // Still need to deal with the amount of recipes under 7 and 0 recipes
-      // Yield here as we don't know the target is the correct value
-      // Perhaps a ISODate.Create which returns => ISODate | ErrorWithUserMessage
-      var start = new ISODate(e.target.value)
-      yield setMealPlannerSettings({startDate: start})
-      var recipeDates = yield getRecipeDates(start, 1)
-      var recipes = yield getRecipes()
-      const { currentRecipes, unUsedRecipes } = parseRecipes(recipes, recipeDates)
-      // extract random from getCurrentRecipes, perhaps a different implementation?
-      const { currentRecipesAddedDates } = getCurrentRecipes({ currentRecipes, unUsedRecipes, start })
-      yield setRecipeDate(currentRecipesAddedDates.map(x => ({
-         recipeId: x.date.recipeId,
-         date: x.date.date,
-         mealTimeId: x.date.mealTimeId,
-         quantity: x.date.quantity,
-      })))
-
-      mealSelections.innerHTML = ""
-      currentRecipesAddedDates.forEach(x => {
-         var recipeNode = getRecipe(x.date.date, x.recipe)
-         mealSelections.appendChild(recipeNode.nodes.root)
-      })
-   }
+function handleDateChange(target: HTMLInputElement) {
+   // Still need to deal with the amount of recipes under 7 and 0 recipes
+   // Yield here as we don't know the target is the correct value
+   // Perhaps a ISODate.Create which returns => ISODate | ErrorWithUserMessage
+   var start = new ISODate(target.value)
+   return Do(taskEither)
+   .do(setMealPlannerSettings({startDate: start}))
+   .bind("recipeDates", getRecipeDates(start, 1))
+   .bind("recipes", getRecipes)
+   .letL("parsed", ({recipes, recipeDates}) => parseRecipes(recipes, recipeDates))
+   // extract random from getCurrentRecipes, perhaps a different implementation?
+   .letL("current", ({parsed}) => getCurrentRecipes({ ...parsed, start }))
+   .doL(({ current }) => setRecipeDate(current.currentRecipesAddedDates.map(x => ({
+      recipeId: x.date.recipeId,
+      date: x.date.date,
+      mealTimeId: x.date.mealTimeId,
+      quantity: x.date.quantity,
+   }))))
+   .doL(({ current }) =>
+      tryCatch(() => {
+         mealSelections.innerHTML = ""
+         current.currentRecipesAddedDates.forEach(x => {
+            var recipeNode = getRecipe(x.date.date, x.recipe)
+            mealSelections.appendChild(recipeNode.nodes.root)
+         })
+         return Promise.resolve()
+      }))
+   .done()()
 }
 
 var firstPageView = true
 startDate.addEventListener("change", debounce(function(e: Event) {
       e.preventDefault()
-      run(() => handleDateChange(e))
-      .then(() => {
-         if (firstPageView && location.hash) {
-            location.href = location.hash
-         }
-         firstPageView = false
-      })
+      if (e.target instanceof HTMLInputElement) {
+         handleDateChange(e.target)
+         .then(fold(handleError,
+            () => {
+            if (firstPageView && location.hash) {
+               location.href = location.hash
+            }
+            firstPageView = false
+         }))
+      }
    }, 250, { runImmediatelyFirstTimeOnly: true }))
+
+const cancelRecipe = (oldRecipe: Recipe) =>
+   Do(taskEither)
+   .bind("cancelledRecipe", tryCatchArgs(CreateCancelledRecipe)({ date: oldRecipe.date }))
+   .do(setRecipeDate([
+      { date: oldRecipe.date
+      , recipeId: oldRecipe.id
+      , mealTimeId: { value: 1, _id: "meal-time" as const }
+      , quantity: 1 }]))
+   .doL(({cancelledRecipe}) => tryCatch(() => {
+      oldRecipe.nodes.root.replaceWith(cancelledRecipe.nodes.root)
+      cancelledRecipe.nodes["add-recipe"].focus()
+      return Promise.resolve()
+   }))
+   .done()
+
+const cancelledRecipeToNewRecipe = (cancelledRecipe: CancelledRecipe) =>
+   Do(taskEither)
+   .bind("recipes", getRecipes)
+   .doL(
+      tryCatchArgs(({recipes}) => {
+         const newRecipe = getRecipe(cancelledRecipe.date, recipes[random(0, recipes.length - 1)])
+         cancelledRecipe.nodes.root.replaceWith(newRecipe.nodes.root)
+         newRecipe.nodes["next-meal"].focus()
+         return Promise.resolve()
+      }))
+   .done()
+
+const nextRecipe = (oldRecipe: Recipe): TaskEither<string, any> => {
+   const maybeNextRecipe = oldRecipe.peek()
+   return Do(taskEither)
+   .bind("nextRecipe",
+      !maybeNextRecipe
+         ? getNewRecipe(oldRecipe)
+      : TE.right<string, RecipeAndDateDomain>(maybeNextRecipe))
+   .doL(tryCatchArgs(({nextRecipe}) => {
+      oldRecipe.next(nextRecipe)
+      return Promise.resolve()
+   }))
+   .doL(({nextRecipe}) => setNewRecipe(nextRecipe))
+   .done()
+}
+
+const previousRecipe = (oldRecipe: Recipe) =>
+   Do(taskEither)
+   .bind("recipe", tryCatch(() => {
+      const old = oldRecipe.previous()
+      return Promise.resolve(old)
+   }))
+   .doL(({recipe}) => {
+      if (recipe) {
+         return setNewRecipe(recipe)
+      }
+      return TE.right(void 0)
+   })
+   .done()
 
 mealSelections.addEventListener("click", defer(function(e: Event) {
    var $button = e.target
@@ -129,67 +192,34 @@ mealSelections.addEventListener("click", defer(function(e: Event) {
           cancelledRecipe: Recipe | undefined,
           toNewRecipe: CancelledRecipe | undefined,
           toPreviousRecipe: Recipe | undefined
-      return (cancelledRecipe = actions.recipeCancelMeal.get($button))
-         ? run(() => CancelRecipe(<Recipe>cancelledRecipe))
-      : (toNewRecipe = actions.addRecipe.get($button))
-         ? run(() => CancelledRecipeToNewRecipe(<CancelledRecipe>toNewRecipe))
-      : (changeRecipe = actions.recipeNextMeal.get($button))
-         ? run(() => NextRecipe(<Recipe>changeRecipe))
-      : (toPreviousRecipe = actions.recipePreviousMeal.get($button))
-         ? run(() => PreviousRecipe(<Recipe>toPreviousRecipe))
-      : Promise.resolve()
+      let result : Promise<Either<string, any>> =
+         (cancelledRecipe = actions.recipeCancelMeal.get($button))
+            ? cancelRecipe(<Recipe>cancelledRecipe)()
+         : (toNewRecipe = actions.addRecipe.get($button))
+            ? cancelledRecipeToNewRecipe(<CancelledRecipe>toNewRecipe)()
+         : (changeRecipe = actions.recipeNextMeal.get($button))
+            ? nextRecipe(<Recipe>changeRecipe)()
+         : (toPreviousRecipe = actions.recipePreviousMeal.get($button))
+            ? previousRecipe(<Recipe>toPreviousRecipe)()
+         : Promise.resolve(right(void 0))
+      return result.then(fold(handleError, _ => {}))
    } else {
       return Promise.resolve()
    }
 }))
 
-function* CancelRecipe(oldRecipe: Recipe) {
-   var cancelledRecipe = CreateCancelledRecipe({ date: oldRecipe.date })
-   yield setRecipeDate([
-      { date: oldRecipe.date
-      , recipeId: oldRecipe.id
-      , mealTimeId: { value: 1, _id: "meal-time" as const }
-      , quantity: 1 }])
-   oldRecipe.nodes.root.replaceWith(cancelledRecipe.nodes.root)
-   cancelledRecipe.nodes["add-recipe"].focus()
-}
-
-function* CancelledRecipeToNewRecipe(cancelledRecipe: CancelledRecipe) {
-   var date = cancelledRecipe.date
-   var recipes = <RecipeDomain[]>(yield getActiveRecipes())
-   let newRecipe = getRecipe(date, recipes[random(0, recipes.length - 1)])
-   cancelledRecipe.nodes.root.replaceWith(newRecipe.nodes.root)
-   newRecipe.nodes["next-meal"].focus()
-}
-
-function* NextRecipe(oldRecipe: Recipe) {
-   const recipe = <RecipeAndDateDomain | undefined>(yield oldRecipe.next(() => getNewRecipe(oldRecipe)))
-   if (recipe) {
-      yield setNewRecipe(recipe)
-   }
-}
-
-function* PreviousRecipe(oldRecipe: Recipe) {
-   const recipe = oldRecipe.previous()
-   if (recipe) {
-      yield setNewRecipe(recipe)
-   }
-}
-
-async function setNewRecipe(o: RecipeAndDateDomain) {
-   var recipe: RecipeDateDomain =
-      { date: o.date
+const setNewRecipe = (o: RecipeAndDateDomain) =>
+   setRecipeDate([{ date: o.date
       , mealTimeId: { _id: "meal-time", value: 1 }
       , quantity: 1
-      , recipeId: o.id }
-   await setRecipeDate([recipe])
-}
+      , recipeId: o.id }])
 
-async function getNewRecipe(oldRecipe: Recipe) {
-   var recipes = <RecipeDomain[]>(await getActiveRecipes())
-   var newRecipe = recipes[random(0, recipes.length - 1)]
-   return { ...newRecipe , date: oldRecipe.date }
-}
+const getNewRecipe = (oldRecipe: Recipe): TaskEither<string, RecipeAndDateDomain> =>
+      Do(taskEither)
+      .bind("xs", getRecipes)
+      .bindL("picked", ({xs}) => tryCatch(() => Promise.resolve(xs[random(0, xs.length - 1)])))
+      .letL("newRecipe", ({picked}) => ({ ...picked , date: oldRecipe.date }))
+      .return(({newRecipe}) => newRecipe)
 
 function getRecipe(date : ISODate, recipe : RecipeDomain) {
    return CreateRecipe({...recipe, date})
@@ -202,12 +232,14 @@ function init() {
 
 if (!startDate.value) {
    getMealPlannerSettings()
-   .then(settings => {
-      if (settings) {
-         startDate.value = settings.startDate.toString()
-         init()
-      }
-   })
+   .then(fold(
+      handleError,
+      settings => {
+         if (settings) {
+            startDate.value = settings.startDate.toString()
+            init()
+         }
+      }))
 } else {
    init()
 }

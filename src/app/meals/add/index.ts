@@ -1,5 +1,5 @@
 import { String100, String50, PositiveWholeNumber, createString100, createString50, createPositiveWholeNumber, createIdNumber } from "../../utils/common-domain-types.js"
-import { Do, validateForm, Either, either, right, left, taskEither, fromEither, pipe, mapLeft, fold, Validation, tryCatch, array } from "../../utils/fp.js"
+import { Do, validateForm, Either, either, right, left, taskEither, fromEither, pipe, mapLeft, fold, Validation, array, handleError, handleErrorWith, tryCatchArgs } from "../../utils/fp.js"
 import { Domain } from "../../utils/database-domain-types.js"
 import { createRecipe, getMealTimes } from "./store.js"
 import { defer } from "../../utils/utils.js"
@@ -19,7 +19,7 @@ const $mealTime = <HTMLFieldSetElement>document.getElementById(page.mealTime)
 /** Add Meal Time Choices */
 
 const makeEl = (s: string) => document.createElement(s)
-function addMealTimes({mealTimes}: {mealTimes: DatabaseType.MealTimeData[]}) {
+function _addMealTimes({mealTimes}: {mealTimes: DatabaseType.MealTimeData[]}) {
     const times = document.createDocumentFragment()
     mealTimes.forEach(x => {
         const $input = makeEl("input")
@@ -39,12 +39,10 @@ function addMealTimes({mealTimes}: {mealTimes: DatabaseType.MealTimeData[]}) {
 }
 
 Do(taskEither)
-.bind("mealTimes", getMealTimes())
-.doL(x => tryCatch(() => addMealTimes(x), String))
+.bind("mealTimes", getMealTimes)
+.doL(tryCatchArgs(_addMealTimes))
 .done()()
-.then(fold(error => {
-    document.dispatchEvent(new CustomEvent("Error", { detail: error }))
-}, _ => {}))
+.then(fold(handleError, _ => {}))
 
 /** Form submit **/
 
@@ -57,10 +55,8 @@ const saveRecipe =
 const submitOnce = () =>
     saveRecipe()
     .then(
-        fold(x => {
-            document.dispatchEvent(new CustomEvent("Error", { detail: x }))
-            return Promise.resolve()
-        }, x => {
+        fold(handleErrorWith(Promise.resolve())
+        , x => {
             location.href = `/app/meals/?id=${x.result}`
             return Promise.resolve()
         })
@@ -75,10 +71,8 @@ var previousRecipeView = template.get<PreviousRecipeTemplateId>("_previous-recip
 const previousRecipesList = <HTMLDivElement>document.getElementById(page.previousRecipes)
 const saveAndAdd = () =>
     saveRecipe()
-    .then(fold(x => {
-        document.dispatchEvent(new CustomEvent("Error", { detail: x }))
-        return Promise.resolve()
-    }, x => {
+    .then(fold(handleErrorWith(Promise.resolve())
+    , x => {
         var root = previousRecipeView.cloneNode(true)
         var nodes = <PreviousRecipeTemplate>previousRecipeView.collect(root)
         nodes["previous-recipe"].href = `/app/meals/?id=${x.result}`

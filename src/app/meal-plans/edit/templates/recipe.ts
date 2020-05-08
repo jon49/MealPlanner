@@ -56,22 +56,16 @@ export class Recipe {
       return recipe
    }
 
-   async next(f: () => Promise<RecipeAndDateDomain>) {
-      if (this.stopUpdate) {
-         return
-      }
+   peek(): RecipeAndDateDomain | undefined {
+      return this.recipes[this.recipeIndex + 1]
+   }
 
+   next(recipe: RecipeAndDateDomain) {
       this.recipeIndex++
       if (this.recipeIndex === this.recipes.length) {
-         this.stopUpdate = true
-         const newRecipe = await f()
-         this.recipes.push(newRecipe)
-         this.stopUpdate = false
+         this.recipes.push(recipe)
       }
-
-      const newRecipe = this.recipes[this.recipeIndex]
-      this._update(newRecipe)
-      return newRecipe
+      this._update(recipe)
    }
 }
 

@@ -1,7 +1,8 @@
 import getDB, { DatabaseType, getReadOnlyDb } from "../../../utils/database.js"
 import { RecipeDomain, RecipeDateDomain } from "../Domain/DomainTypes.js";
+import { tryCatch, tryCatchArgs } from "../../../utils/fp.js"
 
-export async function getActiveRecipes() : Promise<RecipeDomain[]> {
+async function _getActiveRecipes() : Promise<RecipeDomain[]> {
    var db = await getReadOnlyDb(["recipe"])
    var recipes = await db.recipe.getAll()
    return recipes.map(x => (
@@ -11,7 +12,9 @@ export async function getActiveRecipes() : Promise<RecipeDomain[]> {
       }))
 }
 
-export async function setRecipeDate(data: RecipeDateDomain[]) {
+export const getActiveRecipes = tryCatch(_getActiveRecipes)
+
+async function _setRecipeDate(data: RecipeDateDomain[]) {
    var db = await getDB(["recipe-date"])
    for (var d of data) {
       var o : DatabaseType.RecipeDateData = {
@@ -24,3 +27,5 @@ export async function setRecipeDate(data: RecipeDateDomain[]) {
    }
    await db.done
 }
+
+export const setRecipeDate = tryCatchArgs(_setRecipeDate)
