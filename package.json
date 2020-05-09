@@ -39,6 +39,7 @@
     "@rollup/plugin-typescript": "^3.1.1",
     "@types/debounce": "^1.2.0",
     "@types/node": "^12.12.30",
+    "@types/service_worker_api": "0.0.9",
     "ava": "^3.5.0",
     "chokidar-cli": "^2.1.0",
     "http-server": "^0.12.1",
