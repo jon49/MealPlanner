@@ -14,28 +14,36 @@ var urlsToCache = createLinks("/app", {
         , "snack-bar.js"
         , "utils.js" ]},
     meals: { add: { _files: ["index.html", "index.js"] } },
-    "meal-plans":
-        { _files: ["index.html", "index.js"]
-        , search: { _files: ["index.html", "index.js"]} },
+    "meal-plans": {
+        edit: { _files: ["index.html", "index.js"]
+        , search: { _files: ["index.html", "index.js"]} }
+    }
 }).concat("/images/meal-planner-logo.svg")
 
 self.addEventListener("install", installHandler)
 self.addEventListener("fetch", fetchHandler)
 
 /**
+ * @param {string} url 
+ * @returns string
+ */
+function normalizeUrl(url) {
+    const lastSlash = url.lastIndexOf("/")
+    let newUrl = url.includes("?") ? url.substring(0, url.lastIndexOf("?")) : url
+    newUrl = newUrl.includes("#") ? url.substring(0, url.lastIndexOf("#")) : newUrl
+    newUrl = !newUrl.endsWith("/") && newUrl.lastIndexOf("/") > newUrl.lastIndexOf(".") ? newUrl + "/" : newUrl
+    return newUrl
+}
+
+/**
  * @param {FetchEvent} event 
  */
 function fetchHandler(event) {
+    const url = normalizeUrl(event.request.url)
     event.respondWith(
         caches
-        .match(event.request)
-        .then(function (response) {
-            // Cache hit - return response
-            if (response) {
-                return response
-            }
-            return fetch(event.request)
-        }))
+        .match(url)
+        .then(res => res ? res : fetch(event.request)))
 }  
 
 /**
@@ -54,12 +62,19 @@ function installHandler(e) {
 
 /**
  * @param {string} root
- * @param {*} links
+ * @param {{[K: string]: any, _files: string[]}} links
  * @param {?string[]} files
  */
 function createLinks(root, links, files = []) {
     if (links._files) {
-        links._files.forEach(x => { files.push(`${root}/${x}`) })
+        links._files.forEach(x => {
+            if (x === "index.html") {
+                // files.push(root)
+                files.push(root + "/")
+            } else {
+                files.push(`${root}/${x}`)
+            }
+        })
     }
     for (const link of Object.keys(links)) {
         if (link !== "_files") {

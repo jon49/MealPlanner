@@ -38,17 +38,17 @@ var _default = ({ main, currentPage, afterMain, head } : DefaultOptions) => html
 </head>
 <body>
    <nav>
-      <a href="/app">
+      <a href="/app/">
          <img alt="Meal Planner Logo" src="/images/meal-planner-logo.svg" height="50" width="300">
       </a>
       <ul>
       ${
          (<Link[]>[{
-            href: "/app/meal-plans/edit",
+            href: "/app/meal-plans/edit/",
             title: "Plan Meals",
             isCurrentPage: currentPage === "Plan Meals"
          }, {
-            href: "/app/meals/add",
+            href: "/app/meals/add/",
             title: "Add Meal",
             isCurrentPage: currentPage == "Add Meal"
          }])
