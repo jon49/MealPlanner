@@ -5,7 +5,6 @@ import sucrase from "@rollup/plugin-sucrase"
 var external = ["./utils.js", "./utils/utils.js", "../utils/utils.js", "../../utils/utils.js", "../../../utils/utils.js",
    "./utils/template.js", "../utils/template.js", "../../utils/template.js", "../../../utils/template.js",
    "./utils/database.js", "../utils/database.js", "../../utils/database.js", "../../../utils/database.js",
-   "./fp.js", "./utils/fp.js", "../utils/fp.js", "../../utils/fp.js", "../../../utils/fp.js",
    "./utils/common-domain-types.js", "../utils/common-domain-types.js", "../../utils/common-domain-types.js", "../../../utils/common-domain-types.js",
    ]
 
@@ -73,14 +72,4 @@ export default [{
       resolve1()
    ],
    external
-}, {
-   input: "./src/app/utils/fp.ts",
-   output: {
-      file: "./public/app/utils/fp.js",
-      format: "esm"
-   },
-   plugins: [
-      typescript(),
-      resolve1()
-   ]
-}].concat(pages)
+} ].concat(pages)
