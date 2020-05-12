@@ -1,8 +1,7 @@
 import { RecipeDomain, RecipeDateDomain } from "../Domain/DomainTypes.js";
 import getDB, { ISODate, DatabaseType, getReadOnlyDb } from "../../../utils/database.js";
-import { tryCatch, tryCatchArgs } from "../../../utils/fp.js"
 
-async function _getRecipes() : Promise<RecipeDomain[]> {
+export async function getRecipes() : Promise<RecipeDomain[]> {
    var db = await getReadOnlyDb(["recipe"])
    var recipes = await db.recipe.getAll()
    return recipes.map(x => (
@@ -12,10 +11,8 @@ async function _getRecipes() : Promise<RecipeDomain[]> {
       }))
 }
 
-export const getRecipes = tryCatch(_getRecipes)
-
 interface MealPlannerStoreSettings { startDate: ISODate }
-async function _getMealPlannerSettings() : Promise<MealPlannerStoreSettings> {
+export async function getMealPlannerSettings() : Promise<MealPlannerStoreSettings> {
    var db = await getReadOnlyDb(["settings"])
    var settings = await db.settings.get("mealPlanner")
    return {
@@ -23,9 +20,7 @@ async function _getMealPlannerSettings() : Promise<MealPlannerStoreSettings> {
    }
 }
 
-export const getMealPlannerSettings = tryCatch(_getMealPlannerSettings)
-
-async function _setMealPlannerSettings(mealPlannerSettings: MealPlannerStoreSettings) {
+export async function setMealPlannerSettings(mealPlannerSettings: MealPlannerStoreSettings) {
    var db = await getDB(["settings"])
    var settings = await db.settings.get("mealPlanner")
    if (settings) {
@@ -35,9 +30,7 @@ async function _setMealPlannerSettings(mealPlannerSettings: MealPlannerStoreSett
    await db.done
 }
 
-export const setMealPlannerSettings = tryCatchArgs(_setMealPlannerSettings)
-
-async function _getRecipeDates(startDate: ISODate, mealTimeId: number) : Promise<RecipeDateDomain[]> {
+export async function getRecipeDates(startDate: ISODate, mealTimeId: number) : Promise<RecipeDateDomain[]> {
    var db = await getReadOnlyDb(["recipe-date"])
    var start = startDate.toString()
    var end = startDate.addDays(7).toString()
@@ -50,9 +43,7 @@ async function _getRecipeDates(startDate: ISODate, mealTimeId: number) : Promise
       }))
 }
 
-export const getRecipeDates = tryCatchArgs(_getRecipeDates)
-
-async function _setRecipeDate(data: RecipeDateDomain[]) {
+export async function setRecipeDate(data: RecipeDateDomain[]) {
    var db = await getDB(["recipe-date"])
    for (var d of data) {
       var o : DatabaseType.RecipeDateData = {
@@ -65,5 +56,3 @@ async function _setRecipeDate(data: RecipeDateDomain[]) {
    }
    await db.done
 }
-
-export const setRecipeDate = tryCatchArgs(_setRecipeDate)

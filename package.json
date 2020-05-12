@@ -27,7 +27,6 @@
   "license": "ISC",
   "dependencies": {
     "aws-sdk": "^2.643.0",
-    "fp-ts": "^2.5.3",
     "fp-ts-contrib": "^0.1.15",
     "glob": "^7.1.6",
     "idb": "^5.0.1",

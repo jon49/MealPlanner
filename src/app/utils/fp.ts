@@ -1,45 +1,28 @@
-import { Either, either, left, right, getValidation, mapLeft, fold, isLeft } from "fp-ts/es6/Either"
-import { TaskEither, taskEither, rightTask, right as rightTaskEither, leftTask, fromEither, tryCatch as _tryCatch } from "fp-ts/es6/TaskEither"
-import { pipe } from "fp-ts/es6/pipeable"
-import { Do } from "fp-ts-contrib/es6/Do"
-import { getMonoid, array } from "fp-ts/es6/Array"
-
-const validateForm = () => getValidation(getMonoid<string>())
-const handleError = (err: string) => { document.dispatchEvent(new CustomEvent("Error", { detail: err })) }
-const handleErrorWith = <T>(ret: T) => (err: string) => (handleError(err), ret)
-const toErrorType = JSON.stringify
-const tryCatchArgs = <T, S extends any[]>(f: (...args: S) => Promise<T>) =>
-    (...args: S) => _tryCatch(() => f(...args), toErrorType)
-const tryCatch = <T>(f: () => Promise<T>) => _tryCatch(f, toErrorType)
-const tryCatchRaw = _tryCatch
-
-const TE = {
-    right: rightTaskEither
+export const handleError = <T>(err: T) => { document.dispatchEvent(new CustomEvent("Error", { detail: err })) }
+export const tryCatch = <T>(func: () => T): Promise<T> => {
+  try {
+    return Promise.resolve(func())
+  } catch(e) {
+    return Promise.reject(e)
+  }
 }
 
-export type Validation<T> = Either<string[], T>
-export {
-    tryCatchRaw,
-    tryCatchArgs,
-    handleError,
-    handleErrorWith,
-    toErrorType,
-    Do,
-    Either,
-    either,
-    fold,
-    mapLeft,
-    left,
-    right,
-    isLeft,
-    array,
-    validateForm,
-    TaskEither,
-    taskEither,
-    rightTask,
-    leftTask,
-    fromEither,
-    tryCatch,
-    pipe,
-    TE
+export const tryCatchWithArgs =
+    <S extends any[], T>(f: (...args: S) => T) => 
+    (...args: S) => tryCatch(() => f(...args))
+
+export async function validate<T extends readonly unknown[] | readonly [unknown]>(promises: T):
+    Promise<{ -readonly [P in keyof T]: T[P] extends PromiseLike<infer U> ? U : T[P] }> {
+    const result = await Promise.allSettled(<any[]><unknown>promises)
+    const failed: string[] = []
+    for (const item of result) {
+        if (item.status === "rejected") failed.push(item.reason)
+    }
+    if (failed.length > 0) return Promise.reject(failed)
+    return <any>result.map(x => {
+        if (x.status === "fulfilled") {
+            return x.value
+        }
+        throw new Error("All items should already be resolved")
+    })
 }
