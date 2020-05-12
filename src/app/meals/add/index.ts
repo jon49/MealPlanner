@@ -1,11 +1,11 @@
-import { createString100, createString50, createPositiveWholeNumber, createIdNumber } from "../../utils/common-domain-types.js"
-import { handleError, tryCatchWithArgs, validate } from "../../utils/fp.js"
-import { Domain } from "../../utils/database-domain-types.js"
-import { createRecipe, getMealTimes } from "./store.js"
-import { defer } from "../../utils/utils.js"
-import template from "../../utils/template.js"
-import { Page, HTMLAddRecipeForm, SourceValue } from "./index.html.js"
-import { DatabaseType } from "../../utils/database.js"
+import { createString100, createString50, createPositiveWholeNumber, createIdNumber } from "../../utils/common-domain-types"
+import { handleError, tryCatchWithArgs, validate } from "../../utils/fp"
+import { Domain } from "../../utils/database-domain-types"
+import { createRecipe, getMealTimes } from "./store"
+import { defer } from "../../utils/utils"
+import template from "../../utils/template"
+import { Page, HTMLAddRecipeForm, SourceValue } from "./index.html"
+import { DatabaseType } from "../../utils/database"
 
 var page : Page = {
     addRecipeFormId: "_add-recipe",

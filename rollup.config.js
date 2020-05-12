@@ -1,5 +1,6 @@
 import resolve from "@rollup/plugin-node-resolve"
-import typescript from "@rollup/plugin-typescript"
+// import typescript from "@rollup/plugin-typescript"
+import sucrase from "@rollup/plugin-sucrase"
 
 var external = ["./utils.js", "./utils/utils.js", "../utils/utils.js", "../../utils/utils.js", "../../../utils/utils.js",
    "./utils/template.js", "../utils/template.js", "../../utils/template.js", "../../../utils/template.js",
@@ -8,9 +9,11 @@ var external = ["./utils.js", "./utils/utils.js", "../utils/utils.js", "../../ut
    "./utils/common-domain-types.js", "../utils/common-domain-types.js", "../../utils/common-domain-types.js", "../../../utils/common-domain-types.js",
    ]
 
-const tscOptions = {
-   module: "ES2015"
-}
+const resolve1 = () => resolve({ extensions: ['.js', '.ts'] })
+const typescript = () => sucrase({
+   exclude: ['node_modules/**'],
+   transforms: ['typescript'],
+   module: "ES2015" })
 
 var pages = [
    "app/meal-plans/edit",
@@ -23,8 +26,8 @@ var pages = [
       format: "esm"
    },
    plugins: [
-      typescript(tscOptions),
-      resolve()
+      typescript(),
+      resolve1()
    ],
    external
 } ))
@@ -36,8 +39,8 @@ export default [{
     format: "esm"
   },
   plugins: [
-     typescript(tscOptions),
-     resolve()
+     typescript(),
+     resolve1()
   ]
 }, {
    input: "./src/app/utils/template.ts",
@@ -46,8 +49,8 @@ export default [{
       format: "esm"
    },
    plugins: [
-      typescript(tscOptions),
-      resolve()
+      resolve1(),
+      typescript()
    ]
 }, {
    input: "./src/app/utils/database.ts",
@@ -56,8 +59,8 @@ export default [{
       format: "esm"
    },
    plugins: [
-      typescript(tscOptions),
-      resolve()
+      typescript(),
+      resolve1()
    ]
 }, {
    input: "./src/app/utils/common-domain-types.ts",
@@ -66,8 +69,8 @@ export default [{
       format: "esm"
    },
    plugins: [
-      typescript(tscOptions),
-      resolve()
+      typescript(),
+      resolve1()
    ],
    external
 }, {
@@ -77,7 +80,7 @@ export default [{
       format: "esm"
    },
    plugins: [
-      typescript(tscOptions),
-      resolve()
+      typescript(),
+      resolve1()
    ]
 }].concat(pages)

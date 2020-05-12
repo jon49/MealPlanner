@@ -1,5 +1,5 @@
 import test from "ava"
-import defer from "./defer.js"
+import {defer} from "./utils.js"
 
 let wait = (time : number, message: string) => new Promise<string>((resolve, _) => {
   setTimeout( function() {

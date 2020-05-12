@@ -1,13 +1,13 @@
 import { Page } from "./index.html"
-import { recipeCancelMeal, recipeNextMeal, recipePreviousMeal, CreateRecipe, Recipe } from "./templates/recipe.js"
-import { addRecipe, CancelledRecipe, CreateCancelledRecipe } from "./templates/cancelled-recipe.js"
-import { random, range } from "./util/util.js"
-import { getRecipes, setRecipeDate, getRecipeDates, setMealPlannerSettings, getMealPlannerSettings } from "./store/store.js"
-import { ISODate } from "../../utils/database.js"
-import { debounce, defer } from "../../utils/utils.js"
-import { RecipeDomain, RecipeDateDomain, RecipeAndDateDomain } from "./Domain/DomainTypes.js"
-import start from "./temp-meal-store.js"
-import { tryCatch, handleError, tryCatchWithArgs } from "../../utils/fp.js"
+import { recipeCancelMeal, recipeNextMeal, recipePreviousMeal, CreateRecipe, Recipe } from "./templates/recipe"
+import { addRecipe, CancelledRecipe, CreateCancelledRecipe } from "./templates/cancelled-recipe"
+import { random, range } from "./util/util"
+import { getRecipes, setRecipeDate, getRecipeDates, setMealPlannerSettings, getMealPlannerSettings } from "./store/store"
+import { ISODate } from "../../utils/database"
+import { debounce, defer } from "../../utils/utils"
+import { RecipeDomain, RecipeDateDomain, RecipeAndDateDomain } from "./Domain/DomainTypes"
+import start from "./temp-meal-store"
+import { tryCatch, handleError, tryCatchWithArgs } from "../../utils/fp"
 start()
 
 var page : Page = {

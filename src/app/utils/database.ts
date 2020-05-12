@@ -1,5 +1,5 @@
 import { openDB, DBSchema, IDBPObjectStore, IDBPTransaction, IDBPDatabase } from "idb"
-import ISODate from "./ISODate.js"
+import ISODate from "./ISODate"
 
 export { ISODate }
 

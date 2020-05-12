@@ -21,13 +21,19 @@ function handleError(e) {
         const $message = $template.content.cloneNode(true)
         if ($message instanceof DocumentFragment) {
             var $p = $message.querySelector("[slot=message]")
-            if (typeof e.detail === "string") {
+            if (Array.isArray(e.detail) && typeof e.detail[0] === "string") {
+              console.error(e.detail)
+              $p.textContent = e.detail.join("\n")
+            } else if (typeof e.detail === "string") {
                 console.error(e.detail)
                 $p.textContent = e.detail
             } else {
-                const error = JSON.stringify(e.detail)
-                console.error(error)
-                $p.textContent = e.detail
+                if (e.detail.message) {
+                  $p.textContent = e.detail.message
+                } else {
+                  $p.textContent = JSON.stringify(e.detail)
+                }
+                console.error(e.detail)
             }
             document.getElementById("error-message").appendChild($message)
         }

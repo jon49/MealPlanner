@@ -1,7 +1,7 @@
-import { getActiveRecipes, setRecipeDate } from "./store.js"
-import { RecipeDateDomain } from "../Domain/DomainTypes.js";
-import ISODate from "../../../utils/ISODate.js";
-import { handleError, tryCatchWithArgs } from "../../../utils/fp.js"
+import { getActiveRecipes, setRecipeDate } from "./store"
+import { RecipeDateDomain } from "../Domain/DomainTypes";
+import ISODate from "../../../utils/ISODate";
+import { handleError, tryCatchWithArgs } from "../../../utils/fp"
 
 interface FuzzySearch extends HTMLElement {
    template: string
