@@ -1,7 +1,7 @@
 import { getActiveRecipes, setRecipeDate } from "./store"
 import { RecipeDateDomain } from "../Domain/DomainTypes";
 import ISODate from "../../../utils/ISODate";
-import { handleError, tryCatchWithArgs } from "../../../utils/utils"
+import { handleError } from "../../../utils/utils"
 
 interface FuzzySearch extends HTMLElement {
    template: string
@@ -12,7 +12,7 @@ interface FuzzySearch extends HTMLElement {
 }
 
 getActiveRecipes()
-.then(tryCatchWithArgs(recipes => {
+.then(recipes => {
    const $fuzzySearch = <FuzzySearch>document.createElement("fuzzy-search")
    $fuzzySearch.setAttribute("limit", "10")
    $fuzzySearch.setAttribute("empty-message", "No meals available.")
@@ -35,7 +35,8 @@ getActiveRecipes()
    if ($main) {
       $main.append($fuzzySearch)
    }
-}), handleError)
+})
+.catch(handleError)
 
 function selected(e: CustomEvent) {
    e.preventDefault()
@@ -57,5 +58,6 @@ function selected(e: CustomEvent) {
       recipeId: { _id: "recipe", value: id }
    }
    setRecipeDate([data])
-   .then(() => { location.href = `/app/meal-plans/edit#${recipeDate.toString()}` }, handleError)
+   .then(() => { location.href = `/app/meal-plans/edit#${recipeDate.toString()}` })
+   .catch(handleError)
 }

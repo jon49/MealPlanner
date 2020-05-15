@@ -1,7 +1,7 @@
 import { createString100, createString50, createPositiveWholeNumber, createIdNumber } from "../../utils/common-domain-types"
 import { Domain } from "../../utils/database-domain-types"
 import { createRecipe, getMealTimes } from "./store"
-import { handleError, tryCatchWithArgs, validate, defer } from "../../utils/utils"
+import { handleError, validate, defer } from "../../utils/utils"
 import template from "../../utils/template"
 import { Page, HTMLAddRecipeForm, SourceValue } from "./index.html"
 import { DatabaseType } from "../../utils/database"
@@ -37,7 +37,7 @@ function addMealTimes(mealTimes: DatabaseType.MealTimeData[]) {
 }
 
 getMealTimes()
-.then(tryCatchWithArgs(addMealTimes))
+.then(addMealTimes)
 .catch(handleError)
 
 /** Form submit **/
@@ -50,10 +50,8 @@ const saveRecipe = async () => {
 
 const submitOnce = () =>
     saveRecipe()
-    .then(x => {
-            location.href = `/app/meals/?id=${x.result}`
-            return Promise.resolve()
-        }, handleError)
+    .then(x => { location.href = `/app/meals/?id=${x.result}` })
+    .catch(handleError)
 
 interface PreviousRecipeTemplate {
     "previous-recipe": HTMLAnchorElement
@@ -71,8 +69,8 @@ const saveAndAdd = () =>
         nodes["previous-recipe"].textContent = x.data.name.value
         previousRecipesList.prepend(nodes.root)
         $form.reset()
-        return Promise.resolve()
-    }, handleError)
+    })
+    .catch(handleError)
 
 const submit = (e: Event) => {
     e.preventDefault()

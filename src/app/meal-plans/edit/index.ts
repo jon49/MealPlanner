@@ -4,7 +4,7 @@ import { addRecipe, CancelledRecipe, CreateCancelledRecipe } from "./templates/c
 import { random, range } from "./util/util"
 import { getRecipes, setRecipeDate, getRecipeDates, setMealPlannerSettings, getMealPlannerSettings } from "./store/store"
 import { ISODate } from "../../utils/database"
-import { debounce, defer, tryCatch, handleError, tryCatchWithArgs } from "../../utils/utils"
+import { debounce, defer, handleError } from "../../utils/utils"
 import { RecipeDomain, RecipeDateDomain, RecipeAndDateDomain } from "./Domain/DomainTypes"
 import start from "./temp-meal-store"
 start()
@@ -101,13 +101,13 @@ function handleDateChange(target: HTMLInputElement) {
       })))
       return current
    })
-   .then(tryCatchWithArgs(current => {
+   .then(current => {
       mealSelections.innerHTML = ""
       current.currentRecipesAddedDates.forEach(x => {
          var recipeNode = getRecipe(x.date.date, x.recipe)
          mealSelections.appendChild(recipeNode.nodes.root)
       })
-   }))
+   })
 }
 
 var firstPageView = true
@@ -120,7 +120,8 @@ startDate.addEventListener("change", debounce(function(e: Event) {
                location.href = location.hash
             }
             firstPageView = false
-         }, handleError)
+         })
+         .catch(handleError)
       }
    }, 250, { runImmediatelyFirstTimeOnly: true }))
 
@@ -133,18 +134,18 @@ const cancelRecipe = (oldRecipe: Recipe) =>
          , mealTimeId: { value: 1, _id: "meal-time" as const }
          , quantity: 1 }])
       ]) 
-   .then(tryCatchWithArgs(([cancelledRecipe]) => {
+   .then(([cancelledRecipe]) => {
       oldRecipe.nodes.root.replaceWith(cancelledRecipe.nodes.root)
       cancelledRecipe.nodes["add-recipe"].focus()
-   }))
+   })
 
 const cancelledRecipeToNewRecipe = (cancelledRecipe: CancelledRecipe) =>
    getRecipes()
-   .then(tryCatchWithArgs(recipes => {
+   .then(recipes => {
       const newRecipe = getRecipe(cancelledRecipe.date, recipes[random(0, recipes.length - 1)])
       cancelledRecipe.nodes.root.replaceWith(newRecipe.nodes.root)
       newRecipe.nodes["next-meal"].focus()
-   }))
+   })
 
 const nextRecipe = async (oldRecipe: Recipe) => {
    const maybeNextRecipe = oldRecipe.peek()
@@ -193,7 +194,7 @@ const setNewRecipe = (o: RecipeAndDateDomain) =>
 
 const getNewRecipe = async (oldRecipe: Recipe) => {
    const recipes = await getRecipes()
-   const picked = await tryCatch(() => recipes[random(0, recipes.length - 1)])
+   const picked = recipes[random(0, recipes.length - 1)]
    return { ...picked, date: oldRecipe.date }
 }
 
@@ -214,7 +215,8 @@ if (!startDate.value) {
             startDate.value = settings.startDate.toString()
             init()
          }
-      }, handleError)
+      })
+   .catch(handleError)
 } else {
    init()
 }

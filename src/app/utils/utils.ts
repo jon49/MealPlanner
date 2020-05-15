@@ -1,12 +1,12 @@
 type ArgTypes<T> = T extends (...args: infer A) => any ? A:[]
-export function defer<R, T extends (...args: any[]) => Promise<R>>(p: T) : (...args: ArgTypes<T>) => Promise<R|undefined> {
+export function defer<R, T extends (...args: any[]) => Promise<R>>(p: T) : (...args: ArgTypes<T>) => Promise<R|void> {
    let wait = false
    return (...args: ArgTypes<T>) => {
       if (!wait) {
          wait = true
          return p.apply(p, args).finally(() => wait = false)
       }
-      return Promise.resolve(void 0)
+      return Promise.resolve()
    }
 }
 
@@ -61,17 +61,6 @@ export function debounce<F extends Procedure>(
 // FP
 
 export const handleError = <T>(err: T) => { document.dispatchEvent(new CustomEvent("Error", { detail: err })) }
-export const tryCatch = <T>(func: () => T): Promise<T> => {
-  try {
-    return Promise.resolve(func())
-  } catch(e) {
-    return Promise.reject(e)
-  }
-}
-
-export const tryCatchWithArgs =
-    <S extends any[], T>(f: (...args: S) => T) => 
-    (...args: S) => tryCatch(() => f(...args))
 
 export async function validate<T extends readonly unknown[] | readonly [unknown]>(promises: T):
     Promise<{ -readonly [P in keyof T]: T[P] extends PromiseLike<infer U> ? U : T[P] }> {
