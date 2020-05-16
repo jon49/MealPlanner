@@ -1,4 +1,5 @@
-import html from '../../../layouts/util.js'
+// @ts-check
+import html from '../../../layouts/html.js'
 import _default from "../../../layouts/_default.html.js"
 
 var head = html`

@@ -4,7 +4,7 @@ import { RecipeDomain, RecipeDateDomain } from "../Domain/DomainTypes.js";
 export async function getActiveRecipes() : Promise<RecipeDomain[]> {
    var db = await getReadOnlyDb(["recipe"])
    var recipes = await db.recipe.getAll()
-   return recipes.map(x => (
+   return recipes.map((x: DatabaseType.RecipeData) => (
       { location: x.location
       , id: { _id: "recipe", value: x.id }
       , name: x.name

@@ -1,12 +1,14 @@
-import html from '../../layouts/util.js'
+// @ts-check
+import html from '../../layouts/html.js'
 import _default from "../../layouts/_default.html.js"
 import { recipeTemplate } from './templates/_recipe.html.js'
 import { cancelledRecipeTemplate } from './templates/_cancelled-recipe.html.js'
 
-export interface Page {
-   mealSelectionsId: "_meal-selections"
-   startDateFormId: "start-date"
-}
+/**
+ * @typedef Page
+ * @property {"_meal-selections"} mealSelectionsId
+ * @property {"start-date"} startDateFormId
+ */
 
 var head = html`
 <script async src="/app/utils/utils.js" type="module"></script>

@@ -1,8 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "module": "CommonJS",
-   //  "module": "ES2015",
+    "module": "ES2015",
     "moduleResolution": "node",
 
     "strict": true,
@@ -12,13 +11,14 @@
     "strictPropertyInitialization": true,
     "noImplicitThis": true,
     "alwaysStrict": true,
+    "allowJs": true,
 
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
 
-    "outDir": "./build/app",
+    "outDir": "./public/app",
    //  "watch": true,
     "skipLibCheck": true,
   },
@@ -26,8 +26,8 @@
   "files": [
     "./node_modules/@types/node/index.d.ts"
   ],
-  "include": [ "src/**/*.ts", "src/app/utils/utils.js" ],
+  "include": [ "src/**/*.ts" ],
   "exclude": [
-    "node_modules"
+    "node_modules", "src/**/*spec.ts"
   ]
 }

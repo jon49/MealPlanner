@@ -1,25 +1,22 @@
-const glob = require("glob")
-const fs = require("fs")
-const cp = require("child_process")
+import glob from "glob"
+import fs from "fs"
+import cp from "child_process"
+import path from "path"
+
 const execFile = cp.execFile
-const path = require("path")
 
 var cwd = process.cwd()
 
 var fileLocation = process.argv[3]
-if (fileLocation && fileLocation.indexOf("__") > -1) {
-   GenerateHTML(fileLocation)
-} else {
-   glob("./build/**/index.html.js", (err, matches) => {
-      if (err) {
-         console.error(err)
-         return
-      }
-      for (var filename of matches) {
-         GenerateHTML(filename)
-      }
-   })
-}
+glob("./src/**/index.html.js", (err, matches) => {
+   if (err) {
+      console.error(err)
+      return
+   }
+   for (var filename of matches) {
+      GenerateHTML(filename)
+   }
+})
 
 function GenerateHTML(filename) {
    const clean = filename

@@ -1,21 +1,9 @@
-import html from "../../layouts/util.js"
+// @ts-check
+import html from "../../layouts/html.js"
 import _default from "../../layouts/_default.html.js"
 
 const head = html`<link rel="stylesheet" type="text/css" href="/app/form.css">
     <script src="/app/utils/form-tabs.js" async></script>`
-
-type AddRecipeFormField = "recipe-name" | "book" | "book-page" | "url" | "other" | "url-title" | "use-url-as-title"
-export type SourceValue = "url" | "book" | "other"
-export interface Page {
-    addRecipeFormId: "_add-recipe"
-    previousRecipes: "_previous-recipes"
-    mealTime: "meal-time"
-}
-
-type FormField_ = { [K in AddRecipeFormField]: HTMLInputElement }
-export interface HTMLAddRecipeForm extends HTMLFormElement, FormField_ {
-    source: RadioNodeList
-}
 
 const main = html`
     <form id="_add-recipe">
@@ -83,4 +71,3 @@ const page = _default({
 })
 
 console.log(page)
-

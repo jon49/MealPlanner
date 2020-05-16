@@ -1,50 +1,20 @@
 import resolve from "@rollup/plugin-node-resolve"
-// import typescript from "@rollup/plugin-typescript"
 import sucrase from "@rollup/plugin-sucrase"
 
-var external = ["./utils.js", "./utils/utils.js", "../utils/utils.js", "../../utils/utils.js", "../../../utils/utils.js",
-   "./utils/template.js", "../utils/template.js", "../../utils/template.js", "../../../utils/template.js",
-   "./utils/database.js", "../utils/database.js", "../../utils/database.js", "../../../utils/database.js",
-   "./utils/common-domain-types.js", "../utils/common-domain-types.js", "../../utils/common-domain-types.js", "../../../utils/common-domain-types.js",
-   ]
+// Use this with rollup to generate the type definitions
+// npx tsc -d -m ES2020 --outDir ./src/app/utils/ ./external/*.ts
 
 const resolve1 = () => resolve({ extensions: ['.js', '.ts'] })
 const typescript = () => sucrase({
    exclude: ['node_modules/**'],
    transforms: ['typescript'],
+   declaration: true,
    module: "ES2015" })
 
-var pages = [
-   "app/meal-plans/edit",
-   "app/meal-plans/edit/search",
-   "app/meals/add"
-].map(x => ({
-   input: `./src/${x}/index.ts`,
+export default [ {
+   input: "./external/template.ts",
    output: {
-      file: `./public/${x}/index.js`,
-      format: "esm"
-   },
-   plugins: [
-      typescript(),
-      resolve1()
-   ],
-   external
-} ))
-
-export default [{
-  input: "./src/app/utils/utils.ts",
-  output: {
-    file: "./public/app/utils/utils.js",
-    format: "esm"
-  },
-  plugins: [
-     typescript(),
-     resolve1()
-  ]
-}, {
-   input: "./src/app/utils/template.ts",
-   output: {
-      file: "./public/app/utils/template.js",
+      file: "./src/app/utils/template.js",
       format: "esm"
    },
    plugins: [
@@ -52,24 +22,13 @@ export default [{
       typescript()
    ]
 }, {
-   input: "./src/app/utils/database.ts",
+   input: "./external/idb.ts",
    output: {
-      file: "./public/app/utils/database.js",
+      file: "./src/app/utils/idb.js",
       format: "esm"
    },
    plugins: [
       typescript(),
       resolve1()
    ]
-}, {
-   input: "./src/app/utils/common-domain-types.ts",
-   output: {
-      file: "./public/app/utils/common-domain-types.js",
-      format: "esm"
-   },
-   plugins: [
-      typescript(),
-      resolve1()
-   ],
-   external
-} ].concat(pages)
+} ]

@@ -1,5 +1,7 @@
-import { openDB, DBSchema, IDBPObjectStore, IDBPTransaction, IDBPDatabase } from "idb"
-import ISODate from "./ISODate"
+import { DBSchema, IDBPObjectStore, IDBPTransaction, IDBPDatabase } from "idb"
+import { openDB as OPEND_DB } from "idb/build/esm/entry"
+import openDB from "./idb.js"
+import ISODate from "./ISODate.js"
 
 export { ISODate }
 
@@ -214,7 +216,7 @@ export async function getReadOnlyDb<T extends AllTableNames>(tables: T[]) {
 }
 
 async function getDB_() {
-   return openDB<MealPlanner>("meal-planner", 18, {
+   return (<typeof OPEND_DB>openDB)<MealPlanner>("meal-planner", 18, {
       async upgrade(db, _, __, tx) {
          var stores = db.objectStoreNames
          if (!stores.contains("meal-time")) {

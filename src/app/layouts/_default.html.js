@@ -1,29 +1,33 @@
-import html from './util.js'
+// @ts-check
+import html from './html.js'
 
-type CurrentPageTitle
-   = "Home"
-   | "Plan Meals" 
-   | "Meal Plan Search"
-   | "Add Meal"
+/**
+ * @typedef CurrentPageTitle
+ * @type {"Home"|"Plan Meals"|"Meal Plan Search"|"Add Meal"}
+ */
 
-interface DefaultOptions {
-   currentPage : CurrentPageTitle
-   head : string
-   header : string
-   main : string
-   afterMain : string
-}
+/**
+ * @typedef {Object} Link
+ * @property {string} href
+ * @property {CurrentPageTitle} title
+ * @property {boolean} isCurrentPage
+ */
 
-interface Link {
-   href : string
-   title : CurrentPageTitle
-   isCurrentPage : boolean 
-}
-
-const createLink = (o : Link) =>
+/**
+ * @param {Link} o 
+ */
+const createLink = o =>
    html`<a href="${o.isCurrentPage ? "#" : o.href}">${o.title}</a>`
 
-var _default = ({ main, currentPage, afterMain, head } : DefaultOptions) => html`
+/**
+ * @param {Object} htmlSegment
+ * @param {CurrentPageTitle} htmlSegment.currentPage
+ * @param {string} htmlSegment.head
+ * @param {string} htmlSegment.header
+ * @param {string} htmlSegment.main
+ * @param {string} htmlSegment.afterMain
+ */
+var _default = ({ main, currentPage, afterMain, head }) => html`
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -43,7 +47,10 @@ var _default = ({ main, currentPage, afterMain, head } : DefaultOptions) => html
       </a>
       <ul>
       ${
-         (<Link[]>[{
+         /**
+          * @type {Link[]}
+          */
+         ([{
             href: "/app/meal-plans/edit/",
             title: "Plan Meals",
             isCurrentPage: currentPage === "Plan Meals"
