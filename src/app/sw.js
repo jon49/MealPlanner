@@ -1,24 +1,10 @@
 // @ts-check
 
+// GENERATED FILE LOCATIONS ON LINE 4 DO NOT MOVE!!!!
+const files = {"app":{"meal-plans":{"edit":{"_files":["index.html","index.js","temp-meal-store.js"],"search":{"_files":["index.html","index.js","store.js"]},"store":{"_files":["store.js"]},"templates":{"_files":["cancelled-recipe.js","recipe.js"]},"util":{"_files":["util.js"]}}},"meals":{"add":{"_files":["index.html","index.js","store.js"]}},"utils":{"_files":["common-domain-types.js","database.js","form-tabs.js","fuzzy-search.js","idb.js","ISODate.js","snack-bar.js","template.js","utils.js"]}}}
+
 var CACHE_NAME = 'meal-planner-v1'
-var urlsToCache = createLinks("/app", {
-    _files: [ "form.css", "index.css", "index.html", "index.js" ],
-    utils: {
-        _files:
-        [ "common-domain-types.js"
-        , "form-tabs.js"
-        , "fuzzy-search.js"
-        , "template.js"
-        , "database.js"
-        , "fp.js"
-        , "snack-bar.js"
-        , "utils.js" ]},
-    meals: { add: { _files: ["index.html", "index.js"] } },
-    "meal-plans": {
-        edit: { _files: ["index.html", "index.js"]
-        , search: { _files: ["index.html", "index.js"]} }
-    }
-}).concat("/images/meal-planner-logo.svg")
+var urlsToCache = createLinks("/app", files).concat("/images/meal-planner-logo.svg")
 
 self.addEventListener("install", installHandler)
 self.addEventListener("fetch", fetchHandler)
@@ -62,7 +48,7 @@ function installHandler(e) {
 
 /**
  * @param {string} root
- * @param {{[K: string]: any, _files: string[]}} links
+ * @param {{[K: string]: any, _files?: string[]}} links
  * @param {?string[]} files
  */
 function createLinks(root, links, files = []) {

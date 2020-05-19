@@ -1,3 +1,4 @@
+// @ts-check
 import _default from "./layouts/_default.html.js"
 
 const page = _default({

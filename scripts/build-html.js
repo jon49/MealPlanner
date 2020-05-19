@@ -7,7 +7,6 @@ const execFile = cp.execFile
 
 var cwd = process.cwd()
 
-var fileLocation = process.argv[3]
 glob("./src/**/index.html.js", (err, matches) => {
    if (err) {
       console.error(err)

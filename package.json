@@ -18,8 +18,9 @@
     "tsc": "npx tsc",
     "rollup": "npx rollup -c",
     "build:html": "node ./scripts/build-html.js",
-    "build:static": "cd ./src; find . -name '*.js' -o -name '*.css' -o -name '*.svg' -not -name '*.html.js' | cpio -pdm ../public; cd ..;",
-    "build": "npm-run-all -s clean tsc build:html build:static",
+    "build:static": "cd ./src; find . ! '(' -name '*.html.js' -o -path '*/layouts/*' ')' -name '*.js' -o -name '*.css' -o -name '*.svg' | cpio -pdm ../public; cd ..;",
+    "build:service-worker": "node ./scripts/build-sources.js",
+    "build": "npm-run-all -s build:service-worker clean tsc build:html build:static",
     "build:external:rollup": "npx rollup -c",
     "build:external:type:template": "npx tsc -d -m ES2020 --outDir ./src/app/utils/ ./external/template.ts 2> /dev/null",
     "build:external": "npm-run-all build:external:rollup build:external:type:template"
