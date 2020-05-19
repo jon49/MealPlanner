@@ -43,7 +43,7 @@ const maxLength = (error: string, val: string, maxLength: number) =>
         ? Promise.reject([error])
     : Promise.resolve(val)
 
-const createString = async <T>(ctor: (s: string) => T, name: string, val: string | undefined, maxLength_: number) => {
+const createString = async <T>(ctor: (s: string) => T, name: string, maxLength_: number, val?: string | undefined) => {
     const trimmed = await notFalsey(`'${name} is required.'`, val?.trim())
     const s = await maxLength(`'${name}' must be less than 50 characters.`, trimmed, maxLength_)
     return ctor(s)
@@ -51,11 +51,11 @@ const createString = async <T>(ctor: (s: string) => T, name: string, val: string
 
 const isInteger = (val: number) => val === (val|0)
 
-export const createString50 = (name: string, val: string | undefined): Promise<String50> =>
-    createString(s => new String50_(s), name, val, String50_.maxLength)
+export const createString50 = (name: string, val?: string | undefined): Promise<String50> =>
+    createString(s => new String50_(s), name, String50_.maxLength, val)
 
-export const createString100 = (name: string, val: string | undefined) : Promise<String100> =>
-    createString(s => new String100_(s), name, val, String100_.maxLength)
+export const createString100 = (name: string, val?: string | undefined) : Promise<String100> =>
+    createString(s => new String100_(s), name, String100_.maxLength, val)
 
 export const createPositiveWholeNumber = (name: string, val: number) : Promise<PositiveWholeNumber>  => {
     if (val < 0) return Promise.reject([`'${name}' must be 0 or greater. But was given '${val}'.`])

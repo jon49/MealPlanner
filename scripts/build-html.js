@@ -20,9 +20,8 @@ glob("./src/**/index.html.js", (err, matches) => {
 
 function GenerateHTML(filename) {
    const clean = filename
-   .replace("__", "")
    .replace(/\.js$/, "")
-   .replace(/\.\/build/, "public")
+   .replace(/\.\/src/, "public")
    var full = path.join(cwd, filename)
    execFile("node", [full], (error, stdout, stderr) => {
       if (error) {

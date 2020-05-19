@@ -26,7 +26,7 @@ function addMealTimes(mealTimes: DatabaseType.MealTimeData[]) {
         const id = `meal-time-${x.id}`
         ;[["type", "checkbox"]
         , ["id", id]
-        , ["name", `meal-time-${x.id}`]
+        , ["name", `meal-times`]
         , ["value", ""+x.id] ]
         .forEach(xs => $input.setAttribute(xs[0], xs[1]))
         $label.setAttribute("for", id)
@@ -105,11 +105,14 @@ async function getValidatedLocation() {
 }
 
 function getValidatedMealTimeIds() {
-    const rawMealTimes = []
-    for (const input of $form.querySelectorAll("[name^=meal-time-]")) {
-        if (input instanceof HTMLInputElement && input.checked) rawMealTimes.push({id: input.value, name: input.dataset.name})
-    }
-    return validate(rawMealTimes.map(x => createIdNumber(x.name || "Unknown", +x.id)))
+    var rawMealTimes = $form["meal-times"]
+    const mealTimes =
+        (rawMealTimes instanceof RadioNodeList
+            ? Array.from(rawMealTimes)
+        : [rawMealTimes])
+        .filter(x => x instanceof HTMLInputElement && x.checked)
+        .map(x => (<HTMLInputElement>x).value)
+    return validate(mealTimes.map(x => createIdNumber("Meal times", +x)))
 }
 
 async function validateAddMealForm(): Promise<Domain.Recipe.Recipe> {

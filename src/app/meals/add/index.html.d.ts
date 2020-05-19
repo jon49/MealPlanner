@@ -9,4 +9,5 @@ export interface Page {
 type FormField_ = { [K in AddRecipeFormField]: HTMLInputElement }
 export interface HTMLAddRecipeForm extends HTMLFormElement, FormField_ {
     source: RadioNodeList
+    "meal-times": RadioNodeList | HTMLInputElement
 }

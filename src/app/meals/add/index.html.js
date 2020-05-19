@@ -48,8 +48,8 @@ const main = html`
                 </fieldset>
             </fieldset>
         </form-tabs>
-        <fieldset id="meal-time">
-        <legend>Meal Time</legend>
+        <fieldset id="meal-times">
+        <legend>Meal Times</legend>
         </fieldset>
         <input type="reset" value="Clear">&nbsp;
         <input id="save-once" type="submit" value="Save">&nbsp;
