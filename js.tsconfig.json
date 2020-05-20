@@ -21,13 +21,16 @@
     "outDir": "./public/app",
    //  "watch": true,
     "skipLibCheck": true,
+    "noEmit": true
   },
   "compileOnSave": true,
   "files": [
     "./node_modules/@types/node/index.d.ts"
   ],
-  "include": [ "src/**/*.ts" ],
+  "include": [ 
+    "src/**/*.js" 
+  ],
   "exclude": [
-    "node_modules", "src/**/*spec.ts", "src/**/*.js"
+    "node_modules", "src/**/*.ts"
   ]
 }
