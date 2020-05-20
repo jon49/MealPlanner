@@ -2,6 +2,9 @@
 
 ;(function() {
     const $style = document.createElement("style")
+    /**
+     * @param {number} count
+     */
     const tabStyles = count => `
         form-tabs [data-tab] { display: none; }
         form-tabs [data-tab] + label { cursor: pointer; background: #eee; padding: 0.25em; border: 1px solid #ccc; }
@@ -37,6 +40,7 @@
         }
 
         disconnectedCallback() {
+            // @ts-ignore
             this.removeEventListener("change", this.clickListener)
         }
 
@@ -48,7 +52,7 @@
                     tabNumber = currentSelected.dataset.tab
                 }
             }
-            this.fieldSetTabContent
+            (this.fieldSetTabContent ?? [])
             .forEach(x => {
                 if (x instanceof HTMLFieldSetElement) {
                     if (x.dataset.tab === tabNumber) {

@@ -6,7 +6,9 @@ const files = {"app":{"meal-plans":{"edit":{"_files":["index.html","index.js","t
 var CACHE_NAME = 'meal-planner-v1'
 var urlsToCache = createLinks("/app", files).concat("/images/meal-planner-logo.svg")
 
+// @ts-ignore
 self.addEventListener("install", installHandler)
+// @ts-ignore
 self.addEventListener("fetch", fetchHandler)
 
 /**
@@ -14,7 +16,6 @@ self.addEventListener("fetch", fetchHandler)
  * @returns string
  */
 function normalizeUrl(url) {
-    const lastSlash = url.lastIndexOf("/")
     let newUrl = url.includes("?") ? url.substring(0, url.lastIndexOf("?")) : url
     newUrl = newUrl.includes("#") ? url.substring(0, url.lastIndexOf("#")) : newUrl
     newUrl = !newUrl.endsWith("/") && newUrl.lastIndexOf("/") > newUrl.lastIndexOf(".") ? newUrl + "/" : newUrl
@@ -50,12 +51,13 @@ function installHandler(e) {
  * @param {string} root
  * @param {{[K: string]: any, _files?: string[]}} links
  * @param {?string[]} files
+ * @returns {string[]}
  */
 function createLinks(root, links, files = []) {
     if (links._files) {
         links._files.forEach(x => {
+            if (!files) throw `Files must be an array but got '${files}'`
             if (x === "index.html") {
-                // files.push(root)
                 files.push(root + "/")
             } else {
                 files.push(`${root}/${x}`)
@@ -67,5 +69,5 @@ function createLinks(root, links, files = []) {
             createLinks(`${root}/${link}`, links[link], files)
         }
     }
-    return files
+    return files || []
 }

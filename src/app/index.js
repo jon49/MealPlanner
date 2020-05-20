@@ -20,7 +20,9 @@ function handleError(e) {
     if ($template instanceof HTMLTemplateElement) {
         const $message = $template.content.cloneNode(true)
         if ($message instanceof DocumentFragment) {
+            /** @type {HTMLElement|null} */
             var $p = $message.querySelector("[slot=message]")
+            if (!$p) throw "No slot message found."
             if (Array.isArray(e.detail) && typeof e.detail[0] === "string") {
               console.error(e.detail)
               $p.textContent = e.detail.join("\n")
@@ -35,10 +37,11 @@ function handleError(e) {
                 }
                 console.error(e.detail)
             }
-            document.getElementById("error-message").appendChild($message)
+            document.getElementById("error-message")?.appendChild($message)
         }
     }
 }
 
+// @ts-ignore
 document.addEventListener("Error", handleError)
 

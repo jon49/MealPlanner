@@ -88,21 +88,23 @@
             $currentSelected.classList.add("highlight")
             $currentSelected.setAttribute("aria-selected", "true")
             $input.setAttribute("aria-activedescendant", $currentSelected.id)
-            $input.value = $currentSelected.dataset.title
+            $input.value = $currentSelected.dataset.title ?? "Unknown"
          }
       }
 
    /**
     * @param {{ $fuzzySearch: FuzzySearch }} param0
-    * @returns {(arg0: KeyboardEvent) => (false|undefined|void)}
     */
    const handleKeyDown =
       ({ $fuzzySearch }) =>
+      /**
+       * @type {(e: KeyboardEvent) => false|undefined|void}
+       */
       e => {
          if (commandKeys.some(x => e.key === x)) {
             if (!e.shiftKey && key.arrowDown === e.key) {
                if (!$list.firstElementChild) {
-                  $input.dispatchEvent(new KeyboardEvent("keydown", { key: key.escape }))
+                  $input.dispatchEvent(new KeyboardEvent("keydown", { key: key._escape }))
                   return
                }
                /**
@@ -240,7 +242,7 @@
          if (content instanceof DocumentFragment) {
             Object.keys(value).forEach(key => {
                const el = content.querySelector(`[name=${key}]`)
-               if (value[key]) {
+               if (el && value[key]) {
                   el.textContent = value[key]
                }
             })
@@ -252,10 +254,12 @@
          throw new Error("Value is not a string and the template is not set.")
       }
       li.dataset.id = "" + id
-      ;[["role", "option"]
+      ;/** @type {[string, string][]} */[["role", "option"]
       , ["id", "_" + id]
       , ["aria-label", title]
-      ].forEach(xs => li.setAttribute(xs[0], xs[1]))
+      ]
+      // @ts-ignore
+      .forEach(([/** @type {string} */key, /** @type {string} */val]) => li.setAttribute(key, val))
       li.addEventListener("mouseenter", mouseOverEvent)
       li.classList.add("cursor-pointer")
       return li
@@ -310,9 +314,12 @@
       get placeholder() { return this.getAttribute("placeholder") || "" }
       get label() { return this.getAttribute("label") || "Search" }
       get limit() {
-         return (isNaN(+this.getAttribute("limit")))
+         const maybeLimit = this.getAttribute("limit")
+         if (!maybeLimit) return 10
+         const limit = +maybeLimit
+         return isNaN(limit)
             ? 10
-         : +this.getAttribute("limit")
+         : limit
       }
 
       /**
@@ -393,7 +400,7 @@
          ].forEach(x => $list.setAttribute(x[0], x[1]))
 
          const handleKeyDownBound = handleKeyDown({ $fuzzySearch: this })
-         const handleKeyupBound = handleKeyup({ limit: this.limit, searchList: this.__searchList })
+         const handleKeyupBound = handleKeyup({ limit: this.limit, searchList: this.__searchList ?? [] })
          const handleClickBound = handleClick({ $fuzzySearch: this })
 
          $input.addEventListener("keydown", handleKeyDownBound)
@@ -418,7 +425,7 @@
       }
 
       disconnectedCallback() {
-         this.__destroy()
+         if (this.__destroy instanceof Function) this.__destroy()
       }
    }
    customElements.define("fuzzy-search", FuzzySearch)
@@ -426,7 +433,11 @@
    /**** ALGORITHM ****/
 
    // https://github.com/tad-lispy/node-damerau-levenshtein
-   // ts-ignore
+   /**
+    * @param {*} __this
+    * @param {*} that
+    * @param {*} [limit]
+    */
    function fuzzySearch(__this, that, limit) {
 
       var thisLength = __this.length,
@@ -478,6 +489,7 @@
 
       return prepare (matrix[thisLength][thatLength]);
 
+      // @ts-ignore
       function prepare(steps) {
          var length = Math.max(thisLength, thatLength)
          var relative = length === 0
