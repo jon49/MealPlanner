@@ -13,13 +13,13 @@
 --rc: 8px;
 }
 
-/* @media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: dark) {
  :root {
   --c2:#333;
   --c3:#1e1f20;
   --c4:#fff;
  }
-} */
+}
 
 html {
   -ms-text-size-adjust: 100%;
@@ -108,9 +108,13 @@ aside:first-child, article:first-child {margin-left:0}
  --sans: Georgia, "Times New Roman", Times, serif;
 }
 
-/* @media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: dark) {
  :root { --c2:#333; --c4:#eee; }
-} */
+}
+
+input, select, textarea {
+  font-size: inherit;
+}
 
 /**
 Custom

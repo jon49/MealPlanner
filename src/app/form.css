@@ -1,4 +1,21 @@
 /**
+  MAPPING
+*/
+
+:root {
+  --selected-tab: var(--c3);
+  --unselected-tab: var(--c2);
+}
+
+/**
+  OVERRIDES
+*/
+
+label {
+  padding-right: .5em;
+}
+
+/**
     VALIDATION
 */
 
@@ -6,7 +23,6 @@
   display: hidden;
   font-size: 0.8em;
   margin: 0;
-  line-height: 0;
   font-weight: normal;
 }
 
@@ -29,4 +45,5 @@ input:required:placeholder-shown {
 
 fieldset {
   margin-top: 0.5em;
+  margin-bottom: 0.5em;
 }

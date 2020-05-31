@@ -7,8 +7,8 @@
      */
     const tabStyles = count => `
         form-tabs [data-tab] { display: none; }
-        form-tabs [data-tab] + label { cursor: pointer; background: #eee; padding: 0.25em; border: 1px solid #ccc; }
-        form-tabs [data-tab]:checked + label { border-bottom: solid #f9f9f9 1px; background-color: #f9f9f9; }
+        form-tabs [data-tab] + label { cursor: pointer; padding: 0.25em; border: 1px solid #ccc; background-color: var(--unselected-tab); }
+        form-tabs [data-tab]:checked + label { border-bottom: solid var(--selected-tab) 1px; background-color: var(--selected-tab); }
         ${[...Array(count).keys()].map(x => `form-tabs [data-tab="${x}"]:checked ~ [data-tab="${x}"]`).join(",")} {
             padding: 1em;
             display: block;
