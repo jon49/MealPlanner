@@ -3,7 +3,7 @@ export type SourceValue = "url" | "book" | "other"
 export interface Page {
     addRecipeFormId: "_add-recipe"
     previousRecipes: "_previous-recipes"
-    mealTime: "meal-time"
+    mealTimes: "meal-times"
 }
 
 type FormField_ = { [K in AddRecipeFormField]: HTMLInputElement }

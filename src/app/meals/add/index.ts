@@ -9,11 +9,11 @@ import { DatabaseType } from "../../utils/database.js"
 var page : Page = {
     addRecipeFormId: "_add-recipe",
     previousRecipes: "_previous-recipes",
-    mealTime: "meal-time"
+    mealTimes: "meal-times"
 }
 
 const $form = <HTMLAddRecipeForm>document.getElementById(page.addRecipeFormId)
-const $mealTime = <HTMLFieldSetElement>document.getElementById(page.mealTime)
+const $mealTime = <HTMLFieldSetElement>document.getElementById(page.mealTimes)
 
 /** Add Meal Time Choices */
 
