@@ -20,8 +20,8 @@ const $mealTime = <HTMLFieldSetElement>document.getElementById(page.mealTimes)
 const makeEl = (s: string) => document.createElement(s)
 function addMealTimes(mealTimes: DatabaseType.MealTimeData[]) {
     const times = document.createDocumentFragment()
+    var $input = makeEl("input")
     mealTimes.forEach(x => {
-        const $input = makeEl("input")
         const $label = makeEl("label")
         const id = `meal-time-${x.id}`
         ;[["type", "checkbox"]
@@ -33,6 +33,7 @@ function addMealTimes(mealTimes: DatabaseType.MealTimeData[]) {
         $label.textContent = x.name || "Unknown"
         times.append($input, $label, makeEl("br"))
     })
+    mealTimes.length === 1 && $input.setAttribute("checked", "true")
     $mealTime.append(times)
 }
 
