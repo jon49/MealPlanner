@@ -19,7 +19,6 @@
     "noFallthroughCasesInSwitch": true,
 
     "outDir": "./public/app",
-   //  "watch": true,
     "skipLibCheck": true
   },
   "compileOnSave": true,

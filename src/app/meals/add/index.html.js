@@ -64,7 +64,7 @@ const afterMain = html`
 
 const page = _default({
     head,
-    header: "Add Meal",
+    header: "<h1>Add Meal</h1>",
     currentPage: "Add Meal",
     main,
     afterMain

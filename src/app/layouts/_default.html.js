@@ -14,20 +14,14 @@ import html from './html.js'
  */
 
 /**
- * @param {Link} o 
- */
-const createLink = o =>
-   html`<a href="${o.isCurrentPage ? "#" : o.href}">${o.title}</a>`
-
-/**
  * @param {Object} htmlSegment
  * @param {CurrentPageTitle} htmlSegment.currentPage
  * @param {string} htmlSegment.head
- * @param {string} htmlSegment.header
+ * @param {string} [htmlSegment.header]
  * @param {string} htmlSegment.main
  * @param {string} htmlSegment.afterMain
  */
-var _default = ({ main, currentPage, afterMain, head }) => html`
+var _default = ({ main, currentPage, afterMain, head, header }) => html`
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -41,28 +35,23 @@ var _default = ({ main, currentPage, afterMain, head }) => html`
    ${head}
 </head>
 <body>
-   <nav>
-      <a href="/app/">
-         <img alt="Meal Planner Logo" src="/images/meal-planner-logo.svg" height="50" width="300">
-      </a>
-      <ul>
-      ${
-         /**
-          * @type {Link[]}
-          */
-         ([{
-            href: "/app/meal-plans/edit/",
-            title: "Plan Meals",
-            isCurrentPage: currentPage === "Plan Meals"
-         }, {
-            href: "/app/meals/add/",
-            title: "Add Meal",
-            isCurrentPage: currentPage == "Add Meal"
-         }])
-         .map(x => `<li>${createLink(x)}</li>`).join("|")
-      }
-      </ul>
-   </nav>
+   <header>
+      ${header}
+      <nav>
+         ${
+            /**
+             * @type {Link[]}
+             */
+            ([ { href: "/app/", title: "Home" }
+             , { href: "/app/meal-plans/edit/", title: "Plan Meals", }
+             , { href: "/app/meals/add/", title: "Add Meal", }
+             ])
+            .map(x => html`<a href=${x.href}>${x.title}</a>`)
+            .join("&nbsp;|&nbsp;")
+         }
+      </nav>
+   </header>
+   
 
    <main id="_main">${main}</main>
 

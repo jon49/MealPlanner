@@ -28,18 +28,24 @@ export class Recipe {
    _update(o: RecipeAndDateDomain) {
       this.id = o.id
       this.date = o.date
-      this.nodes.name.nodeValue = o.name
+      this.nodes.name.textContent = o.name
+      this.nodes.name.title = o.name
 
       this.nodes["recipe-url"].href = ""
       this.nodes["recipe-url"].textContent = ""
-      if (typeof o.location === "string") {
-         this.nodes["recipe-location"].nodeValue = o.location || "Unknown"
+      if (o.location._kind === "other") {
+         const value = o.location.other || "Unknown"
+         this.nodes["recipe-location"].textContent = value
+         this.nodes["recipe-location"].title = value
       } else if ("book" in o.location) {
-         this.nodes["recipe-location"].nodeValue = `${o.location.book} (${o.location.page})`
+         const value = `${o.location.book} (${o.location.page})`
+         this.nodes["recipe-location"].textContent = value
+         this.nodes["recipe-location"].title = value
       } else {
-         this.nodes["recipe-location"].nodeValue = ""
+         this.nodes["recipe-location"].textContent = ""
          this.nodes["recipe-url"].href = o.location.url
          this.nodes["recipe-url"].textContent = o.location.title
+         this.nodes["recipe-url"].title = o.location.title
       }
 
       this.nodes["recipe-date"].nodeValue = o.date.getDate().toLocaleDateString()

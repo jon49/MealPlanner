@@ -9,8 +9,8 @@ import html from "../../../layouts/html.js"
 /**
  * @typedef {Object} RecipeTemplate
  * @property {HTMLButtonElement} cancel-meal
- * @property {Text} name
- * @property {Text} recipe-location
+ * @property {HTMLH2Element} name
+ * @property {HTMLSpanElement} recipe-location
  * @property {HTMLAnchorElement} recipe-url 
  * @property {Text} recipe-date 
  * @property {Text} description 
@@ -22,18 +22,16 @@ import html from "../../../layouts/html.js"
 
 export const recipeTemplate = html`
 <template id="_recipe-template">
-   <aside #root>
-      <header>
-         <p>#recipe-date</p>
-         <h2 class="text-2xl">#name</h2>
-      </header>
-      <p><small><span>#recipe-location</span><a #recipe-url></a></small></p>
+   <article class="meal-edit" #root>
+      <p>#recipe-date</p>
+      <h2 #name></h2>
+      <p><small><span #recipe-location></span><a #recipe-url></a></small></p>
       <p>#description</p>
       <div>
          <button #cancel-meal>Cancel</button>&nbsp;
-         <a #search-meal>Search</a>&nbsp;
+         <a #search-meal><button>Search</button></a>&nbsp;
          <button #previous-meal>&laquo; Back</button>&nbsp;
          <button #next-meal>Next &raquo;</button>
       </div>
-   </aside>
+   </article>
 </template>`

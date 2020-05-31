@@ -14,6 +14,7 @@ var head = html`
 <script async src="/app/utils/utils.js" type="module"></script>
 <script async src="/app/utils/template.js" type="module"></script>
 <script async src="/app/utils/database.js" type="module"></script>
+<style>.meal-edit { min-width: 22em; } .meal-edit h2 { height: 1.25em; overflow: hidden; } .meal-edit p { height: 1.25em; overflow: hidden; } main { width: 100%; }</style>
 `
 
 var main = html`
@@ -30,7 +31,7 @@ ${cancelledRecipeTemplate}
 
 const page = _default({
    head,
-   header: "Meal Planner",
+   header: "<h1>Meal Planner</h1>",
    currentPage: "Plan Meals",
    main,
    afterMain,

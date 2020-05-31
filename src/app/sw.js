@@ -4,7 +4,7 @@
 const files = {"app":{"meal-plans":{"edit":{"_files":["index.html","index.js","temp-meal-store.js"],"search":{"_files":["index.html","index.js","store.js"]},"store":{"_files":["store.js"]},"templates":{"_files":["cancelled-recipe.js","recipe.js"]},"util":{"_files":["util.js"]}}},"meals":{"add":{"_files":["index.html","index.js","store.js"]}},"utils":{"_files":["common-domain-types.js","database.js","form-tabs.js","fuzzy-search.js","idb.js","ISODate.js","snack-bar.js","template.js","utils.js"]}}}
 
 var CACHE_NAME = 'meal-planner-v1'
-var urlsToCache = createLinks("/app", files).concat("/images/meal-planner-logo.svg")
+var urlsToCache = createLinks("", files).concat("/images/meal-planner-logo.svg")
 
 // @ts-ignore
 self.addEventListener("install", installHandler)

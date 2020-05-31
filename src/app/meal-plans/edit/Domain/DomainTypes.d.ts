@@ -1,11 +1,11 @@
-import { Location } from "../../../utils/database.js";
-import { ISODate } from "../../../utils/utils.js";
+import { DatabaseType } from "../../../utils/database.js"
+import ISODate from "../../../utils/ISODate.js";
 import { IDType } from "../../../utils/common-domain-types.js"
 
 export interface RecipeDomain {
    id: RecipeId
    name: string
-   location: Location
+   location: DatabaseType.Location
 }
 
 export interface RecipeDateDomain {

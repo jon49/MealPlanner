@@ -1,7 +1,7 @@
-import { getActiveRecipes, setRecipeDate } from "./store"
-import { RecipeDateDomain } from "../Domain/DomainTypes";
-import ISODate from "../../../utils/ISODate";
-import { handleError } from "../../../utils/utils"
+import { getActiveRecipes, setRecipeDate } from "./store.js"
+import { RecipeDateDomain } from "../Domain/DomainTypes.js";
+import ISODate from "../../../utils/ISODate.js";
+import { handleError } from "../../../utils/utils.js"
 
 interface FuzzySearch extends HTMLElement {
    template: string
@@ -19,12 +19,18 @@ getActiveRecipes()
    $fuzzySearch.setAttribute("autofocus", "")
    $fuzzySearch.template = "#_template"
    $fuzzySearch.searchList = recipes.map(x => {
-      const location =
-         typeof x.location === "string"
-            ? x.location
-         : "book" in x.location
-            ? `${x.location.book} - ${x.location.page}`
-         : x.location.url
+      let location : string
+      switch (x.location._kind) {
+         case "book":
+            location = `${x.location.book} - ${x.location.page}`
+            break;
+         case "other":
+            location = x.location.other
+            break;
+         case "url":
+            location = x.location.url
+            break;
+      }
       return {
          value: { title: x.name, location },
          id: x.id.value,

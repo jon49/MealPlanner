@@ -64,6 +64,7 @@ export const handleError = <T>(err: T) => { document.dispatchEvent(new CustomEve
 
 export async function validate<T extends readonly unknown[] | readonly [unknown]>(promises: T):
     Promise<{ -readonly [P in keyof T]: T[P] extends PromiseLike<infer U> ? U : T[P] }> {
+    // @ts-ignore
     const result = await Promise.allSettled(<any[]><unknown>promises)
     const failed: string[] = []
     for (const item of result) {
