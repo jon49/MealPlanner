@@ -22,7 +22,7 @@ export async function getMealPlannerSettings() : Promise<MealPlannerStoreSetting
 
 export async function setMealPlannerSettings(mealPlannerSettings: MealPlannerStoreSettings) {
    var db = await getDB(["settings"])
-   var settings = await db.settings.get("mealPlanner")
+   var settings = <DatabaseType.MealPlannerSettings>await db.settings.get("mealPlanner")
    if (settings) {
       settings.startDate = mealPlannerSettings.startDate.toString()
       db.settings.put({ mealPlanner: settings })

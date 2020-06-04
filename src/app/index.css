@@ -112,6 +112,18 @@ aside:first-child, article:first-child {margin-left:0}
  :root { --c2:#333; --c4:#eee; }
 }
 
+.light {
+  --c2:#ddd;
+  --c3:#eee;
+  --c4:#333;
+}
+
+.dark {
+  --c2: #333;
+  --c3:#1e1f20;
+  --c4: #eee;
+}
+
 input, select, textarea {
   font-size: inherit;
 }

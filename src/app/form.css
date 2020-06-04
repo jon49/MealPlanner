@@ -2,7 +2,7 @@
   MAPPING
 */
 
-:root {
+body {
   --selected-tab: var(--c3);
   --unselected-tab: var(--c2);
 }

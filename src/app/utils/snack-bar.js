@@ -31,6 +31,9 @@
         from {bottom: 30px; opacity: 1;}
         to {bottom: 0; opacity: 0;}
     }
+    fieldset[data-tab] {
+        margin-top: 3px;
+    }
     `
     document.head.append($style)
 

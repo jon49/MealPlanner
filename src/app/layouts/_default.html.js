@@ -2,20 +2,15 @@
 import html from './html.js'
 
 /**
- * @typedef CurrentPageTitle
- * @type {"Home"|"Plan Meals"|"Meal Plan Search"|"Add Meal"}
- */
-
-/**
  * @typedef {Object} Link
  * @property {string} href
- * @property {CurrentPageTitle} title
+ * @property {string} title
  * @property {boolean} isCurrentPage
  */
 
 /**
  * @param {Object} htmlSegment
- * @param {CurrentPageTitle} htmlSegment.currentPage
+ * @param {string} htmlSegment.currentPage
  * @param {string} htmlSegment.head
  * @param {string} [htmlSegment.header]
  * @param {string} htmlSegment.main
@@ -31,7 +26,7 @@ var _default = ({ main, currentPage, afterMain, head, header }) => html`
    <title>${currentPage}</title>
    <link rel="stylesheet" type="text/css" href="/app/index.css">
    <script async src="/app/utils/snack-bar.js"></script>
-   <script async src="/app/index.js"></script>
+   <script async src="/app/index.js" type=module></script>
    ${head}
 </head>
 <body>

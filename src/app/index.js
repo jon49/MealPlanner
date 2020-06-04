@@ -1,4 +1,6 @@
 // @ts-check
+import { getReadOnlyDb } from "./utils/database.js"
+import { handleError } from "./utils/utils.js";
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
@@ -15,7 +17,7 @@ if ('serviceWorker' in navigator) {
 /**
  * @param {CustomEvent} e 
  */
-function handleError(e) {
+function errorHandler(e) {
     const $template = document.getElementById("error-message-template")
     if ($template instanceof HTMLTemplateElement) {
         const $message = $template.content.cloneNode(true)
@@ -43,5 +45,16 @@ function handleError(e) {
 }
 
 // @ts-ignore
-document.addEventListener("Error", handleError)
+document.addEventListener("Error", errorHandler)
 
+async function applySettings() {
+  const db = await getReadOnlyDb(["settings"])
+  const theme = await db.settings.get("theme")
+  if (theme) {
+    document.body.removeAttribute("class")
+    document.body.setAttribute("class", theme)
+  }
+}
+
+applySettings()
+.catch(handleError)

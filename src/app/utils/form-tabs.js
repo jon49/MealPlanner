@@ -13,7 +13,7 @@
             padding: 1em;
             display: block;
             border: solid #ccc 1px;
-            margin: 0;
+            margin: 3px 0 0 0;
         }`
     $style.innerHTML = tabStyles(10)
     document.head.append($style)

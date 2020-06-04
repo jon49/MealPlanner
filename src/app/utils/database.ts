@@ -42,6 +42,7 @@ export namespace DatabaseType {
    }
    export interface SettingsData {
       mealPlanner: MealPlannerSettings
+      theme?: string
    }
 
    export interface ChangeLog {
@@ -83,9 +84,9 @@ class RecipeStore {
    }
    async get(id: number) { return await this.recipeStore.get(id) }
    async getAll() { return await this.recipeStore.getAll() }
-   put(o: DatabaseType.RecipeData) {
-      this.changeLog.put({tableName: "recipe", recordId: [o.id]})
-      return this.recipeStore.put(o)
+   async put(o: DatabaseType.RecipeData) {
+      await this.changeLog.put({tableName: "recipe", recordId: [o.id]})
+      return await this.recipeStore.put(o)
    }
 }
 
@@ -97,9 +98,9 @@ class MealTimeStore {
       this.store = tx.objectStore("meal-time")
    }
    async get(id: number) { return await this.store.get(id) }
-   put(o: DatabaseType.MealTimeData) {
-      this.changeLog.put({tableName: "meal-time", recordId: [o.id]})
-      return this.store.put(o)
+   async put(o: DatabaseType.MealTimeData) {
+      await this.changeLog.put({tableName: "meal-time", recordId: [o.id]})
+      return await this.store.put(o)
    }
 }
 
@@ -112,9 +113,9 @@ class RecipeDateStore {
    }
    async get(id: number) { return await this.recipeDateStore.get(id) }
    async getAll(range: IDBKeyRange) { return await this.recipeDateStore.getAll(range) }
-   put(o: DatabaseType.RecipeDateData) {
-      this.changeLog.put({tableName: "recipe-date", recordId: [o.date, o.mealTimeId]})
-      return this.recipeDateStore.put(o)
+   async put(o: DatabaseType.RecipeDateData) {
+      await this.changeLog.put({tableName: "recipe-date", recordId: [o.date, o.mealTimeId]})
+      return await this.recipeDateStore.put(o)
    }
 }
 
@@ -126,14 +127,18 @@ class SettingsStore {
       this.store = tx.objectStore("settings")
    }
    async get(id: SettingsKey) { return await this.store.get(id) }
-   put(o: Partial<DatabaseType.SettingsData>) {
+   async put(o: Partial<DatabaseType.SettingsData>) {
       for (const key of Object.keys(o)) {
          const value = o[<SettingsKey>key]
          if (value) {
-            this.store.put(value, <SettingsKey>key)
-            this.changeLog.put({tableName: "settings", recordId: [key]})
+            await this.store.put(value, <SettingsKey>key)
+            await this.changeLog.put({tableName: "settings", recordId: [key]})
          }
       }
+   }
+   async delete(key: SettingsKey) {
+      await this.store.delete(key)
+      await this.changeLog.put({ tableName: "settings", recordId: [key] })
    }
 }
 
@@ -187,7 +192,9 @@ class SettingsRead {
    constructor(db: IDBPDatabase<MealPlanner>) {
       this.db = db
    }
-   get(id: SettingsKey) { return this.db.get("settings", id) }
+   get<T extends DatabaseType.SettingsData, K extends SettingsKey>(id: K) : Promise<T[K] | undefined> {
+      return <Promise<any>>this.db.get("settings", id)
+   }
    getAll() { return this.db.getAll("settings") }
 }
 
@@ -221,12 +228,12 @@ async function getDB_() {
          var stores = db.objectStoreNames
          if (!stores.contains("meal-time")) {
             db.createObjectStore("meal-time", { keyPath: "id" })
-            tx.objectStore("meal-time").put({ id: 1, name: "Dinner" })
+            await tx.objectStore("meal-time").put({ id: 1, name: "Dinner" })
          }
 
          if (!stores.contains("settings")) {
             db.createObjectStore("settings")
-            tx.objectStore("settings")
+            await tx.objectStore("settings")
             .put({ startDate: new ISODate(new Date()).toString() }, "mealPlanner")
          }
 
