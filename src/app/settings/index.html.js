@@ -24,7 +24,7 @@ const page = _default({
    header: "<h1>Settings</h1>",
    currentPage: "Settings",
    main,
-   afterMain: `<script src="./index.js" async type="module"></script>`,
+   afterMain: `<script src="/app/settings/index.js" async type="module"></script>`,
 })
 
 console.log(page)

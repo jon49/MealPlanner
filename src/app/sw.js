@@ -1,15 +1,14 @@
 // @ts-check
 
-// GENERATED FILE LOCATIONS ON LINE 4 DO NOT MOVE!!!!
-const files = {"app":{"meal-plans":{"edit":{"_files":["index.html","index.js","temp-meal-store.js"],"search":{"_files":["index.html","index.js","store.js"]},"store":{"_files":["store.js"]},"templates":{"_files":["cancelled-recipe.js","recipe.js"]},"util":{"_files":["util.js"]}}},"meals":{"add":{"_files":["index.html","index.js","store.js"]}},"settings":{"_files":["index.html","index.js"]},"utils":{"_files":["common-domain-types.js","database.js","form-tabs.js","fuzzy-search.js","idb.js","ISODate.js","snack-bar.js","template.js","utils.js"]}}}
-
-var CACHE_NAME = 'meal-planner-v1'
-var urlsToCache = createLinks("", files).concat("/images/meal-planner-logo.svg")
+var CACHE_NAME = 'meal-planner-v2'
+// var urlsToCache = createLinks("", files).concat("/images/meal-planner-logo.svg")
 
 // @ts-ignore
 self.addEventListener("install", installHandler)
 // @ts-ignore
 self.addEventListener("fetch", fetchHandler)
+// @ts-ignore
+self.addEventListener("activate", event => { console.log("Service worker activated!") })
 
 /**
  * @param {string} url 
@@ -26,12 +25,24 @@ function normalizeUrl(url) {
  * @param {FetchEvent} event 
  */
 function fetchHandler(event) {
-    const url = normalizeUrl(event.request.url)
-    event.respondWith(
-        caches
-        .match(url)
-        .then(res => res ? res : fetch(event.request)))
+    event.respondWith(getResponse(event))
 }  
+
+/**
+ * @param {FetchEvent} event 
+ */
+async function getResponse(event) {
+    const url = normalizeUrl(event.request.url)
+    if (url.endsWith("sw.js")) return fetch(event.request)
+    const match = await caches.match(url)
+    if (match) return match
+    const res = await fetch(event.request)
+    if (!res || res.status !== 200 || res.type !== "basic") return res
+    const responseToCache = res.clone()
+    const cache = await caches.open(CACHE_NAME)
+    cache.put(url, responseToCache)
+    return res
+}
 
 /**
  * @param {InstallEvent} e 
@@ -41,8 +52,8 @@ function installHandler(e) {
     e.waitUntil(
         caches.open(CACHE_NAME)
         .then(function(cache) {
-            console.log('Opened cache')
-            return cache.addAll(urlsToCache)
+            const links = createLinks("", { "app": { "_files": [ "index.css", "form.css", "index.html", "index.js" ] } })
+            return cache.addAll(links)
         })
     )
 }
@@ -58,7 +69,7 @@ function createLinks(root, links, files = []) {
         links._files.forEach(x => {
             if (!files) throw `Files must be an array but got '${files}'`
             if (x === "index.html") {
-                files.push(root + "/")
+                files.push(`${root}/`)
             } else {
                 files.push(`${root}/${x}`)
             }
