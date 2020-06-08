@@ -4,39 +4,27 @@
    <meta charset="UTF-8">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
    <title>Yay!</title>
-   <script src="../src/app/utils/snack-bar.js"></script>
-   <style>
-      :root {
-         --snack-bar-duration: 1;
-      }
-      #error-message {
-        min-width: 250px;
-        margin-left: -125px;
-        position: fixed;
-        left: 50%;
-        bottom: 30px;
-        z-index: 1;
-      }
-      snack-bar p {
-         background-color: #aaa;
-         color: #ccc;
-         padding: 3em;
-      }
-   </style>
+   <script async type="module" src="hash-template.js"></script>
 </head>
 <body>
 
-   <template id="my-snack-bar">
-      <snack-bar class=show><p slot="message">I love lizards!</p></snack-bar>
-   </template>
+   <template id="test"><div><h1>#title</h1><a #[title]=title #[href]=testUrl>#messageTest</a></div></template>
 
-   <div id="error-message">
+   <div id="write">
    </div>
 
-   <script>
+   <script type="module">
+      import template from "./hash-template.js"
+      const write = document.getElementById("write")
+      const generator = template(document.getElementById("test"))
+      const item = generator({ title: "Yes!", testUrl: "https://google.com", messageTest: "Yellow!" })
+      write.append(item.root)
+      let num = 1
       setInterval(() => {
-         const message = document.getElementById("my-snack-bar").content.cloneNode(true)
-         document.getElementById("error-message").appendChild(message)
+         num++
+         const item2 = generator()
+         item2.update({ title: `alrighty ${num}`, testUrl: `https://google.com?s=${num}`, messageTest: `Orange ${num}` })
+         write.append(item2.root)
       }, 3e3)
    </script>
 
