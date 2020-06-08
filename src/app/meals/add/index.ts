@@ -2,7 +2,7 @@ import { createString100, createString50, createPositiveWholeNumber, createIdNum
 import { Domain } from "../../utils/database-domain-types.js"
 import { createRecipe, getMealTimes } from "./store.js"
 import { handleError, validate, defer } from "../../utils/utils.js"
-import template from "../../utils/template.js"
+import template from "../../utils/hash-template.js"
 import { Page, HTMLAddRecipeForm, SourceValue } from "./index.html.js"
 import { DatabaseType } from "../../utils/database.js"
 
@@ -55,20 +55,24 @@ const submitOnce = () =>
     .catch(handleError)
 
 interface PreviousRecipeTemplate {
-    "previous-recipe": HTMLAnchorElement
-    root: HTMLParagraphElement
+    previousRecipe: string
+    previousRecipeUrl: string
 }
-type PreviousRecipeTemplateId = "_previous-recipe"
-var previousRecipeView = template.get<PreviousRecipeTemplateId>("_previous-recipe")
+
+interface PreviousRecipeTemplateActions {}
+
+var previousRecipeGenerator =
+    template<PreviousRecipeTemplate, PreviousRecipeTemplateActions>(
+        <HTMLTemplateElement>document.getElementById("_previous-recipe"))
 const previousRecipesList = <HTMLDivElement>document.getElementById(page.previousRecipes)
 const saveAndAdd = () =>
     saveRecipe()
     .then(x => {
-        var root = previousRecipeView.cloneNode(true)
-        var nodes = <PreviousRecipeTemplate>previousRecipeView.collect(root)
-        nodes["previous-recipe"].href = `/app/meals/?id=${x.result}`
-        nodes["previous-recipe"].textContent = x.data.name.value
-        previousRecipesList.prepend(nodes.root)
+        var previous = previousRecipeGenerator({
+            previousRecipe: x.data.name.value,
+            previousRecipeUrl: `/app/meals/?id=${x.result}`
+        })
+        previousRecipesList.prepend(previous.root)
         $form.reset()
     })
     .catch(handleError)

@@ -1,4 +1,4 @@
-declare module HashTemplate {
+declare namespace HashTemplate {
     interface HashTreeWalker extends TreeWalker {
         roll: (n: number) => Node;
     }

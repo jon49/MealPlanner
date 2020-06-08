@@ -1,5 +1,5 @@
-import { CancelledRecipeTemplate, CancelledRecipeTemplateId } from "./_cancelled-recipe.html.js"
-import template from "../../../utils/template.js"
+import { CancelledRecipeTemplate, CancelledRecipeTemplateActions } from "./_cancelled-recipe.html.js"
+import template, { Template } from "../../../utils/hash-template.js"
 import { ISODate } from "../../../utils/database.js"
 
 interface CancelledRecipeOptions {
@@ -7,19 +7,24 @@ interface CancelledRecipeOptions {
 }
 
 export interface CancelledRecipe {
-   nodes: CancelledRecipeTemplate
+   cancel: Template<CancelledRecipeTemplate, CancelledRecipeTemplateActions>
    date: ISODate
+   actions: { addRecipe: HTMLButtonElement }
 }
 
-var cancelledRecipeView = template.get<CancelledRecipeTemplateId>("_cancelled-recipe-template")
+var generator = template<CancelledRecipeTemplate, CancelledRecipeTemplateActions>(<HTMLTemplateElement>document.getElementById("_cancelled-recipe-template"))
 export var addRecipe = new WeakMap<HTMLButtonElement, CancelledRecipe>()
 
 export function CreateCancelledRecipe({ date } : CancelledRecipeOptions) : Promise<CancelledRecipe> {
-   var root = cancelledRecipeView.cloneNode(true)
-   var nodes = <CancelledRecipeTemplate>cancelledRecipeView.collect(root)
-   nodes.date.nodeValue = date.getDate().toLocaleDateString()
-   var cancelRecipe : CancelledRecipe = { nodes, date }
-   addRecipe.set(nodes["add-recipe"], cancelRecipe)
+   try {
+      const cancel = generator({
+         date: date.getDate().toLocaleDateString()
+      })
+      var cancelRecipe : CancelledRecipe = { cancel, date, actions: { addRecipe: cancel.getNodes(["addRecipe"]).addRecipe }}
+      addRecipe.set(cancelRecipe.actions.addRecipe, cancelRecipe)
+   } catch (ex) {
+      return Promise.reject(ex)
+   }
 
    return Promise.resolve(cancelRecipe)
 }

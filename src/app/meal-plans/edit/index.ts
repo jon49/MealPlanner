@@ -1,5 +1,5 @@
 import { Page } from "./index.html.js"
-import { recipeCancelMeal, recipeNextMeal, recipePreviousMeal, CreateRecipe, Recipe } from "./templates/recipe.js"
+import { recipeCancelMeal, recipeNextMeal, recipePreviousMeal, Recipe } from "./templates/recipe.js"
 import { addRecipe, CancelledRecipe, CreateCancelledRecipe } from "./templates/cancelled-recipe.js"
 import { random, range } from "./util/util.js"
 import { getRecipes, setRecipeDate, getRecipeDates, setMealPlannerSettings, getMealPlannerSettings } from "./store/store.js"
@@ -104,8 +104,8 @@ function handleDateChange(target: HTMLInputElement) {
    .then(current => {
       mealSelections.innerHTML = ""
       current.currentRecipesAddedDates.forEach(x => {
-         var recipeNode = getRecipe(x.date.date, x.recipe)
-         mealSelections.appendChild(recipeNode.nodes.root)
+         var recipeNode = new Recipe({ date: x.date.date, ...x.recipe })
+         mealSelections.appendChild(recipeNode.root)
       })
    })
 }
@@ -135,16 +135,16 @@ const cancelRecipe = (oldRecipe: Recipe) =>
          , quantity: 1 }])
       ]) 
    .then(([cancelledRecipe]) => {
-      oldRecipe.nodes.root.replaceWith(cancelledRecipe.nodes.root)
-      cancelledRecipe.nodes["add-recipe"].focus()
+      oldRecipe.root.replaceWith(cancelledRecipe.cancel.root)
+      cancelledRecipe.actions.addRecipe.focus()
    })
 
 const cancelledRecipeToNewRecipe = (cancelledRecipe: CancelledRecipe) =>
    getRecipes()
    .then(recipes => {
-      const newRecipe = getRecipe(cancelledRecipe.date, recipes[random(0, recipes.length - 1)])
-      cancelledRecipe.nodes.root.replaceWith(newRecipe.nodes.root)
-      newRecipe.nodes["next-meal"].focus()
+      const newRecipe = new Recipe({date: cancelledRecipe.date, ...recipes[random(0, recipes.length - 1)]})
+      cancelledRecipe.cancel.root.replaceWith(newRecipe.root)
+      newRecipe.actions.nextMeal.focus()
    })
 
 const nextRecipe = async (oldRecipe: Recipe) => {
@@ -195,10 +195,6 @@ const getNewRecipe = async (oldRecipe: Recipe) => {
    const recipes = await getRecipes()
    const picked = recipes[random(0, recipes.length - 1)]
    return { ...picked, date: oldRecipe.date }
-}
-
-function getRecipe(date : ISODate, recipe : RecipeDomain) {
-   return CreateRecipe({...recipe, date})
 }
 
 function init() {

@@ -1,4 +1,5 @@
 // @ts-check
+/// <reference path="./hash-template.d.ts" />
 
 /**
  * @param {Node} node 
@@ -115,12 +116,12 @@ class Template {
   }
 
   /**
-   * @param {Partial<T>} o
+   * @param {string[]} o
    * @returns {Partial<HashTemplate.Nodes>}
    */
   getNodes(o) {
     const nodes = {}
-    for (const key of Object.keys(o)) {
+    for (const key of o) {
       nodes[key] = this._nodes[key]
     }
     return nodes

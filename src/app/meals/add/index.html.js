@@ -55,7 +55,9 @@ const main = html`
         <input id="save-once" type="submit" value="Save">&nbsp;
         <input id="save-and-add" type="submit" value="Save & Add Another">
     </form>
-    <template id="_previous-recipe"><p #root><a #previous-recipe></a></p></template>
+    <template id="_previous-recipe">
+        <p><a #[href]=previousRecipeUrl>#previousRecipe</a></p>
+    </template>
     <div id="_previous-recipes"></div>
 `
 

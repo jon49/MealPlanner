@@ -15,6 +15,7 @@
 
 @media (prefers-color-scheme: dark) {
  :root {
+  --c1:#87c2f6;
   --c2:#333;
   --c3:#1e1f20;
   --c4:#fff;
@@ -109,7 +110,7 @@ aside:first-child, article:first-child {margin-left:0}
 }
 
 @media (prefers-color-scheme: dark) {
- :root { --c2:#333; --c4:#eee; }
+ :root { --c1:#87c2f6; --c2:#333; --c4:#eee; }
 }
 
 .light {
@@ -119,9 +120,10 @@ aside:first-child, article:first-child {margin-left:0}
 }
 
 .dark {
-  --c2: #333;
+  --c1:#87c2f6;
+  --c2:#333;
   --c3:#1e1f20;
-  --c4: #eee;
+  --c4:#eee;
 }
 
 input, select, textarea {

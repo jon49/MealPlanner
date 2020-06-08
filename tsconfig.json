@@ -19,18 +19,14 @@
     "noFallthroughCasesInSwitch": true,
 
     "outDir": "./public/app",
-   //  "watch": true,
-    "skipLibCheck": true,
-    "noEmit": true
+    "skipLibCheck": true
   },
   "compileOnSave": true,
   "files": [
     "./node_modules/@types/node/index.d.ts"
   ],
-  "include": [ 
-    "src/**/*.js" 
-  ],
+  "include": [ "src/**/*.ts" ],
   "exclude": [
-    "node_modules", "src/**/*.ts"
+    "node_modules", "src/**/*spec.ts"
   ]
 }

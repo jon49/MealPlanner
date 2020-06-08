@@ -8,17 +8,20 @@ import html from "../../../layouts/html.js"
 
 /**
  * @typedef {Object} CancelledRecipeTemplate
- * @property {HTMLDivElement} root
- * @property {HTMLButtonElement} add-recipe
- * @property {Text} date
+ * @property {string} date
+ */
+
+/**
+ * @typedef {Object} CancelledRecipeTemplateActions
+ * @property {HTMLButtonElement} addRecipe
  */
 
 export const cancelledRecipeTemplate = html`
 <template id="_cancelled-recipe-template">
-   <article #root>
+   <article>
       <p>#date</p>
       <h2>No Recipe Chosen</h2>
-      <button #add-recipe>Add Recipe</button>
+      <button #=addRecipe>Add Recipe</button>
    </article>
 </template>
 `

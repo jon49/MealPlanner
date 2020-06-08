@@ -2,36 +2,36 @@
 import html from "../../../layouts/html.js"
 
 /**
- * @typedef MealPlanTemplateId
- * @type {"_recipe-template"}
+ * @typedef {Object} RecipeTemplate
+ * @property {string} name
+ * @property {string} recipeLocation
+ * @property {string} url
+ * @property {string} urlTitle
+ * @property {string} recipeDate 
+ * @property {string} date 
+ * @property {string} description
+ * @property {string} searchMeal 
  */
 
 /**
- * @typedef {Object} RecipeTemplate
- * @property {HTMLButtonElement} cancel-meal
- * @property {HTMLH2Element} name
- * @property {HTMLSpanElement} recipe-location
- * @property {HTMLAnchorElement} recipe-url 
- * @property {Text} recipe-date 
- * @property {Text} description 
- * @property {HTMLButtonElement} next-meal 
- * @property {HTMLButtonElement} previous-meal 
- * @property {HTMLAnchorElement} search-meal 
- * @property {HTMLDivElement} root 
+ * @typedef {Object} RecipeTemplateActions
+ * @property {HTMLButtonElement} nextMeal 
+ * @property {HTMLButtonElement} previousMeal 
+ * @property {HTMLButtonElement} cancelMeal
  */
 
 export const recipeTemplate = html`
 <template id="_recipe-template">
-   <article class="meal-edit" #root>
-      <p>#recipe-date</p>
-      <h2 #name></h2>
-      <p><small><span #recipe-location></span><a #recipe-url></a></small></p>
+   <article class="meal-edit" #[id]=date>
+      <p>#recipeDate</p>
+      <h2>#name</h2>
+      <p><small><span #[title,text]=recipeLocation></span><a #[href]=url #[title,text]=urlTitle></a></small></p>
       <p>#description</p>
       <div>
-         <button #cancel-meal>Cancel</button>&nbsp;
-         <a #search-meal><button>Search</button></a>&nbsp;
-         <button #previous-meal>&laquo; Back</button>&nbsp;
-         <button #next-meal>Next &raquo;</button>
+         <button #=cancelMeal>Cancel</button>&nbsp;
+         <a #[href]=searchMeal><button>Search</button></a>&nbsp;
+         <button #=previousMeal>&laquo; Back</button>&nbsp;
+         <button #=nextMeal>Next &raquo;</button>
       </div>
    </article>
 </template>`
