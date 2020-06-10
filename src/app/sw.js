@@ -26,18 +26,17 @@ function activateHandler(event) {
  */
 async function removeCaches(event) {
     const keys = await caches.keys()
-    return Promise.all(keys.filter(x => x !== CACHE_NAME).map(x => caches.delete(x)))
+    return Promise.all(keys.filter(x => x !== CACHE_NAME && x.startsWith("meal-planner")).map(x => caches.delete(x)))
 }
 
 /**
  * @param {string} url 
- * @returns string
+ * @returns {string}
  */
 function normalizeUrl(url) {
-    let newUrl = url.includes("?") ? url.substring(0, url.lastIndexOf("?")) : url
-    newUrl = newUrl.includes("#") ? url.substring(0, url.lastIndexOf("#")) : newUrl
-    newUrl = !newUrl.endsWith("/") && newUrl.lastIndexOf("/") > newUrl.lastIndexOf(".") ? newUrl + "/" : newUrl
-    return newUrl
+    let path = new URL(url).pathname
+    !path.endsWith("/") && (path = path.lastIndexOf("/") > path.lastIndexOf(".") ? path+"/" : path)
+    return path
 }
 
 /**
@@ -67,7 +66,6 @@ async function getResponse(event) {
  * @param {InstallEvent} e 
  */
 function installHandler(e) {
-    // Perform install steps
     console.log(`Installing version '${SW_VERSION}' service worker.`)
     e.waitUntil(
         caches.open(CACHE_NAME)
