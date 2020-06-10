@@ -2,8 +2,17 @@
 /// <reference path="./hash-template.d.ts" />
 
 /**
+ * @typedef { import("./hash-template-util").PropertyAttributes } PropertyAttributes
+ * @typedef { import("./hash-template-util").HashTreeWalker } HashTreeWalker
+ * @typedef { import("./hash-template-util").Paths } Paths
+ * @typedef { import("./hash-template-util").Refs } Refs
+ * @typedef { import("./hash-template-util").Names } Names
+ * @typedef { import("./hash-template-util").Nodes } Nodes
+ */
+
+/**
  * @param {Node} node 
- * @returns {HashTemplate.PropertyAttributes|0}
+ * @returns {PropertyAttributes|0}
  */
 function collector(node) {
   if (node instanceof HTMLElement && node.attributes !== undefined) {
@@ -13,8 +22,8 @@ function collector(node) {
         let aname = attr.name
         if (aname[0] === '#') {
             const attrs =
-                (aname[1] === '[')
-                    ? aname.slice(2, aname.length - 1).split(',')
+                aname.length > 1
+                    ? aname.slice(1).split(',')
                 : []
             const name = attr.value
             if (name in values) values[name].push(...attrs)
@@ -35,7 +44,7 @@ function collector(node) {
 }
 
 /**
- * @type {HashTemplate.HashTreeWalker}
+ * @type {HashTreeWalker}
  */
 // @ts-ignore
 const TREE_WALKER = document.createTreeWalker(document, NodeFilter.SHOW_ALL, null, false)
@@ -48,18 +57,18 @@ const genPath = (() => {
   let id = 0
   /**
    * @param {Node} node 
-   * @returns {HashTemplate.Paths}
+   * @returns {Paths}
    */
   const pathGenerator = node => {
     const w = TREE_WALKER
     w.currentNode = node
 
-    /** @type {HashTemplate.Refs} */
+    /** @type {Refs} */
     let refs = {}
-    /** @type {HashTemplate.Names} */
+    /** @type {Names} */
     let names = {}
     let indices = [], idx = 0
-    /** @type {HashTemplate.PropertyAttributes|0} */
+    /** @type {PropertyAttributes|0} */
     let ref
     do {
       if (ref = collector(node)) {
@@ -84,8 +93,8 @@ const genPath = (() => {
 
 /**
  * @param {Node} node
- * @param {HashTemplate.Paths} paths
- * @returns {HashTemplate.Nodes}
+ * @param {Paths} paths
+ * @returns {Nodes}
  */
 function walker(node, paths) {
   /** @type {{[key: number]: Node}} */
@@ -105,7 +114,7 @@ function walker(node, paths) {
 class Template {
   /**
    * @param {Node} node
-   * @param {HashTemplate.Paths} paths
+   * @param {Paths} paths
    * @param {Partial<T>} [o]
    */
   constructor(node, paths, o) {
@@ -117,7 +126,7 @@ class Template {
 
   /**
    * @param {string[]} o
-   * @returns {Partial<HashTemplate.Nodes>}
+   * @returns {Partial<Nodes>}
    */
   getNodes(o) {
     const nodes = {}

@@ -22,14 +22,14 @@ import html from "../../../layouts/html.js"
 
 export const recipeTemplate = html`
 <template id="_recipe-template">
-   <article class="meal-edit" #[id]=date>
+   <article class="meal-edit" #id=date>
       <p>#recipeDate</p>
       <h2>#name</h2>
-      <p><small><span #[title,text]=recipeLocation></span><a #[href]=url #[title,text]=urlTitle></a></small></p>
+      <p><small><span #title,text=recipeLocation></span><a #href=url #title,text=urlTitle></a></small></p>
       <p>#description</p>
       <div>
          <button #=cancelMeal>Cancel</button>&nbsp;
-         <a #[href]=searchMeal><button>Search</button></a>&nbsp;
+         <a #href=searchMeal><button>Search</button></a>&nbsp;
          <button #=previousMeal>&laquo; Back</button>&nbsp;
          <button #=nextMeal>Next &raquo;</button>
       </div>
