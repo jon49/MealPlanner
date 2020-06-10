@@ -131,7 +131,7 @@ class Template {
   getNodes(o) {
     const nodes = {}
     for (const key of o) {
-      nodes[key] = this._nodes[key]
+      nodes[key] = this._nodes[this._refPaths.names[key][0]]
     }
     return nodes
   }

@@ -1,14 +1,33 @@
 // @ts-check
 
-var CACHE_NAME = 'meal-planner-v2'
-// var urlsToCache = createLinks("", files).concat("/images/meal-planner-logo.svg")
+import { ClientRequest } from "http"
+
+const CACHE_NAME = 'meal-planner-v1'
+const SW_VERSION = "v1" 
 
 // @ts-ignore
 self.addEventListener("install", installHandler)
 // @ts-ignore
 self.addEventListener("fetch", fetchHandler)
 // @ts-ignore
-self.addEventListener("activate", event => { console.log("Service worker activated!") })
+self.addEventListener("activate", activateHandler)
+
+/**
+ * @param {ExtendableEvent} event 
+ */
+function activateHandler(event) {
+    self.clients.claim()
+    console.log(`Service worker version '${SW_VERSION}' activated. Cache version '${CACHE_NAME}'.`)
+    event.waitUntil(removeCaches(event))
+}
+
+/**
+ * @param {ExtendableEvent} event 
+ */
+async function removeCaches(event) {
+    const keys = await caches.keys()
+    return Promise.all(keys.filter(x => x !== CACHE_NAME).map(x => caches.delete(x)))
+}
 
 /**
  * @param {string} url 
@@ -49,6 +68,7 @@ async function getResponse(event) {
  */
 function installHandler(e) {
     // Perform install steps
+    console.log(`Installing version '${SW_VERSION}' service worker.`)
     e.waitUntil(
         caches.open(CACHE_NAME)
         .then(function(cache) {
