@@ -24,7 +24,7 @@ export const recipeTemplate = html`
 <template id="_recipe-template">
    <article class="meal-edit" #id=date>
       <p>#recipeDate</p>
-      <h2>#name</h2>
+      <h2 #title,text=name></h2>
       <p><small><span #title,text=recipeLocation></span><a #href=url #title,text=urlTitle></a></small></p>
       <p>#description</p>
       <div>

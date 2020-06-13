@@ -1,9 +1,6 @@
 // @ts-check
 
-import { ClientRequest } from "http"
-
-const CACHE_NAME = 'meal-planner-v1'
-const SW_VERSION = "v1" 
+const CACHE_NAME = 'meal-planner-v2'
 
 // @ts-ignore
 self.addEventListener("install", installHandler)
@@ -17,7 +14,7 @@ self.addEventListener("activate", activateHandler)
  */
 function activateHandler(event) {
     self.clients.claim()
-    console.log(`Service worker version '${SW_VERSION}' activated. Cache version '${CACHE_NAME}'.`)
+    console.log(`Service worker activated. Cache version '${CACHE_NAME}'.`)
     event.waitUntil(removeCaches(event))
 }
 
@@ -66,7 +63,7 @@ async function getResponse(event) {
  * @param {InstallEvent} e 
  */
 function installHandler(e) {
-    console.log(`Installing version '${SW_VERSION}' service worker.`)
+    console.log(`Installing version '${CACHE_NAME}' service worker.`)
     e.waitUntil(
         caches.open(CACHE_NAME)
         .then(function(cache) {
