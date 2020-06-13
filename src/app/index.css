@@ -95,12 +95,6 @@ section{display: flex; flex-flow: row wrap}
 
 aside,article {flex:1; margin:var(--m1)}
 
-/* Cards */
-
-article {background: var(--c2); border-radius: var(--rc); padding: 1em; box-shadow: 0px 1px 0px rgba(0,0,0,0.3)}
-
-aside:first-child, article:first-child {margin-left:0}
-
 /** END BASIC.CSS **/
 
 /** Overrides */
@@ -133,6 +127,18 @@ input, select, textarea {
 button, input[type=submit], input[type=reset] {
   margin-top: 4px;
 }
+
+/* Cards */
+
+.cards > div {
+  background: var(--c2);
+  border-radius: var(--rc);
+  padding: 1em;
+  box-shadow: 0px 1px 0px rgba(0,0,0,0.3)
+}
+
+aside:first-child, .cards > div:first-child {margin-left:0}
+
 
 /**
 Custom
@@ -190,3 +196,4 @@ aside {
   border-radius: 0.5em;
   margin-top: 0.125em;
 }
+

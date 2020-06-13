@@ -19,10 +19,10 @@ var head = html`
 
 var main = html`
    <form>
-      <label for="start-date"> Start Date: </label>
+      <label for="start-date">Start Date:&nbsp;</label>
       <input id="start-date" name="start-date" type="date" required />
    </form>
-   <section id="_meal-selections"></section>`
+   <section id=_meal-selections class=cards></section>`
 
 var afterMain = html`
 ${recipeTemplate}

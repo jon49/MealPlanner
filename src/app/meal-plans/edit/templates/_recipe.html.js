@@ -22,7 +22,7 @@ import html from "../../../layouts/html.js"
 
 export const recipeTemplate = html`
 <template id="_recipe-template">
-   <article class="meal-edit" #id=date>
+   <div class="meal-edit" #id=date>
       <p>#recipeDate</p>
       <h2 #title,text=name></h2>
       <p><small><span #title,text=recipeLocation></span><a #href=url #title,text=urlTitle></a></small></p>
@@ -33,5 +33,5 @@ export const recipeTemplate = html`
          <button #=previousMeal>&laquo; Back</button>&nbsp;
          <button #=nextMeal>Next &raquo;</button>
       </div>
-   </article>
+   </div>
 </template>`
