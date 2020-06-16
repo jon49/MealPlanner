@@ -1,5 +1,10 @@
-import getDB, { getReadOnlyDb, DatabaseType } from "../../utils/database.js"
+import { DatabaseType } from "../../utils/database.js"
 import { Domain } from "../../utils/database-domain-types.js"
+import { DatabaseWindow } from "../../utils/database.js"
+
+declare let self: DatabaseWindow
+
+const { getReadOnlyDB, getDB } = self.DB
 
 export async function createRecipe(recipe: Domain.Recipe.Recipe) {
     const db = await getDB(["recipe"])
@@ -27,6 +32,6 @@ export async function createRecipe(recipe: Domain.Recipe.Recipe) {
 }
 
 export async function getMealTimes() {
-    const db = await getReadOnlyDb(["meal-time"])
+    const db = await getReadOnlyDB(["meal-time"])
     return await db["meal-time"].getAll()
 }

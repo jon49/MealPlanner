@@ -25,6 +25,7 @@ var _default = ({ main, currentPage, afterMain, head, header }) => html`
    <meta http-equiv="X-UA-Compatible" content="ie=edge">
    <title>${currentPage}</title>
    <link rel="stylesheet" type="text/css" href="/app/index.css">
+   <script src="/app/utils/database.js"></script>
    <script async src="/app/utils/snack-bar.js"></script>
    <script async src="/app/index.js" type=module></script>
    ${head}

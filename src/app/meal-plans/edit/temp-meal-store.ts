@@ -1,4 +1,9 @@
-import getDb, { DatabaseType } from "../../utils/database.js"
+import { DatabaseType } from "../../utils/database.js"
+import { DatabaseWindow } from "../../utils/database.js"
+
+declare let self: DatabaseWindow
+
+const { getDB } = self.DB
 
 function getLocation(location: string) : DatabaseType.Location {
    location = location.trim()
@@ -16,7 +21,7 @@ function getLocation(location: string) : DatabaseType.Location {
    return { _kind: "other", other: location }
 }
 
-const db = getDb(["recipe"]);
+const db = getDB(["recipe"]);
 
 [
 "????, 1000 Veg 457",

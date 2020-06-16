@@ -1,5 +1,9 @@
-import getDB from "../utils/database.js"
 import { handleError } from "../utils/utils.js"
+import { DatabaseWindow } from "../utils/database.js"
+
+declare let self: DatabaseWindow
+
+const { getDB } = self.DB
 
 const $form = <HTMLFormElement>document.getElementById("settings")
 

@@ -25,7 +25,7 @@
   "files": [
     "./node_modules/@types/node/index.d.ts"
   ],
-  "include": [ "src/**/*.ts" ],
+  "include": [ "src/**/*.ts", "src/app/utils/database___.js" ],
   "exclude": [
     "node_modules", "src/**/*spec.ts"
   ]

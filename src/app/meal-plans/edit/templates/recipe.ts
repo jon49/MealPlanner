@@ -2,7 +2,7 @@ import template from "../../../utils/hash-template.js"
 import { Template } from "../../../utils/hash-template"
 import { RecipeTemplate, RecipeTemplateActions } from "./_recipe.html.js"
 import { RecipeId, RecipeAndDateDomain } from "../Domain/DomainTypes.js"
-import { ISODate } from "../../../utils/database.js"
+import { ISODate } from "../../../utils/utils.js"
 
 var recipeGenerator = template<RecipeTemplate, RecipeTemplateActions>(<HTMLTemplateElement>document.getElementById("_recipe-template"))
 
