@@ -93,7 +93,7 @@ button:hover,button:focus,input:hover,textarea:hover,select:hover {opacity: 0.8}
 
 section{display: flex; flex-flow: row wrap}
 
-aside,article {flex:1; margin:var(--m1)}
+aside,article,.cards>div {flex:1; margin:var(--m1)}
 
 /** END BASIC.CSS **/
 
@@ -165,7 +165,7 @@ aside {
 
 @media (max-width: 481px) {
   main,footer {width: 98%}
-  aside,article {flex:none; width:100%; margin-left: 0;}
+  .cards>div,aside,article {flex:none; width:100%; margin-left: 0;}
   header { padding: 1em; width: 100%; }
 }
 
