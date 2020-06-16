@@ -1,6 +1,11 @@
 // @ts-check
-import { getReadOnlyDb } from "./utils/database.js"
 import { handleError } from "./utils/utils.js";
+
+/** @type {import("./utils/database").DatabaseWindow} */
+// @ts-ignore
+const s = self
+
+const { getReadOnlyDB } = s.DB
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
@@ -46,7 +51,7 @@ function errorHandler(e) {
 document.addEventListener("Error", errorHandler)
 
 async function applySettings() {
-  const db = await getReadOnlyDb(["settings"])
+  const db = await getReadOnlyDB(["settings"])
   const theme = await db.settings.get("theme")
   if (theme) {
     document.body.removeAttribute("class")

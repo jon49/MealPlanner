@@ -110,6 +110,7 @@ aside,article,.cards>div {flex:1; margin:var(--m1)}
 }
 
 .light {
+  --c1:#0074d9;
   --c2:#ddd;
   --c3:#eee;
   --c4:#333;

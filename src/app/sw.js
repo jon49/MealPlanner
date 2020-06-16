@@ -1,6 +1,6 @@
 // @ts-check
 
-const CACHE_NAME = 'meal-planner-v2'
+const CACHE_NAME = 'meal-planner-v5'
 
 // @ts-ignore
 self.addEventListener("install", installHandler)
