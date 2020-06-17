@@ -1,11 +1,11 @@
 // @ts-check
 import html from "../../layouts/html.js"
-import _default from "../../layouts/_default.html.js"
 
 const head = html`<link rel="stylesheet" type="text/css" href="/app/form.css">
-    <script src="/app/utils/form-tabs.js" async></script>`
+    <script async src="/app/utils/form-tabs.js"></script>`
 
-const main = html`
+
+const $main = html`
     <form id="_add-recipe">
         <label for="name">Recipe Name:</label>
         <input id="name" type="text" placeholder="Spaghetti with Meatballs" name="recipe-name" autofocus required>
@@ -50,6 +50,7 @@ const main = html`
         </form-tabs>
         <fieldset id="meal-times">
         <legend>Meal Times</legend>
+        {{createMealTimes}}
         </fieldset>
         <input type="reset" value="Clear">&nbsp;
         <input id="save-once" type="submit" value="Save">&nbsp;
@@ -61,15 +62,32 @@ const main = html`
     <div id="_previous-recipes"></div>
 `
 
+async function main() {
+    /** @type {import("../../@types/globals").CustomGlobal} */
+    // @ts-ignore
+    const s = self
+    const db = await s.DB.getReadOnlyDB(["meal-time"])
+    const mealTimes = (await db["meal-time"].getAll()) || []
+    //! const $main = {{$main}}
+    const $mealTimes = mealTimes
+    .map(x => {
+        const id = ""+(+x.id)
+        const checked = mealTimes.length === 1 ? `checked="true"` : ``
+        s.M.html`
+        <input type="checkbox" id="meal-time-$${id}" name="meal-times" value="$${id}" $${checked}>
+        <label for="meal-time-$${id}">${x.name || "Unknown"}</label><br>`
+    }).join("")
+    return $main.replace(`{{${this.name}}}`, $mealTimes)
+}
+
 const afterMain = html`
     <script src="/app/meals/add/index.js" async type="module"></script>`
 
-const page = _default({
-    head,
-    header: "<h1>Add Meal</h1>",
-    currentPage: "Add Meal",
-    main,
-    afterMain
-})
-
-console.log(page)
+console.log(
+    "self.M.page = {template:'defaultTemplate', content:",
+    "[",
+    {afterMain, head, title: "Add Meal", header: "<h1>Add Meal</h1>"},
+    ",",
+    `{main:`,
+    main.toString().replace("//! ", "").replace("{{$main}}", JSON.stringify($main)),
+    "}]}")

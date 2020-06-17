@@ -84,7 +84,7 @@ const parsedTemplate =
     .split(placeHolders)
     .map(x => found.indexOf(x) > -1 ? mapValue(x) : x)
 
-console.log("self.defaultTemplate = [")
+console.log("self.M.defaultTemplate = [")
 parsedTemplate.forEach(x => {
     if (typeof x === "string") {
         console.log(JSON.stringify(x), ",")
