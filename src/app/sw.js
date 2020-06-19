@@ -87,39 +87,23 @@ async function htmlFragment(url) {
 
 /**
  * @param {{ enqueue: (arg0: any) => void; }} controller
+ * @param {TextEncoder} encoder
  */
 const append =
-    controller =>
+    (controller, encoder) =>
     /** @param {*} item */
     async item => {
         if (!item) return
         if (typeof item === "string") {
-            controller.enqueue(item)
+            controller.enqueue(encoder.encode(item))
         } else if (isAsyncFunction(item)) {
             const result = await item()
-            if (result) controller.enqueue(result)
+            if (result) controller.enqueue(encoder.encode(result))
         } else if (typeof item === "function") {
             const result = item()
-            if (result) controller.enqueue(result)
+            if (result) controller.enqueue(encoder.encode(result))
         }
     }
-
-/**
- * @param {string} html
- * @param {any} val
- * @returns {Promise<string>}
- */
-const appendString =
-    (html, val) =>
-        !val
-            ? Promise.resolve(html)
-        : typeof val === "string"
-            ? Promise.resolve(html += val)
-        : isAsyncFunction(val)
-            ? val().then(/** @param {string} x */x => (x ? html += x : html))
-        : typeof val === "function"
-            ? Promise.resolve(((val = val(), val instanceof Promise) ? val : Promise.resolve(val)).then(x => x ? html += x : html))
-        : Promise.resolve(html)
 
 /**
  * @param {string} templateUrl
@@ -141,49 +125,38 @@ async function streamResponse(contentUrl, templateUrl) {
     /** @type {any} */
     // @ts-ignore
     const content = self.M.template[contentUrl]
-    // const stream = new ReadableStream({
-    //     async start(controller) {
-    //         const send = append(controller)
-    //         /**
-    //          * @param {number} idx
-    //          */
-    //         async function push(idx) {
-    //             if (idx === template.length) {
-    //                 controller.close()
-    //                 return
-    //             }
-    //             console.log(`${idx+1} of ${template.length}`)
-    //             const val = template[idx]
-    //             if (!val) {
-    //                 return push(++idx)
-    //             } else if (typeof val === "string") {
-    //                 controller.enqueue(val)
-    //                 push(++idx)
-    //             } else {
-    //                 const key = Object.keys(val)[0]
-    //                 await send(val[key])
-    //                 if (key in content) await send(content[key])
-    //                 push(++idx)
-    //             }
-    //         }
-    //         push(0)
-    //     }
-    // })
 
-    let html = ""
-    for (const val of template) {
-        if (!val) {
-            continue
-        } else if (typeof val === "string") {
-            html += val
-        } else {
-            const key = Object.keys(val)[0]
-            html = await appendString(html, val[key])
-            html = await appendString(html, content[key])
+    const encoder = new TextEncoder()
+    const stream = new ReadableStream({
+        async start(controller) {
+            const send = append(controller, encoder)
+            /**
+             * @param {number} idx
+             */
+            async function push(idx) {
+                if (idx === template.length) {
+                    controller.close()
+                    return
+                }
+                console.log(`${idx+1} of ${template.length}`)
+                const val = template[idx]
+                if (!val) {
+                    return push(++idx)
+                } else if (typeof val === "string") {
+                    controller.enqueue(encoder.encode(val))
+                    push(++idx)
+                } else {
+                    const key = Object.keys(val)[0]
+                    await send(val[key])
+                    if (key in content) await send(content[key])
+                    push(++idx)
+                }
+            }
+            push(0)
         }
-    }
+    })
 
-    return new Response(html, { headers: { "content-type": "text/html; charset=utf-8" }})
+    return new Response(stream, { headers: { "content-type": "text/html; charset=utf-8" }})
 }
 
 /**
