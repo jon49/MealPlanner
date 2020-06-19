@@ -3,14 +3,15 @@ import html from './html.js'
 
 /**
  * @typedef {Object} DefaultTemplate
- * @property {string} meta
- * @property {string} title
- * @property {string} head
- * @property {string} bodyClass
- * @property {string} header
- * @property {string} nav
- * @property {string} main
- * @property {string} afterMain
+ * @property {string|(() => Promise<string>)} $meta
+ * @property {string|(() => Promise<string>)} $title
+ * @property {string|(() => Promise<string>)} $head
+ * @property {string|(() => Promise<string>)} $bodyClass
+ * @property {string|(() => Promise<string>)} $header
+ * @property {string|(() => Promise<string>)} $nav
+ * @property {string|(() => Promise<string>)} $main
+ * @property {string|(() => Promise<string>)} $afterMain
+ * @property {string} $template
  */
 const template = html`
 <!DOCTYPE html>
@@ -19,22 +20,21 @@ const template = html`
    <meta charset="UTF-8">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-   {{meta}}
-   <title>{{title}}</title>
+   <meta name=swjs>
+   <title>{{$title}}</title>
    <link rel="stylesheet" type="text/css" href="/app/index.css">
    <script src="/app/utils/database.js"></script>
    <script async src="/app/utils/snack-bar.js"></script>
    <script async src="/app/index.js" type=module></script>
-   {{head}}
+   {{$head}}
 </head>
-<body class={{bodyClass}}>
+<body class="{{$bodyClass}}">
    <header>
-      {{header}}
-      <nav><a href="/app/">Home</a>&nbsp;|&nbsp;{{nav}}</nav>
+      {{$header}}
+      <nav><a href="/app/">Home</a>&nbsp;|&nbsp;{{$nav}}</nav>
    </header>
-   <main id="_main">{{main}}</main>
-   {{afterMain}}
-
+   <main id="_main">{{$main}}</main>
+   {{$afterMain}}
    <template id="error-message-template">
       <snack-bar class=show><p slot="message"></p></snack-bar>
    </template>
@@ -56,26 +56,25 @@ function getPlaceHolderNames (template) {
     return xs
 }
 
-const meta = html`<meta name=swjs content=generated>`
 const found = getPlaceHolderNames(template)
 
-const bodyClass = async () => {
+const $bodyClass = async () => {
     /** @type {import("../utils/database").DatabaseWindow} */
     // @ts-ignore
     const s = self
     const db = await s.DB.getReadOnlyDB(["settings"])
-    return await db.settings.get("theme")
+    return (await db.settings.get("theme")) || ""
 }
 
 const maps = {
-    meta,
-    bodyClass
+    $bodyClass
 }
 /**
  * @param {string} key
  */
 const mapValue = key =>
     key in maps
+        // @ts-ignore
         ? { [key]: maps[key] }
     : { [key]: "" }
 
@@ -84,7 +83,7 @@ const parsedTemplate =
     .split(placeHolders)
     .map(x => found.indexOf(x) > -1 ? mapValue(x) : x)
 
-console.log("self.M.defaultTemplate = [")
+console.log(`self.M.template["/app/layouts/_default.builder.html.js"] = [`)
 parsedTemplate.forEach(x => {
     if (typeof x === "string") {
         console.log(JSON.stringify(x), ",")

@@ -11,6 +11,11 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
     navigator.serviceWorker.register('/app/sw.js').then(function(registration) {
       console.log('ServiceWorker registration successful with scope: ', registration.scope);
+      const redirect = document.querySelector("meta[name=swjs]")
+      if (!redirect) {
+        debugger;
+        document.location.href = document.location.href
+      }
     }, function(err) {
       console.log('ServiceWorker registration failed: ', err);
     });

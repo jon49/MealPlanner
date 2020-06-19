@@ -16,7 +16,6 @@ const re = new RegExp(Object.keys(chars).join("|"), "g")
 // Return the escaped string
 const htmlEscape = (str = "") => String(str).replace(re, match => chars[match])
 
-if (!self.M) self.M = {}
 self.M.html = function htmlTemplateTag(literals, ...substs) {
     return literals.raw.reduce((acc, lit, i) => {
         let subst = substs[i - 1]

@@ -1,11 +1,10 @@
 // @ts-check
 import html from "../../layouts/html.js"
 
-const head = html`<link rel="stylesheet" type="text/css" href="/app/form.css">
+const $head = html`<link rel="stylesheet" type="text/css" href="/app/form.css">
     <script async src="/app/utils/form-tabs.js"></script>`
 
-
-const $main = html`
+const main = html`
     <form id="_add-recipe">
         <label for="name">Recipe Name:</label>
         <input id="name" type="text" placeholder="Spaghetti with Meatballs" name="recipe-name" autofocus required>
@@ -62,32 +61,38 @@ const $main = html`
     <div id="_previous-recipes"></div>
 `
 
-async function main() {
+async function $main() {
     /** @type {import("../../@types/globals").CustomGlobal} */
     // @ts-ignore
     const s = self
     const db = await s.DB.getReadOnlyDB(["meal-time"])
-    const mealTimes = (await db["meal-time"].getAll()) || []
-    //! const $main = {{$main}}
-    const $mealTimes = mealTimes
-    .map(x => {
-        const id = ""+(+x.id)
-        const checked = mealTimes.length === 1 ? `checked="true"` : ``
-        s.M.html`
-        <input type="checkbox" id="meal-time-$${id}" name="meal-times" value="$${id}" $${checked}>
-        <label for="meal-time-$${id}">${x.name || "Unknown"}</label><br>`
-    }).join("")
-    return $main.replace(`{{${this.name}}}`, $mealTimes)
+    const mealTimes = await db["meal-time"].getAll()
+    const $mealTimes =
+        mealTimes
+        .map(x => {
+            const id = ""+(+x.id)
+            const checked = mealTimes.length === 1 ? `checked="true"` : ``
+            s.M.html`
+            <input type="checkbox" id="meal-time-$${id}" name="meal-times" value="$${id}" $${checked}>
+            <label for="meal-time-$${id}">${x.name || "Unknown"}</label><br>`
+        }).join("")
+    return main.replace(`{{createMealTimes}}`, $mealTimes)
 }
 
-const afterMain = html`
+const $afterMain = html`
     <script src="/app/meals/add/index.js" async type="module"></script>`
 
-console.log(
-    "self.M.page = {template:'defaultTemplate', content:",
-    "[",
-    {afterMain, head, title: "Add Meal", header: "<h1>Add Meal</h1>"},
-    ",",
-    `{main:`,
-    main.toString().replace("//! ", "").replace("{{$main}}", JSON.stringify($main)),
-    "}]}")
+const $template = "/app/layouts/_default.builder.html.js"
+
+/** @type {Partial<import("../../layouts/_default.builder.html.js").DefaultTemplate>} */
+const templateItems = {
+    $main,
+    $afterMain,
+    $head,
+    $header: "<h1>Add Meal</h1>",
+    $title: "Add Meal",
+    $template,
+    $nav: html`<a href="/app/meal-plans/edit">Plan Meals</a>`
+}
+
+export default Object.assign({ main }, templateItems)

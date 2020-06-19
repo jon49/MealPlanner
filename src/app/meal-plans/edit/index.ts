@@ -81,32 +81,30 @@ function getCurrentRecipes({ currentRecipes, unUsedRecipes, start }: GetCurrentR
 // * Drag and drop recipes
 
 type RecipeAndRecipeDate = { recipe: RecipeDomain, date: RecipeDateDomain }
-function handleDateChange(target: HTMLInputElement) {
+async function handleDateChange(target: HTMLInputElement) {
    // Still need to deal with the amount of recipes under 7 and 0 recipes
    // Yield here as we don't know the target is the correct value
    // Perhaps a ISODate.Create which returns => ISODate | ErrorWithUserMessage
    var start = new ISODate(target.value)
-   return setMealPlannerSettings({startDate: start})
-   .then(() => Promise.all([getRecipeDates(start, 1), getRecipes()])) // recipeDates
-   .then(([recipeDates, recipes]) => parseRecipes(recipes, recipeDates))
-   // extract random from getCurrentRecipes, perhaps a different implementation?
-   .then(parsed => getCurrentRecipes({ ...parsed, start }))
-   .then(current => {
-      setRecipeDate(current.currentRecipesAddedDates.map(x => ({
+   await setMealPlannerSettings({ startDate: start })
+   const [recipeDates, recipes] = await Promise.all([getRecipeDates(start, 1), getRecipes()])
+   const parsed = parseRecipes(recipes, recipeDates)
+   const current = getCurrentRecipes({ ...parsed, start })
+   await setRecipeDate(current.currentRecipesAddedDates.map(x => ({
       recipeId: x.date.recipeId,
       date: x.date.date,
       mealTimeId: x.date.mealTimeId,
       quantity: x.date.quantity,
-      })))
-      return current
+   })))
+   const fragment = document.createDocumentFragment()
+   current.currentRecipesAddedDates.forEach(x => {
+      var recipeNode = new Recipe({ date: x.date.date, ...x.recipe })
+      fragment.appendChild(recipeNode.root)
    })
-   .then(current => {
-      mealSelections.innerHTML = ""
-      current.currentRecipesAddedDates.forEach(x => {
-         var recipeNode = new Recipe({ date: x.date.date, ...x.recipe })
-         mealSelections.appendChild(recipeNode.root)
-      })
-   })
+   const $addNewMeal = document.getElementById("add-new-meal")
+   if ($addNewMeal) fragment.appendChild($addNewMeal.cloneNode(true))
+   mealSelections.innerHTML = ""
+   mealSelections.appendChild(fragment)
 }
 
 var firstPageView = true

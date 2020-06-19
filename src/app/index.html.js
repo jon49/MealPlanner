@@ -1,8 +1,7 @@
 // @ts-check
-import _default from "./layouts/_default.html.js"
 import html from "./layouts/html.js"
 
-const header = html`
+const $header = html`
 <h1>
    <a href="/app/">
       <img alt="Meal Planner Logo" src="/images/meal-planner-logo.svg" height="50" width="300">
@@ -10,12 +9,11 @@ const header = html`
 </h1>
 `
 
-const page = _default({
-   currentPage: "Home",
-   head: "",
-   header,
-   main: "Yellow!",
-   afterMain: "",
-})
+/** @type {Partial<import("./layouts/_default.builder.html.js").DefaultTemplate>} */
+const page = {
+   $title: "Home",
+   $header,
+   $main: "Yellow!",
+}
 
-console.log(page)
+export default page

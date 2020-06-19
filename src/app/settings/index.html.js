@@ -1,9 +1,7 @@
 // @ts-check
-
 import html from '../layouts/html.js'
-import _default from "../layouts/_default.html.js"
 
-const main = html`
+const $main = html`
 <form id=settings>
     <label for=theme>Theme:</label>
     <br>
@@ -15,16 +13,17 @@ const main = html`
 </form>
 `
 
-const head = html`
+const $head = html`
 <script async src="/app/utils/database.js" type="module"></script>
 `
 
-const page = _default({
-   head,
-   header: "<h1>Settings</h1>",
-   currentPage: "Settings",
-   main,
-   afterMain: `<script src="/app/settings/index.js" async type="module"></script>`,
-})
+/** @type {Partial<import("../layouts/_default.builder.html.js").DefaultTemplate>} */
+const page = {
+   $head,
+   $header: "<h1>Settings</h1>",
+   $title: "Settings",
+   $main,
+   $afterMain: `<script src="/app/settings/index.js" async type="module"></script>`,
+}
 
-console.log(page)
+export default page
