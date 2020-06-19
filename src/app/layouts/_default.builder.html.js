@@ -58,16 +58,14 @@ function getPlaceHolderNames (template) {
 
 const found = getPlaceHolderNames(template)
 
-const $bodyClass = async () => {
-    /** @type {import("../utils/database").DatabaseWindow} */
-    // @ts-ignore
-    const s = self
-    const db = await s.DB.getReadOnlyDB(["settings"])
-    return (await db.settings.get("theme")) || ""
-}
-
 const maps = {
-    $bodyClass
+    $bodyClass: async () => {
+        /** @type {import("../utils/database").DatabaseWindow} */
+        // @ts-ignore
+        const s = self
+        const db = await s.DB.getReadOnlyDB(["settings"])
+        return (await db.settings.get("theme")) || ""
+    }
 }
 /**
  * @param {string} key
@@ -83,17 +81,4 @@ const parsedTemplate =
     .split(placeHolders)
     .map(x => found.indexOf(x) > -1 ? mapValue(x) : x)
 
-console.log(`self.M.template["/app/layouts/_default.builder.html.js"] = [`)
-parsedTemplate.forEach(x => {
-    if (typeof x === "string") {
-        console.log(JSON.stringify(x), ",")
-    } else {
-        const key = Object.keys(x)[0]
-        if (typeof x[key] === 'function') {
-            console.log(`{"${key}":`, x[key].toString(), "},")
-        } else {
-            console.log(x, ",")
-        }
-    }
-})
-console.log("]")
+export default parsedTemplate

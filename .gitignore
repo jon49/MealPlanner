@@ -4,6 +4,7 @@ temp
 build
 public
 *.zip
+bin
 
 # Logs
 logs
