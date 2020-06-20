@@ -11,8 +11,12 @@ const modules = await Promise.all(files.map(x => import(x.realPath).then(m => ({
 
 for (const x of modules) {
     if (!("default" in x.module)) continue
-    const [sourceInfo, publicInfo] = await Promise.all([Deno.stat(x.fileInfo.realPath), Deno.stat(x.fileInfo.realPath.replace("src", "public"))])
-    if (sourceInfo.mtime && publicInfo.mtime && sourceInfo.mtime < publicInfo.mtime) continue
+    // tsc overwrites my files so I have to overwrite tsc :-(
+    // const [sourceInfo, publicInfo] =
+    //     await Promise
+    //     .all([Deno.stat(x.fileInfo.realPath), Deno.stat(x.fileInfo.realPath.replace("src", "public"))])
+    //     .catch(x => [undefined, undefined])
+    // if (sourceInfo?.mtime && publicInfo?.mtime && sourceInfo.mtime < publicInfo.mtime) continue
     const result = createFile(x.module.default, x.fileInfo.path.replace("src/", "/"))
     writeFileStr(x.fileInfo.realPath.replace("src", "public"), result)
     .then(() => console.log(`Finished creating file to ${x.fileInfo.path.replace("src", "public")}`))

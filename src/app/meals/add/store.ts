@@ -4,7 +4,7 @@ import { DatabaseWindow } from "../../utils/database.js"
 
 declare let self: DatabaseWindow
 
-const { getReadOnlyDB, getDB } = self.DB
+const { getDB } = self.DB
 
 export async function createRecipe(recipe: Domain.Recipe.Recipe) {
     const db = await getDB(["recipe"])
@@ -29,9 +29,4 @@ export async function createRecipe(recipe: Domain.Recipe.Recipe) {
     })
     await db.done
     return id
-}
-
-export async function getMealTimes() {
-    const db = await getReadOnlyDB(["meal-time"])
-    return await db["meal-time"].getAll()
 }

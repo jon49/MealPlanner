@@ -72,7 +72,7 @@ async function $main() {
         .map(x => {
             const id = ""+(+x.id)
             const checked = mealTimes.length === 1 ? `checked="true"` : ``
-            s.M.html`
+            return s.M.html`
             <input type="checkbox" id="meal-time-$${id}" name="meal-times" value="$${id}" $${checked}>
             <label for="meal-time-$${id}">${x.name || "Unknown"}</label><br>`
         }).join("")

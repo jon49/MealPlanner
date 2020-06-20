@@ -1,6 +1,6 @@
 // @ts-check
 
-const CACHE_NAME = 'meal-planner-v4'
+const CACHE_NAME = 'meal-planner-v2'
 // @ts-ignore
 if (!self.M) self.M = {}
 // @ts-ignore
@@ -115,9 +115,9 @@ async function streamResponse(contentUrl, templateUrl) {
     const js = [templateUrl, contentUrl].filter(x => !self.M.template[x]).map(x => fetch(x))
     // @ts-ignore
     if (!self.DB || !self.M.html) js.push(...[fetch("/app/utils/database.js"), fetch("/app/utils/html-template-tag.js")])
-    const templates = await Promise.all(js)
+    const templates = await Promise.all(js).catch(e => (console.log(`Couldn't fetch resource: ${e}`), []))
     for (const template of templates) {
-        eval(await template.text())
+        eval(await template.text().catch(/** @param {*} err*/err => (console.log(err), err.toString())))
     }
     /** @type {any[]} */
     // @ts-ignore

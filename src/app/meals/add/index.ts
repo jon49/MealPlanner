@@ -1,10 +1,9 @@
 import { createString100, createString50, createPositiveWholeNumber, createIdNumber } from "../../utils/common-domain-types.js"
 import { Domain } from "../../utils/database-domain-types.js"
-import { createRecipe, getMealTimes } from "./store.js"
+import { createRecipe } from "./store.js"
 import { handleError, validate, defer } from "../../utils/utils.js"
 import template from "../../utils/hash-template.js"
 import { Page, HTMLAddRecipeForm, SourceValue } from "./index.html.js"
-import { DatabaseType } from "../../utils/database.js"
 
 var page : Page = {
     addRecipeFormId: "_add-recipe",
@@ -13,33 +12,6 @@ var page : Page = {
 }
 
 const $form = <HTMLAddRecipeForm>document.getElementById(page.addRecipeFormId)
-const $mealTime = <HTMLFieldSetElement>document.getElementById(page.mealTimes)
-
-/** Add Meal Time Choices */
-
-const makeEl = (s: string) => document.createElement(s)
-function addMealTimes(mealTimes: DatabaseType.MealTimeData[]) {
-    const times = document.createDocumentFragment()
-    var $input = makeEl("input")
-    mealTimes.forEach(x => {
-        const $label = makeEl("label")
-        const id = `meal-time-${x.id}`
-        ;[["type", "checkbox"]
-        , ["id", id]
-        , ["name", `meal-times`]
-        , ["value", ""+x.id] ]
-        .forEach(xs => $input.setAttribute(xs[0], xs[1]))
-        $label.setAttribute("for", id)
-        $label.textContent = x.name || "Unknown"
-        times.append($input, $label, makeEl("br"))
-    })
-    mealTimes.length === 1 && $input.setAttribute("checked", "true")
-    $mealTime.append(times)
-}
-
-getMealTimes()
-.then(addMealTimes)
-.catch(handleError)
 
 /** Form submit **/
 
