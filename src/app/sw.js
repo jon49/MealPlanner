@@ -1,6 +1,6 @@
 // @ts-check
 
-const CACHE_NAME = 'meal-planner-v2'
+const CACHE_NAME = 'meal-planner-v3'
 // @ts-ignore
 if (!self.M) self.M = {}
 // @ts-ignore

@@ -101,8 +101,8 @@ async function handleDateChange(target: HTMLInputElement) {
       var recipeNode = new Recipe({ date: x.date.date, ...x.recipe })
       fragment.appendChild(recipeNode.root)
    })
-   const $addNewMeal = document.getElementById("add-new-meal")
-   if ($addNewMeal) fragment.appendChild($addNewMeal.cloneNode(true))
+   const $addNewMeal = <HTMLTemplateElement|null>document.getElementById("add-new-meal")
+   $addNewMeal?.content?.firstChild && fragment.appendChild($addNewMeal.content.firstChild.cloneNode(true))
    mealSelections.innerHTML = ""
    mealSelections.appendChild(fragment)
 }

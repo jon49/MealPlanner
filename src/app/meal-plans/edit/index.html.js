@@ -26,7 +26,7 @@ var $afterMain = html`
 ${recipeTemplate}
 ${cancelledRecipeTemplate}
 <script src="/app/meal-plans/edit/index.js" async type="module"></script>
-<div id=add-new-meal><a href="/app/meals/add">Add New Meal</a></div>`
+<template id=add-new-meal><div><a href="/app/meals/add">Add New Meal</a></div></template>`
 
 /** @type {Partial<import("../../layouts/_default.builder.html.js").DefaultTemplate>} */
 const page = {
