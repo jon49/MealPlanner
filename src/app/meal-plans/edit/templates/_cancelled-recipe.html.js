@@ -18,11 +18,11 @@ import html from "../../../layouts/html.js"
 
 export const cancelledRecipeTemplate = html`
 <template id="_cancelled-recipe-template">
-   <article>
+   <div>
       <p>#date</p>
       <h2>No Recipe Chosen</h2>
       <button #=addRecipe>Add Recipe</button>
-   </article>
+   </div>
 </template>
 `
 
