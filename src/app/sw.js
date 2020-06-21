@@ -53,7 +53,7 @@ function fetchHandler(event) {
 function getResponse(event) {
     const url = normalizeUrl(event.request.url)
     if (url.endsWith("sw.js")) return fetch(event.request)
-    if (url.endsWith("/")) {
+    if (url.endsWith("/") && url !== "/app/") {
         return htmlFragment(url)
     }
     return cacheResponse(url, event)
@@ -61,12 +61,12 @@ function getResponse(event) {
 
 /**
  * @param {string} url
- * @param {{ request: string | Request; }} event
+ * @param {{ request: string | Request; }?} event
  */
 async function cacheResponse(url, event) {
     const match = await caches.match(url)
     if (match) return match
-    const res = await fetch(event.request)
+    const res = await fetch(event?.request || url)
     if (!res || res.status !== 200 || res.type !== "basic") return res
     const responseToCache = res.clone()
     const cache = await caches.open(CACHE_NAME)
@@ -96,11 +96,8 @@ const append =
         if (!item) return
         if (typeof item === "string") {
             controller.enqueue(encoder.encode(item))
-        } else if (isAsyncFunction(item)) {
-            const result = await item()
-            if (result) controller.enqueue(encoder.encode(result))
-        } else if (typeof item === "function") {
-            const result = item()
+        } else if (item instanceof Promise) {
+            const result = await item
             if (result) controller.enqueue(encoder.encode(result))
         }
     }
@@ -112,12 +109,17 @@ const append =
 async function streamResponse(contentUrl, templateUrl) {
     console.log(`Loading ${contentUrl} and ${templateUrl}`)
     // @ts-ignore
-    const js = [templateUrl, contentUrl].filter(x => !self.M.template[x]).map(x => fetch(x))
+    const js = [templateUrl, contentUrl].filter(x => !self.M.template[x]).map(x => cacheResponse(x))
     // @ts-ignore
-    if (!self.DB || !self.M.html) js.push(...[fetch("/app/utils/database.js"), fetch("/app/utils/html-template-tag.js")])
-    const templates = await Promise.all(js).catch(e => (console.log(`Couldn't fetch resource: ${e}`), []))
+    if (!self.DB || !self.M.html) js.push(...["/app/utils/database.js", "/app/utils/html-template-tag.js"].map(x => cacheResponse(x)))
+    const templates = await Promise.all(js)
     for (const template of templates) {
-        eval(await template.text().catch(/** @param {*} err*/err => (console.log(err), err.toString())))
+        const jsText = await template.text()
+        if (jsText && jsText[0] !== "<") {
+            eval(jsText)
+        } else {
+            console.error(`Could not parse ${template.url}. Text: ${jsText}`)
+        }
     }
     /** @type {any[]} */
     // @ts-ignore
@@ -129,30 +131,12 @@ async function streamResponse(contentUrl, templateUrl) {
     const encoder = new TextEncoder()
     const stream = new ReadableStream({
         async start(controller) {
+            const allContent = preFetchTemplate(template, content)
             const send = append(controller, encoder)
-            /**
-             * @param {number} idx
-             */
-            async function push(idx) {
-                if (idx === template.length) {
-                    controller.close()
-                    return
-                }
-                console.log(`${idx+1} of ${template.length}`)
-                const val = template[idx]
-                if (!val) {
-                    return push(++idx)
-                } else if (typeof val === "string") {
-                    controller.enqueue(encoder.encode(val))
-                    push(++idx)
-                } else {
-                    const key = Object.keys(val)[0]
-                    await send(val[key])
-                    if (key in content) await send(content[key])
-                    push(++idx)
-                }
+            for (const item of allContent) {
+                await send(item)
             }
-            push(0)
+            controller.close()
         }
     })
 
@@ -160,10 +144,35 @@ async function streamResponse(contentUrl, templateUrl) {
 }
 
 /**
- * @param {*} f
+ * @param {any[]} template
+ * @param {{ [x: string]: any; }} content
  */
-function isAsyncFunction(f) {
-    return typeof f === "function" && f[Symbol.toStringTag] === "AsyncFunction"
+function preFetchTemplate(template, content) {
+    const allContent = []
+    for (const segment of template) {
+        getTemplate(segment, content, allContent)
+    }
+    return allContent
+}
+
+/**
+ * @param {{ (): any; [x: string]: any; }} val
+ * @param {{ [x: string]: any; }} [content]
+ * @param {any[]} [allContent]
+ */
+function getTemplate(val, content, allContent) {
+    if (!val) return
+    if (typeof val === "string") {
+        allContent.push(val)
+    } else if (typeof val === "function") {
+        allContent.push(val())
+    } else {
+        const key = Object.keys(val)[0]
+        getTemplate(val[key], void 0, allContent)
+        if (content && key in content) {
+            getTemplate(content[key], void 0, allContent)
+        }
+    }
 }
 
 /**
