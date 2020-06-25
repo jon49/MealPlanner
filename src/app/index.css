@@ -91,12 +91,6 @@ button, input[type=submit], input[type=reset] {font-size: 1em; display: inline-b
 
 button:hover,button:focus,input:hover,textarea:hover,select:hover {opacity: 0.8}
 
-/* Infinite Grid */
-
-section{display: flex; flex-flow: row wrap}
-
-aside,article,.cards>div {flex:1; margin:var(--m1)}
-
 /** END BASIC.CSS **/
 
 /** Overrides */
@@ -133,15 +127,20 @@ button, input[type=submit], input[type=reset] {
 
 /* Cards */
 
-.cards > div {
+.cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.cards > * {
   background: var(--c2);
   border-radius: var(--rc);
   padding: 1em;
-  box-shadow: 0px 1px 0px rgba(0,0,0,0.3)
+  box-shadow: 0px 1px 0px rgba(0,0,0,0.3);
+  flex: 0 1 calc(25% - var(--m1));
+  margin-top: var(--m1);
 }
-
-aside:first-child, .cards > div:first-child {margin-left:0}
-
 
 /**
 Custom
@@ -199,4 +198,3 @@ aside {
   border-radius: 0.5em;
   margin-top: 0.125em;
 }
-

@@ -1,6 +1,6 @@
 // @ts-check
 
-const CACHE_NAME = 'meal-planner-v4'
+const CACHE_NAME = 'meal-planner-v6'
 // @ts-ignore
 if (!self.M) self.M = {}
 // @ts-ignore
@@ -61,7 +61,7 @@ function getResponse(event) {
 
 /**
  * @param {string} url
- * @param {{ request: string | Request; }?} event
+ * @param {{ request: string | Request; }} [event]
  */
 async function cacheResponse(url, event) {
     const match = await caches.match(url)
@@ -108,8 +108,11 @@ const append =
  */
 async function streamResponse(contentUrl, templateUrl) {
     console.log(`Loading ${contentUrl} and ${templateUrl}`)
-    // @ts-ignore
-    const js = [templateUrl, contentUrl].filter(x => !self.M.template[x]).map(x => cacheResponse(x))
+    const js =
+        [templateUrl, contentUrl]
+        // @ts-ignore
+        .filter(x => !self.M.template[x])
+        .map(x => cacheResponse(x))
     // @ts-ignore
     if (!self.DB || !self.M.html) js.push(...["/app/utils/database.js", "/app/utils/html-template-tag.js"].map(x => cacheResponse(x)))
     const templates = await Promise.all(js)
