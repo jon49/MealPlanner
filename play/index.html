@@ -44,7 +44,7 @@
 
          function update(root, data) {
             var v = map.get(root)
-            if (!v) return false
+            if (!v) v = compile(root)
             for (var key of Object.keys(data)) {
                for (var content of v[key] || []) {
                   var el = content.el
@@ -58,7 +58,7 @@
                   })
                }
             }
-            return true
+            return v
          }
 
          window.skinnyMap = {compile, update}
