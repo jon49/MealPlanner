@@ -15,119 +15,119 @@
    </div>
 
    <script>
-      ;(function(){
-         function getRefs(root) {
-            var refs = {}
-            for (var el of Array.from(root.querySelectorAll("[_]"))) {
-            el.getAttribute("_").split(";").reduce((acc, val) => {
-               var vv = val.split("|")
-               var data = {targets: vv[1] ? vv[1].split(",") : [], el}
-               if (acc[vv[0]]) {
-                  acc[vv[0]].push(data)
+;(function(){
+   function getRefs(root) {
+      var refs = {}
+      for (var el of Array.from(root.querySelectorAll("[_]"))) {
+      el.getAttribute("_").split(";").reduce((acc, val) => {
+         var vv = val.split("|")
+         var data = {targets: vv[1] ? vv[1].split(",") : [], el}
+         if (acc[vv[0]]) {
+            acc[vv[0]].push(data)
+         } else {
+            acc[vv[0]] = [data]
+         }
+         return acc
+      }, refs)
+      }
+      return refs
+   }
+
+   var map = new WeakMap()
+   function compile(root) {
+      if (map.has(root)) {
+         return map[root]
+      } else {
+         return map.set(root, getRefs(root)).get(root)
+      }
+   }
+
+   function update(root, data) {
+      var v = map.get(root)
+      if (!v) v = compile(root)
+      for (var key of Object.keys(data)) {
+         for (var content of v[key] || []) {
+            var el = content.el
+            content.targets.forEach(x => {
+               if (x === "text") {
+                  el.textContent = data[key]
                } else {
-                  acc[vv[0]] = [data]
+                  if (data[key] === null || data[key] === undefined) el.removeAttribute(x)
+                  else el.setAttribute(x, data[key])
                }
-               return acc
-            }, refs)
-            }
-            return refs
-         }
-
-         var map = new WeakMap()
-         function compile(root) {
-            if (map.has(root)) {
-               return map[root]
-            } else {
-               return map.set(root, getRefs(root)).get(root)
-            }
-         }
-
-         function update(root, data) {
-            var v = map.get(root)
-            if (!v) v = compile(root)
-            for (var key of Object.keys(data)) {
-               for (var content of v[key] || []) {
-                  var el = content.el
-                  content.targets.forEach(x => {
-                     if (x === "text") {
-                        el.textContent = data[key]
-                     } else {
-                        if (data[key] === null || data[key] === undefined) el.removeAttribute(x)
-                        else el.setAttribute(x, data[key])
-                     }
-                  })
-               }
-            }
-            return v
-         }
-
-         window.skinnyMap = {compile, update}
-      }());
-
-      class RootEl {
-         constructor(e = []) {
-            this.refs = {}
-            this.el = this._createEl(e)
-         }
-
-         _createEl(e) {
-            let el =
-               e[0] === void 0
-                  ? document.createDocumentFragment()
-               : document.createElement(e[0] || 'div')
-            for (let a of Object.entries(e[1])) {
-               a[0] === "text"
-                  ? el.textContent = a[1]
-               : a[0] === "update"
-                  ? (this._createUpdate(el, a[1]))
-               : el.setAttribute(a[0], a[1])
-            }
-            if (e[2]) {
-               el.append(...e[2].map(x => this._createEl(x)))
-            }
-            return el
-         }
-
-         _createUpdate(el, map) {
-            Object.entries(map)
-            .forEach(([key, attrs]) => {
-               let ref = {el, attrs}
-               if (!this.refs[key]) {
-                  this.refs[key] = [ref]
-               } else {
-                  this.refs[key].push(ref)
-               }
-            })
-         }
-
-         update(data = {}) {
-            Object.entries(data)
-            .forEach(([key, val]) => {
-               const updates = this.refs[key]
-               if (!updates) return
-               updates.forEach(({el, attrs}) => {
-                  attrs.forEach(attr => {
-                     if (attr === "text") el.textContent = val
-                     if (val) {
-                        if (attr === "src" && el.src === val) return
-                        el.setAttribute(attr, val)
-                     } else {
-                        el.removeAttribute(attr)
-                     }
-                  })
-               })
             })
          }
       }
+      return v
+   }
 
-      test = 
-         new RootEl(
-            ['div', {id: 'write2'}, [
-               ['h1', {text: "Orange2!", update: {title: ['text', 'title']}}],
-               ['p', {update: {title: ['text']}}],
-               ['a', {update: {yep: ['text'], url: ['href']}}]
-            ]])
-      document.body.appendChild(test.el)
+   window.skinnyMap = {compile, update}
+}());
+
+class RootEl {
+   constructor(e = []) {
+      this.refs = {}
+      this.el = this._createEl(e)
+   }
+
+   _createEl(e) {
+      let el =
+         e[0] === void 0
+            ? document.createDocumentFragment()
+         : document.createElement(e[0] || 'div')
+      for (let a of Object.entries(e[1])) {
+         a[0] === "text"
+            ? el.textContent = a[1]
+         : a[0] === "update"
+            ? (this._createUpdate(el, a[1]))
+         : el.setAttribute(a[0], a[1])
+      }
+      if (e[2]) {
+         el.append(...e[2].map(x => this._createEl(x)))
+      }
+      return el
+   }
+
+   _createUpdate(el, map) {
+      Object.entries(map)
+      .forEach(([key, attrs]) => {
+         let ref = {el, attrs}
+         if (!this.refs[key]) {
+            this.refs[key] = [ref]
+         } else {
+            this.refs[key].push(ref)
+         }
+      })
+   }
+
+   update(data = {}) {
+      Object.entries(data)
+      .forEach(([key, val]) => {
+         const updates = this.refs[key]
+         if (!updates) return
+         updates.forEach(({el, attrs}) => {
+            attrs.forEach(attr => {
+               if (attr === "text") el.textContent = val
+               if (val) {
+                  if (attr === "src" && el.src === val) return
+                  el.setAttribute(attr, val)
+               } else {
+                  el.removeAttribute(attr)
+               }
+            })
+         })
+      })
+   }
+}
+
+test = 
+   new RootEl(
+      ['div', {id: 'write2'}, [
+         ['h1', {text: "Orange2!", update: {title: ['text', 'title']}}],
+         ['p', {update: {title: ['text']}}],
+         ['a', {update: {yep: ['text'], url: ['href']}}]
+      ]])
+document.body.appendChild(test.el)
    </script>
 
 </body>

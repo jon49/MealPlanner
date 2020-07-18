@@ -1,4 +1,3 @@
 {
-    "liveServer.settings.port": 5501,
-    "deno.enable": false
+    "liveServer.settings.port": 5501
 }
