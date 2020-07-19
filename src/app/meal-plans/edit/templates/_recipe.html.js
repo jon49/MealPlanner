@@ -1,5 +1,5 @@
 // @ts-check
-import html from "../../../layouts/html.js"
+import { html } from "../../../layouts/html-build-utils.js"
 
 /**
  * @typedef {Object} RecipeTemplate

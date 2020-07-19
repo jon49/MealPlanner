@@ -1,5 +1,5 @@
 // @ts-check
-import html from "../../layouts/html.js"
+import { html, splitHtml } from "../../layouts/html-build-utils.js"
 
 const $head = html`<link rel="stylesheet" type="text/css" href="/app/form.css">
     <script async src="/app/utils/form-tabs.js"></script>`
@@ -49,7 +49,7 @@ const main = html`
         </form-tabs>
         <fieldset id="meal-times">
         <legend>Meal Times</legend>
-        {{createMealTimes}}
+        {{getMealTimes}}
         </fieldset>
         <input type="reset" value="Clear">&nbsp;
         <input id="save-once" type="submit" value="Save">&nbsp;
@@ -61,7 +61,7 @@ const main = html`
     <div id="_previous-recipes"></div>
 `
 
-async function $main() {
+async function getMealTimes() {
     /** @type {import("../../@types/globals").CustomGlobal} */
     // @ts-ignore
     const s = self
@@ -76,8 +76,10 @@ async function $main() {
             <input type="checkbox" id="meal-time-$${id}" name="meal-times" value="$${id}" $${checked}>
             <label for="meal-time-$${id}">${x.name || "Unknown"}</label><br>`
         }).join("")
-    return main.replace(`{{createMealTimes}}`, $mealTimes)
+    return $mealTimes
 }
+
+const $main = splitHtml(main, { getMealTimes })
 
 const $afterMain = html`
     <script src="/app/meals/add/index.js" async type="module"></script>`

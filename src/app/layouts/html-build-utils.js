@@ -8,7 +8,7 @@ export const html = (strings, ...args) =>
    .replace(/\s+</g, '<')
    .replace(/>\s+/g, '>')
    .replace(/\n\s+/g, ' ')
-//    .replace(/\n\s+/g, '<!-- -->')
+   .trim()
 
 const placeHolders = /{{([^}]+)}}/g
 /**

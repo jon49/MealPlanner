@@ -2,15 +2,19 @@
 import { html } from './html-build-utils.js'
 
 /**
+ * @typedef {string|(() => Promise<string>)|((() => Promise<string>)|string)[]} TemplateReturnType
+ */
+
+/**
  * @typedef {Object} DefaultTemplate
- * @property {string|(() => Promise<string>)} $meta
- * @property {string|(() => Promise<string>)} $title
- * @property {string|(() => Promise<string>)} $head
- * @property {string|(() => Promise<string>)} $bodyClass
- * @property {string|(() => Promise<string>)} $header
- * @property {string|(() => Promise<string>)} $nav
- * @property {string|(() => Promise<string>)} $main
- * @property {string|(() => Promise<string>)} $afterMain
+ * @property {TemplateReturnType} $meta
+ * @property {TemplateReturnType} $title
+ * @property {TemplateReturnType} $head
+ * @property {TemplateReturnType} $bodyClass
+ * @property {TemplateReturnType} $header
+ * @property {TemplateReturnType} $nav
+ * @property {TemplateReturnType} $main
+ * @property {TemplateReturnType} $afterMain
  * @property {string} $template
  */
 const template = html`

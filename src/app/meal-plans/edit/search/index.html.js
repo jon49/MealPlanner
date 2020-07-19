@@ -1,5 +1,5 @@
 // @ts-check
-import html from '../../../layouts/html.js'
+import { html } from "../../../layouts/html-build-utils.js"
 
 var $head = html`
 <script async src="/app/utils/fuzzy-search.js"></script>

@@ -16,7 +16,6 @@ Deno.test("splitHtml: Replaces placeholders", () => {
     const result = splitHtml(h, { yes, ok, list })
 
     const expected = [
-        " ",
         ...list,
         "<header><h1>",
         yes,

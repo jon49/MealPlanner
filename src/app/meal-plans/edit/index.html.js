@@ -1,5 +1,5 @@
 // @ts-check
-import html from '../../layouts/html.js'
+import { html } from '../../layouts/html-build-utils.js'
 import { recipeTemplate } from './templates/_recipe.html.js'
 import { cancelledRecipeTemplate } from './templates/_cancelled-recipe.html.js'
 
