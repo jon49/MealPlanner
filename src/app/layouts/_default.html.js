@@ -1,5 +1,5 @@
 // @ts-check
-import html from './html.js'
+import { html } from './html-build-utils.js'
 
 /**
  * @typedef {Object} Link
