@@ -148,32 +148,34 @@ async function streamResponse(contentUrl, templateUrl) {
 
 /**
  * @param {any[]} template
- * @param {{ [x: string]: any; }} content
+ * @param {{ [x: string]: any; }} page
  */
-function preFetchTemplate(template, content) {
+function preFetchTemplate(template, page) {
     const allContent = []
     for (const segment of template) {
-        getTemplate(segment, content, allContent)
+        getTemplate(segment, page, allContent)
     }
     return allContent
 }
 
 /**
- * @param {{ (): any; [x: string]: any; }} val
- * @param {{ [x: string]: any; }} [content]
+ * @param {*} val
+ * @param {{ [x: string]: any; }} [page]
  * @param {any[]} [allContent]
  */
-function getTemplate(val, content, allContent) {
+function getTemplate(val, page, allContent) {
     if (!val) return
     if (typeof val === "string") {
         allContent.push(val)
     } else if (typeof val === "function") {
         allContent.push(val())
+    } else if (Array.isArray(val)) {
+        val.forEach(x => getTemplate(x, void 0, allContent))
     } else {
         const key = Object.keys(val)[0]
         getTemplate(val[key], void 0, allContent)
-        if (content && key in content) {
-            getTemplate(content[key], void 0, allContent)
+        if (page && key in page) {
+            getTemplate(page[key], void 0, allContent)
         }
     }
 }
