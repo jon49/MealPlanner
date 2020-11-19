@@ -62,23 +62,38 @@ declare namespace DB.Internal {
     }
 }
 
-export interface DatabaseWindow extends Window {
-   DB: {
-      getDB<T extends MealPlannerTable>(tables: T[]): Promise<PickClassFactory<{
-         recipe: typeof DB.Internal.RecipeStore;
-         "meal-time": typeof DB.Internal.MealTimeStore;
-         "recipe-date": typeof DB.Internal.RecipeDateStore;
-         settings: typeof DB.Internal.SettingsStore;
-      }, T> & { done: Promise<void> }>
-      getReadOnlyDB<T extends AllTableNames>(tables: T[]) : Promise<PickClassFactory<{
-         recipe: typeof DB.Internal.RecipeRead
-         "meal-time": typeof DB.Internal.MealTimeRead
-         "recipe-date": typeof DB.Internal.RecipeDateRead
-         settings: typeof DB.Internal.SettingsRead
-         "change-log": typeof DB.Internal.ChangeLogRead
-      }, T> & { done: Promise<void> }>
-      getRawDB(): Promise<IDBPDatabase<MealPlanner>>
-   }
+declare namespace DB {
+   function getDB<T extends MealPlannerTable>(tables: T[]): Promise<PickClassFactory<{
+      recipe: typeof DB.Internal.RecipeStore;
+      "meal-time": typeof DB.Internal.MealTimeStore;
+      "recipe-date": typeof DB.Internal.RecipeDateStore;
+      settings: typeof DB.Internal.SettingsStore;
+   }, T> & { done: Promise<void> }>
+   function getReadOnlyDB<T extends AllTableNames>(tables: T[]) : Promise<PickClassFactory<{
+      recipe: typeof DB.Internal.RecipeRead
+      "meal-time": typeof DB.Internal.MealTimeRead
+      "recipe-date": typeof DB.Internal.RecipeDateRead
+      settings: typeof DB.Internal.SettingsRead
+      "change-log": typeof DB.Internal.ChangeLogRead
+   }, T> & { done: Promise<void> }>
+   function getRawDB(): Promise<IDBPDatabase<MealPlanner>>
+}
+
+export interface DatabaseWindow {
+   getDB<T extends MealPlannerTable>(tables: T[]): Promise<PickClassFactory<{
+      recipe: typeof DB.Internal.RecipeStore;
+      "meal-time": typeof DB.Internal.MealTimeStore;
+      "recipe-date": typeof DB.Internal.RecipeDateStore;
+      settings: typeof DB.Internal.SettingsStore;
+   }, T> & { done: Promise<void> }>
+   getReadOnlyDB<T extends AllTableNames>(tables: T[]) : Promise<PickClassFactory<{
+      recipe: typeof DB.Internal.RecipeRead
+      "meal-time": typeof DB.Internal.MealTimeRead
+      "recipe-date": typeof DB.Internal.RecipeDateRead
+      settings: typeof DB.Internal.SettingsRead
+      "change-log": typeof DB.Internal.ChangeLogRead
+   }, T> & { done: Promise<void> }>
+   getRawDB(): Promise<IDBPDatabase<MealPlanner>>
 }
 
 export namespace DatabaseType {
@@ -337,11 +352,10 @@ type ChangeLogObjectStore = IDBPObjectStore<MealPlanner, AllTableNames[], "chang
       })
    }
 
-   // @ts-ignore
-   self.DB = {
+   return {
       getDB,
       getReadOnlyDB,
-      getRawDB: getRawDB
+      getRawDB
    }
 
 }());

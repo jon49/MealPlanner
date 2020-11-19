@@ -88,3 +88,22 @@ Since the data will live on a public CDN the server will not need to send the
 updated values themselves, but just the tracking data changes. The client can
 then request the updates from the CDN directly.
 
+## Databases
+
+**Cost**
+
+- DynamoDB
+    + Write : $1.25/Million
+    + Read : $0.25/Million
+    + Storage : 25 GB free - $0.25/GB
+- FaunaDB
+    + Write : ~1.45M free - $2.00/Million
+    + Read : ~2.9M free - $0.50/Million
+    + Storage : 5GB free - $0.18/GB
+- Cloudflare Workers KV
+    + Base subscription $5/Month
+    + Lists : 1M free - $5/Million
+    + Delete : 1M free - $5/Million
+    + Write : 1M free - $5/Million
+    + Read : 10M free - $0.50/Million
+    + Storage : 1GB free - $0.50/GB

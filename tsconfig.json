@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES2020",
     "module": "ES2015",
-    "moduleResolution": "node",
+    "moduleResolution": "Node",
 
     "strict": true,
     "noImplicitAny": true,
@@ -22,10 +22,7 @@
     "skipLibCheck": true
   },
   "compileOnSave": true,
-  "files": [
-    "./node_modules/@types/node/index.d.ts"
-  ],
-  "include": [ "src/**/*.ts", "src/app/utils/database___.js" ],
+  "include": ["src/**/*.ts", "src/**/*.js"],
   "exclude": [
     "node_modules", "src/**/*spec.ts"
   ]

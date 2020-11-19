@@ -1,10 +1,5 @@
-// @ts-check
-
-const CACHE_NAME = 'meal-planner-v6'
-// @ts-ignore
-if (!self.M) self.M = {}
-// @ts-ignore
-if (!self.M.template) self.M.template = {}
+const CACHE_NAME = 'meal-planner-v5'
+const loadedFiles: any = {}
 
 // @ts-ignore
 self.addEventListener("install", installHandler)
@@ -30,111 +25,103 @@ function normalizeUrl(url : string) {
     return path
 }
 
+const getHtmlJsUrl = (url: string) => `${url}index.html.js`
+
 function fetchHandler(event: FetchEvent) {
-    event.respondWith(getResponse(event))
+    event.respondWith(getResponse(event).then(x => x.res).catch(x => console.error(x)))
 }
 
-function getResponse(event: FetchEvent) {
-    const url = normalizeUrl(event.request.url)
-    if (url.endsWith("sw.js")) return fetch(event.request)
+async function loadJavascript(...files : string[]) {
+    const jsFilesTask = files
+        .filter(x => !loadedFiles[x])
+        .map(x => cacheResponse(x))
+    const jsFiles = await Promise.all(jsFilesTask)
+    for (const x of jsFiles) {
+        const jsText = await x.res.text()
+        if (jsText) {
+            loadedFiles[x.url] = await eval(jsText)
+        } else {
+            console.error(`Could not parse ${x.url}. Text: ${jsText}`)
+        }
+    }
+}
+
+var staticFiles : any = {
+    DB: "/app/utils/database.js",
+    html: "/app/utils/html-template-tag.js"
+}
+export type Load = typeof load
+async function load(...files : string[]) {
+    await loadJavascript(...(files.map(x => staticFiles[x] || x)));
+    return <any>files.map(x => loadedFiles[staticFiles[x] || x])
+}
+
+async function getResponse(event: FetchEvent) : Promise<CacheResponse> {
+    const req = event.request
+    const url = normalizeUrl(req.url)
+    if (req.method == "POST") return await handlePost(url, req)
+    if (url.endsWith("sw.js")) return { url, res: await fetch(event.request) }
     if (url.endsWith("/") && url !== "/app/") {
         return htmlFragment(url)
     }
     return cacheResponse(url, event)
 }
 
-async function cacheResponse(url: string, event?: { request: string | Request }) {
+async function handlePost(url: string, req: Request) : Promise<CacheResponse> {
+    url = getHtmlJsUrl(url)
+    const data = await req.formData()
+    if (data.has("cmd")) {
+        var js = (await load(url))[0]
+        var cmd = <string>data.get("cmd")
+        // @ts-ignore
+        var command : any
+        if ((command = js?.command) && (command = command[cmd])) {
+            var result = command(req, data)
+            return { url, res: result }
+        } else {
+            console.error(`Could not find command "${cmd}" for file "${url}"`)
+        }
+    }
+    return { url, res: new Response("doh!", { headers: { "content-type": "text/html" } }) }
+}
+
+interface CacheResponse {
+    url: string
+    res: Response 
+}
+
+async function cacheResponse(url: string, event?: { request: string | Request }) : Promise<CacheResponse> {
     const match = await caches.match(url)
-    if (match) return match
+    if (match) return { url, res: match }
     const res = await fetch(event?.request || url)
-    if (!res || res.status !== 200 || res.type !== "basic") return res
+    if (!res || res.status !== 200 || res.type !== "basic") return { url, res }
     const responseToCache = res.clone()
     const cache = await caches.open(CACHE_NAME)
     cache.put(url, responseToCache)
-    return res
+    return { url, res }
 }
 
-async function htmlFragment(url: string) {
-    const jsPage = `${url}index.html.js`
-    const templateURL = "/app/layouts/_default.builder.html.js"
-    const stream = streamResponse(jsPage, templateURL)
-    if (stream) return stream.catch(e => { console.error(e); return cacheResponse(url, {request: url}) })
+async function htmlFragment(url: string) : Promise<CacheResponse> {
+    const jsPage = getHtmlJsUrl(url)
+    const stream = await streamResponse(jsPage)
+    if (stream) return { url, res: stream }
     return cacheResponse(url, {request: url})
 }
 
-const append =
-    (controller: { enqueue: (arg0: any) => void; }, encoder: TextEncoder) =>
-    async (item: any) => {
-        if (!item) return
-        if (typeof item === "string") {
-            controller.enqueue(encoder.encode(item))
-        } else if (item instanceof Promise) {
-            const result = await item
-            if (result) controller.enqueue(encoder.encode(result))
-        }
-    }
-
-async function streamResponse(contentUrl: string, templateUrl: string) {
-    console.log(`Loading ${contentUrl} and ${templateUrl}`)
-    const js =
-        [templateUrl, contentUrl]
-        // @ts-ignore
-        .filter(x => !self.M.template[x])
-        .map(x => cacheResponse(x))
-    // @ts-ignore
-    if (!self.DB || !self.M.html) js.push(...["/app/utils/database.js", "/app/utils/html-template-tag.js"].map(x => cacheResponse(x)))
-    const templates = await Promise.all(js)
-    for (const template of templates) {
-        const jsText = await template.text()
-        if (jsText && jsText[0] !== "<") {
-            eval(jsText)
-        } else {
-            console.error(`Could not parse ${template.url}. Text: ${jsText}`)
-        }
-    }
-    // @ts-ignore
-    const template: any[] = self.M.template[templateUrl]
-    // @ts-ignore
-    const content: any = self.M.template[contentUrl]
-
+async function streamResponse(url: string) {
+    console.log(`Loading ${url}`)
+    const template = await load(url)
     const encoder = new TextEncoder()
     const stream = new ReadableStream({
         async start(controller) {
-            const allContent = preFetchTemplate(template, content)
-            const send = append(controller, encoder)
-            for (const item of allContent) {
-                await send(item)
-            }
+            const send = (item: string) => controller.enqueue(encoder.encode(item))
+            await template[0].render().start((x: any) => send(x))
+                  .catch((x: any) => console.error(x))
             controller.close()
         }
     })
 
     return new Response(stream, { headers: { "content-type": "text/html; charset=utf-8" }})
-}
-
-function preFetchTemplate(template: any[], page: { [x: string]: any; }) {
-    const allContent : any[] = []
-    for (const segment of template) {
-        getTemplate(segment, page, allContent)
-    }
-    return allContent
-}
-
-function getTemplate(val: any, page: { [x: string]: any; } | undefined, allContent: any[]) {
-    if (!val) return
-    if (typeof val === "string") {
-        allContent.push(val)
-    } else if (typeof val === "function") {
-        allContent.push(val())
-    } else if (Array.isArray(val)) {
-        val.forEach(x => getTemplate(x, void 0, allContent))
-    } else {
-        const key = Object.keys(val)[0]
-        getTemplate(val[key], void 0, allContent)
-        if (page && key in page) {
-            getTemplate(page[key], void 0, allContent)
-        }
-    }
 }
 
 function installHandler(e: InstallEvent) {

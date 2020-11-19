@@ -60,23 +60,6 @@ export function debounce<F extends Procedure>(
 
 export const handleError = <T>(err: T) => { document.dispatchEvent(new CustomEvent("Error", { detail: err })) }
 
-export async function validate<T extends readonly unknown[] | readonly [unknown]>(promises: T):
-    Promise<{ -readonly [P in keyof T]: T[P] extends PromiseLike<infer U> ? U : T[P] }> {
-    // @ts-ignore
-    const result = await Promise.allSettled(<any[]><unknown>promises)
-    const failed: string[] = []
-    for (const item of result) {
-        if (item.status === "rejected") failed.push(item.reason)
-    }
-    if (failed.length > 0) return Promise.reject(failed)
-    return <any>result.map(x => {
-        if (x.status === "fulfilled") {
-            return x.value
-        }
-        throw new Error("All items should already be resolved")
-    })
-}
-
 export class ISODate {
    year: number
   month: number
