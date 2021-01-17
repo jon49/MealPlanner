@@ -1,0 +1,30 @@
+{
+  "name": "mealplanner",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "serve": "http-server -p 5500 -c-1 -g ./public"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "glob": "^7.1.6",
+    "idb": "^5.0.1",
+    "stage0": "0.0.25"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^11.0.2",
+    "@rollup/plugin-node-resolve": "^7.1.1",
+    "@rollup/plugin-sucrase": "^3.0.1",
+    "@types/node": "^12.12.30",
+    "@types/service_worker_api": "0.0.9",
+    "ava": "^3.5.0",
+    "chokidar-cli": "^2.1.0",
+    "http-server": "^0.12.1",
+    "npm-run-all": "^4.1.5",
+    "rollup": "^1.32.1",
+    "typescript": "^3.9.0"
+  }
+}

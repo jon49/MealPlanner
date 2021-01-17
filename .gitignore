@@ -1,5 +1,7 @@
 #
 
+obj
+.vs
 temp
 build
 public

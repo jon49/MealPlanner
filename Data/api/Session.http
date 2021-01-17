@@ -1,0 +1,10 @@
+###
+
+POST http://localhost:55665/api/sessions
+
+###
+
+@Id=9b7b4f43-ebe4-4ade-9ba3-1980911d5c77
+
+POST http://localhost:55665/api/sessions
+    ?sessionId={{Id}}

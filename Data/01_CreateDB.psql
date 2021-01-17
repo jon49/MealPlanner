@@ -1,0 +1,5 @@
+-- psql.exe -U postgres -f .\01_CreateDB.psql
+-- https://stackoverflow.com/a/36218838/632495
+
+CREATE DATABASE userdb;
+

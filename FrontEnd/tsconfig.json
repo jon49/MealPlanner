@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ES2015",
+    // "module": "None",
+    "moduleResolution": "Node",
+
+    "strict": true,
+    "noImplicitAny": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "allowJs": true,
+
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+
+    "outDir": "./public/app",
+    "skipLibCheck": true,
+    // "lib": ["WebWorker", "DOM"]
+
+  },
+  "compileOnSave": true,
+  "include": ["src/**/*.ts", "src/**/*.js"],
+  "exclude": [
+    "node_modules", "src/**/*spec.ts"
+  ]
+}
