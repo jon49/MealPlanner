@@ -1,7 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using MealPlanner.Data.Features.Shared;
+using MealPlanner.User;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
-using D = MealPlanner.User.Data;
+
+#nullable enable
 
 namespace MealPlanner.Data.Features.Sessions
 {
@@ -12,11 +15,25 @@ namespace MealPlanner.Data.Features.Sessions
         [HttpPost]
         public async Task<IActionResult> GetCreateOrDeleteSession([FromQuery] Guid? sessionId)
         {
-            var session = await D.TryGetOrAddOrDeleteSession(sessionId);
-            return Ok(new SessionUser
-                ( Expiration: session.Expiration,
-                  Id: session.Id,
-                  IsLoggedIn: session.UserId > 0 ));
+            Session? session = null;
+            if (sessionId.HasValue)
+            {
+                session = await SystemActor.User.GetSession(sessionId.Value);
+            }
+
+            if (session is null)
+            {
+                session = await SystemActor.User.NewSession();
+            }
+
+            return Ok(session.ToViewModel());
+        }
+
+        [HttpGet, Route("hydrate")]
+        public IActionResult Hydrate()
+        {
+            SystemActor.User.Hydrate();
+            return Ok();
         }
     }
 }

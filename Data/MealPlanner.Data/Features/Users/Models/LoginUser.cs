@@ -15,8 +15,8 @@ namespace MealPlanner.Data.Features.Users.Models
 
     public static class LoginUserExtensions
     {
-        public static User.LoginUser ToDBUser(this LoginUser user, Guid sessionId, byte[] salt)
-            => new User.LoginUser
+        public static User.Actors.LoginUser ToDBUser(this LoginUser user, Guid sessionId, byte[] salt)
+            => new
             ( Email: user.Email,
               EncryptedPassword: SecurePasswordHasher.Hash(user.Password, salt),
               SessionId: sessionId );

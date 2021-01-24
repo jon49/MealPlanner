@@ -44,7 +44,7 @@ namespace MealPlanner.Data
                 Directory.CreateDirectory(Setting.AppDir);
             }
 
-            User.Data.Initialize();
+            SystemActor.Init();
         }
     }
 }

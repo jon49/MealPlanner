@@ -11,44 +11,24 @@ namespace MealPlanner.User
           int? UserId,
           bool Deleted );
 
-    public record NewSession
-        ( Guid Id,
-          long Expiration );
-
     public record QueryResultSessionData
         ( int? UserId,
           long Expiration );
 
     public static class SessionDB
     {
-        private static readonly string commandAddUser = $@"
-INSERT INTO {T.Session.Table} ({T.Session.Id}, {T.Session.Expiration}, {T.Session.UserId})
-VALUES (@{T.Session.Id}, @{T.Session.Expiration}, @{T.Session.UserId});";
-        public static Task LoginUser(Session session)
-            => ExecuteCommandAsync(commandAddUser,
-                new DBParams[]
-                {
-                    new(T.Session.UserId, session.UserId),
-                    new(T.Session.Id, session.Id.ToString()),
-                    new(T.Session.Expiration, session.Expiration),
-                });
 
-        private static readonly string commandCreateSession = $@"
-INSERT INTO {T.Session.Table} ({T.Session.Id}, {T.Session.Expiration})
-VALUES (@{T.Session.Id}, @{T.Session.Expiration});";
-        public static async Task<NewSession> CreateSession()
-        {
-            var session = new NewSession(Id: Guid.NewGuid(), Expiration: DateTimeOffset.Now.AddMonths(1).ToUnixTimeSeconds());
-            await ExecuteCommandAsync(
-                commandCreateSession,
-                new DBParams[]
-                {
-                    new(T.Session.Id, session.Id.ToString()),
-                    new(T.Session.Expiration, session.Expiration),
-                });
-
-            return session;
-        }
+        private static readonly string commandSaveSession = $@"
+INSERT INTO {T.Session.Table} ({T.Session.Id}, {T.Session.Expiration}, {T.Session.UserId}, {T.Session.Deleted})
+VALUES (@{T.Session.Id}, @{T.Session.Expiration}, @{T.Session.UserId}, @{T.Session.Deleted});";
+        public static Task SaveSession(Session session)
+            => ExecuteCommandAsync(commandSaveSession, new DBParams[]
+            {
+                new(T.Session.UserId, session.UserId ?? 0),
+                new(T.Session.Id, session.Id.ToString()),
+                new(T.Session.Expiration, session.Expiration),
+                new(T.Session.Deleted, session.Deleted),
+            });
 
         private static readonly string queryAll = $@"
 SELECT {T.Session.Id}, {T.Session.Expiration}, {T.Session.UserId}, {T.Session.Deleted}
@@ -67,16 +47,6 @@ WHERE {T.Session.Expiration} > @{T.Session.Expiration};";
             }, new DBParams[]
             {
                 new(T.Session.Expiration, DateTimeOffset.UtcNow.ToUnixTimeSeconds()),
-            });
-
-        private static readonly string removeSession = $@"
-INSERT INTO {T.Session.Table} ({T.Session.Id}, {T.Session.Expiration}, {T.Session.Deleted})
-VALUES (@{T.Session.Id}, @{T.Session.Expiration}, true);";
-        public static Task RemoveSession(Guid sessionId)
-            => ExecuteCommandAsync(removeSession, new DBParams[]
-            {
-                new(T.Session.Id, sessionId.ToString()),
-                new(T.Session.Expiration, DateTimeOffset.UtcNow.AddMonths(1).ToUnixTimeSeconds()),
             });
     }
 }

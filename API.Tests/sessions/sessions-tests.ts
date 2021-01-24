@@ -25,21 +25,30 @@ export interface NewSession {
 }
 
 export const Create_New_Session : TestItem = async function Create_New_Session(baseUrl, client) {
+    const now = new Date()
+    const oneMonth = new Date(now.getFullYear(), now.getMonth() + 1, now.getDate() + 1)
+
     var data = await client.postAsync<NewSession>(`${baseUrl}/${url}`, { body: "" })
     check(
         `Session ID is not valid ${data}`,
         () => isNonEmptyUUID(data.id))
 
-    const now = new Date()
-    const oneMonth = new Date(now.getFullYear(), now.getMonth() + 1, now.getDate() + 1)
     check(
-        `Expiration ID is outside of constraints ${data}`,
-        () => isBetween(data.expiration, +now/1e3, +oneMonth/1e3)
+        `Expiration ID is outside of constraints ${JSON.stringify(data)}
+Should be between ${+now/1e3} and ${+oneMonth/1e3} for ${data.expiration}`,
+        () => isBetween(data.expiration, +now/1e3 - 1, +oneMonth/1e3)
     )
 
     return {
         maxTime: 70,
         chain: getSessionChain(data)
+    }
+}
+
+export const Hydrate : TestItem = async function Hydrate(baseUrl, client) {
+    var data = await client.getAsync<{}>(`${baseUrl}/${url}/hydrate`, { })
+    return {
+        maxTime: 8
     }
 }
 

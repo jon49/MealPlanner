@@ -30,13 +30,13 @@ const setResponse : (ctx: Context<unknown>) => void =
     }
 
 export const toHTML =
-    (ctx: Context<unknown>) =>
-    async (html: Promise<HTML>) => {
+    (html: (ctx: Context<unknown>) => Promise<HTML>) =>
+    async (ctx: Context<unknown>) => {
     var buffer = new Deno.Buffer()
     ctx.response.body = new BufReader(buffer)
     ctx.response.headers["Content-Type"] = "text/html; charset=utf-8"
 
-    var h = await html
+    var h = await html(ctx)
     setResponse(ctx)
     await h.start((item: string) => buffer.write(encoder.encode(item)))
 }

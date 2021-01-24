@@ -18,6 +18,36 @@ interface Options {
 export class HttpClientTest {
     _time?: number
     response?: Response
+
+    async getAsync<R>(url: string, { headers = {} } : { headers?: Record<string, string> }) : Promise<R> {
+        const start = Date.now()
+        var headersObj = new Headers({
+            ...headers
+        })
+        var response = await fetch(url, {
+            method: "GET",
+            headers: headersObj
+        })
+        this.response = response
+
+        const end = Date.now()
+        if (this._time) {
+            this._time += end - start
+        } else {
+            this._time = end - start
+        }
+
+        let data : R = <any>{}
+        if (response.headers.get("content-type")?.startsWith("application/json")) {
+            data = await response.json()
+        } else if (!response.ok) {
+            const text = await response.text()
+            throw text
+        }
+
+        return <R>data
+    }
+
     async postAsync<R>(url: string, {body, headers = {}}: Options) : Promise<R> {
         const start = Date.now()
         const length = typeof body === "string" ? body.length : 0
@@ -50,9 +80,11 @@ export class HttpClientTest {
 
         return <R>data
     }
+
     get time() {
         return this._time ?? -1
     }
+
     clearTime() {
         this._time = undefined
     }

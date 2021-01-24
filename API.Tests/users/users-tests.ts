@@ -6,13 +6,14 @@ const url = "api/users"
 interface NewUser {
     email: string
     password: string
+    confirmationPassword: string
     firstName: string
     lastName?: string
 }
 
 
 interface SessionUser {
-    id: number
+    id: string
     expiration: number
     isLoggedIn: boolean
 }
@@ -54,22 +55,26 @@ export const Register_user : TestItem = async function Register_user(baseUrl, cl
         var newUser : NewUser = {
             email: `${session.id}@test.com`,
             password: "I love cheese",
+            confirmationPassword: "I love cheese",
             firstName: "George",
             lastName: "Jungle"
         }
 
         client.clearTime()
-        var userId = await client.postAsync<number>(
+        var user = await client.postAsync<SessionUser>(
             `${baseUrl}/${url}`,
             { body: JSON.stringify(newUser),
               headers: { sessionId: session.id } })
 
         check(
-            `Should be an integer ID ${JSON.stringify(userId)}`,
-            () => userId > 0)
+            `Should be logged in ${JSON.stringify(user)}`,
+            () => user.isLoggedIn)
+        check(
+            `Should be the same session ${JSON.stringify(user)}`,
+            () => user.id === session.id)
         check(
             `Should return location of user.`,
-            () => `/api/users/${userId}` === client.response?.headers.get("location"))
+            () => `/api/sessions` === client.response?.headers.get("location"))
 
         return { maxTime: 70, chain: logoutChain(newUser, session.id) }
     }
@@ -87,8 +92,8 @@ export const Register_bad_user : TestItem = async function Register_bad_user(bas
             `Should return 400 error`,
             () => user.status === 400)
         check(
-            `Should be 3 errors`,
-            () => Object.keys(user.errors).length === 3
+            `Should be 3 errors: ${JSON.stringify(user)}`,
+            () => Object.keys(user.errors).length === 4
         )
 
         return { maxTime: 5 }
@@ -100,6 +105,7 @@ export const Register_user_without_session_id : TestItem = async function Regist
         var newUser : NewUser = {
             email: `${session.id}@test.com`,
             password: "I love cheese",
+            confirmationPassword: "I love cheese",
             firstName: "George",
             lastName: "Jungle"
         }
@@ -116,3 +122,6 @@ export const Register_user_without_session_id : TestItem = async function Regist
 
         return { maxTime: 10 }
     }
+
+// export const Register_user_with_different_passwords : TestItem = async function Register_user_with_different_passwords(baseUrl, client) {
+// }

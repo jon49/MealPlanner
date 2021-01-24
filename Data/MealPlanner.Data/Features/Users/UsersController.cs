@@ -1,4 +1,4 @@
-﻿using MealPlanner.Data.Features.Sessions;
+﻿using MealPlanner.Data.Features.Shared;
 using MealPlanner.Data.Features.Users.Models;
 using MealPlanner.Data.Utils;
 using MealPlannerData.Models;
@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
-using D = MealPlanner.User.Data;
 
 namespace MealPlanner.Data.Controllers.Users
 {
@@ -18,19 +17,25 @@ namespace MealPlanner.Data.Controllers.Users
         public async Task<IActionResult> RegisterUser([FromBody] NewUser user, [FromHeader] Guid? sessionId)
         {
             if (!sessionId.HasValue) return StatusCode(StatusCodes.Status401Unauthorized);
-            var encryptedUser = user.ToDBUser(Setting.App.Session.GetSalt);
-            var userId = await D.RegisterNewUser(sessionId.Value, encryptedUser);
-            if (userId is null)
+            var encryptedPassword = SecurePasswordHasher.Hash(user.Password, Setting.App.Session.GetSalt);
+            var session = await SystemActor.User.RegisterUser(
+                new User.Actors.RegisterUser(
+                    SessionId: sessionId.Value,
+                    Email: user.Email,
+                    EncryptedPassword: encryptedPassword,
+                    FirstName: user.FirstName,
+                    LastName: user.LastName ));
+            if (session?.Id is null)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
 
-            if (userId == 0)
+            if (session.UserId == 0)
             {
                 return BadRequest(new Http.BadRequest("User already exists"));
             }
 
-            return Created($"/api/users/{userId}", userId);
+            return Created("/api/sessions", session.ToViewModel());
         }
 
         [HttpPost]
@@ -39,13 +44,10 @@ namespace MealPlanner.Data.Controllers.Users
         {
             if (!sessionId.HasValue) return StatusCode(StatusCodes.Status401Unauthorized);
             var encryptedUser = user.ToDBUser(sessionId.Value, Setting.App.Session.GetSalt);
-            var result = await D.LoginUser(encryptedUser);
-            if (result is { })
+            var session = await SystemActor.User.LoginUser(encryptedUser);
+            if (session is { })
             {
-                return Ok(new SessionUser
-                    (Expiration: result.Expiration,
-                      Id: result.Id,
-                      IsLoggedIn: result.UserId > 0 ));
+                return Ok(session.ToViewModel());
             }
             return BadRequest("Cannot log in.");
         }
@@ -54,7 +56,7 @@ namespace MealPlanner.Data.Controllers.Users
         [Route("logout")]
         public async Task<IActionResult> LogoutUser([FromHeader] Guid sessionId)
         {
-            await D.LogoutUser(sessionId);
+            await SystemActor.User.LogoutSession(sessionId);
             return Ok();
         }
     }

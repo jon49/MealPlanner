@@ -4,7 +4,7 @@ import staticHandler from "./static-handler.ts"
 
 type Method = "POST" | "GET" | "PATCH" | "DELETE"
 
-type Handler = (req: RouteRequest) => Promise<void>
+type Handler = (req: Context<unknown>) => Promise<void>
 type Guard = (req: Context<Record<string, object>>) => boolean
 
 interface RouteInternal {

@@ -1,3 +1,5 @@
+import { Context } from "../../backend/application.ts"
 import view from "./index.html.ts"
 
-export { view }
+export const login =
+    (ctx: Context<unknown>) => view()
