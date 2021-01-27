@@ -1,5 +1,5 @@
-﻿using MealPlanner.User;
-using MealPlanner.User.Actors;
+﻿using MealPlanner.User.Actors;
+using MealPlanner.User.Databases;
 using Proto;
 using System;
 using System.Diagnostics;
@@ -12,7 +12,11 @@ namespace MealPlanner.Data
     public static class SystemActor
     {
         public static readonly ActorSystem System = new();
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+#pragma warning disable CA2211 // Non-constant fields should not be visible
         public static UserProcess User;
+#pragma warning restore CA2211 // Non-constant fields should not be visible
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
         public static void Init()
         {
@@ -39,7 +43,8 @@ namespace MealPlanner.Data
                 Props.FromProducer(() => new SessionActor())
                 .WithChildSupervisorStrategy(sessionStrategy);
             _sessionRef = system.Root.Spawn(sessionProps);
-            var userProps = Props.FromProducer(() => new UserActor(_sessionRef));
+            var userProps = Props.FromProducer(() => new UserActor(_sessionRef))
+                .WithChildSupervisorStrategy(sessionStrategy);
             _userRef = system.Root.Spawn(userProps);
             system.Root.Send(_sessionRef, null!);
         }

@@ -1,8 +1,8 @@
 ﻿using LanguageExt;
+using MealPlanner.User.Databases;
 using Proto;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace MealPlanner.User.Actors
@@ -17,7 +17,7 @@ namespace MealPlanner.User.Actors
 
     public record LoginSession
         ( Guid Id,
-          int UserId );
+          long UserId );
 
     public record Hydrate();
 
@@ -30,9 +30,9 @@ namespace MealPlanner.User.Actors
         {
             _ = context.Message switch
             {
+                GetSession getSession => ProcessGetSession(context, getSession),
                 NewSession _ => ProcessNewSession(context),
                 LogoutSession logoutSession => ProcessLogoutSession(context, logoutSession),
-                GetSession getSession => ProcessGetSession(context, getSession),
                 LoginSession loginSession => ProcessLoginSession(context, loginSession),
                 Hydrate _ => Unit.Default,
                 Started _ => ProcessStart(context),

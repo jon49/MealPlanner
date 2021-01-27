@@ -4,7 +4,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.IO;
-using MealPlanner.User;
 
 namespace MealPlanner.Data
 {
@@ -43,8 +42,6 @@ namespace MealPlanner.Data
             {
                 Directory.CreateDirectory(Setting.AppDir);
             }
-
-            SystemActor.Init();
         }
     }
 }

@@ -11,7 +11,6 @@ interface NewUser {
     lastName?: string
 }
 
-
 interface SessionUser {
     id: string
     expiration: number

@@ -1,4 +1,4 @@
-﻿using MealPlanner.User;
+﻿using MealPlanner.User.Databases;
 using System;
 
 namespace MealPlanner.Data.Features.Shared

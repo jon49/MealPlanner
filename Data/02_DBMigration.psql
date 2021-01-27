@@ -1,11 +1,5 @@
 -- psql.exe -U postgres -d userdb -f .\02_DBMigration.psql
 
-CREATE TABLE IF NOT EXISTS session (
-    id CHAR(36) NOT NULL,
-    expiration BIGINT NOT NULL,
-    user_id BIGINT NULL,
-    deleted BOOLEAN NOT NULL DEFAULT false);
-
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     email VARCHAR(512) NOT NULL,

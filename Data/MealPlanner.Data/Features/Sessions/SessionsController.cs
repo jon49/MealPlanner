@@ -1,5 +1,5 @@
 ﻿using MealPlanner.Data.Features.Shared;
-using MealPlanner.User;
+using MealPlanner.User.Databases;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
