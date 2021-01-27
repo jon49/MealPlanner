@@ -4,8 +4,8 @@ import staticHandler from "./static-handler.ts"
 
 type Method = "POST" | "GET" | "PATCH" | "DELETE"
 
-type Handler = (req: Context<unknown>) => Promise<void>
-type Guard = (req: Context<Record<string, object>>) => boolean
+type Handler = (req: Context) => Promise<void>
+type Guard = (req: Context) => boolean
 
 interface RouteInternal {
     method : Method
@@ -29,7 +29,7 @@ interface Router {
     get: RouteHandler
     patch: RouteHandler
     delete: RouteHandler
-    run: (req: Context<Record<string, object>>) => Promise<void>
+    run: (req: Context) => Promise<void>
     static: (staticDir: string) => Router
 }
 
@@ -66,7 +66,7 @@ const parseParams = (params: URLSearchParams | undefined) => {
     return obj;
 }
 
-const run = async (ctx: Context<Record<string, object>>) => {
+const run = async (ctx: Context) => {
     var contentType
     var data
 
@@ -110,12 +110,12 @@ const run = async (ctx: Context<Record<string, object>>) => {
 
 export const ifUrl =
     (route: string) =>
-    (ctx: Context<Record<string, object>>) =>
+    (ctx: Context) =>
         ctx.uri.pathname === route
 
 export const command =
     (route: string, cmd: string) =>
-    (ctx: Context<Record<string, object>>) =>
+    (ctx: Context) =>
         ctx.uri.pathname === route && ctx.uri.searchParams.get("cmd") === cmd
 
 export const router : Router = {

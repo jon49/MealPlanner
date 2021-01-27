@@ -8,15 +8,15 @@ export interface ContextResponse {
     cookies: Cookie[] 
 }
 
-export interface Context<T = Record<string, object>> extends ServerRequest {
+export interface Context extends ServerRequest {
     response: ContextResponse
     uri: URL
-    state: T | undefined
+    state: Record<string, any>
     data: any
 }
 
 interface ContextFunction<T> {
-    (ctx: Context<T>): AsyncGenerator<"continue" | "break", any, any>
+    (ctx: Context): AsyncGenerator<"continue" | "break", any, any>
 }
 
 const cleanUrl = (url: string) : URL => {
@@ -35,7 +35,7 @@ export class Application<T> {
         return this
     }
 
-    async _start(req: Context<T>) {
+    async _start(req: Context) {
         var generators = Array(middleware.length)
         var i = 0
         for await (const f of middleware) {
@@ -51,13 +51,13 @@ export class Application<T> {
     }
 
     async listen({ port }: { port: number }) {
+        console.log(`Started on http://localhost:${port}`)
         const server = serve({ port });
         for await (const req of server) {
-            const app = new Application()
-            const ctx = req as Context<T>
+            const ctx = req as Context
             ctx.uri = cleanUrl(req.url)
             ctx.response = { headers: {}, cookies: [] }
-            app._start(ctx)
+            this._start(ctx)
             .catch(() => req.respond({body: "Doh!"}))
         }
     }

@@ -19,7 +19,7 @@ const toCookieHeader : (cookie: Cookie) => string =
         return pairs.join(";")
     }
 
-const setResponse : (ctx: Context<unknown>) => void =
+const setResponse : (ctx: Context) => void =
     ctx => {
         const headers1 = ctx.response.headers
         for (const cookie of ctx.response.cookies) {
@@ -30,8 +30,8 @@ const setResponse : (ctx: Context<unknown>) => void =
     }
 
 export const toHTML =
-    (html: (ctx: Context<unknown>) => Promise<HTML>) =>
-    async (ctx: Context<unknown>) => {
+    (html: (ctx: Context) => Promise<HTML>) =>
+    async (ctx: Context) => {
     var buffer = new Deno.Buffer()
     ctx.response.body = new BufReader(buffer)
     ctx.response.headers["Content-Type"] = "text/html; charset=utf-8"
@@ -42,14 +42,14 @@ export const toHTML =
 }
 
 export const toJson =
-    (ctx: Context<unknown>) =>
+    (ctx: Context) =>
     (data: any) => {
     ctx.response.headers["Content-Type"] = "application/json; charset=utf-8"
     ctx.response.body = JSON.stringify(data)
     setResponse(ctx)
 }
 
-export const redirect = (ctx: Context<unknown>, url: string) => {
+export const redirect = (ctx: Context, url: string) => {
     ctx.response.headers.Location = url
     ctx.response.headers.Status = "302"
     setResponse(ctx)

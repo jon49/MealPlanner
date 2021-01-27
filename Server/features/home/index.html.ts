@@ -2,7 +2,7 @@ import { Context } from "../../backend/application.ts"
 import html from "../../backend/html.ts"
 import layout from "../shared/layout.html.ts"
 
-export default (_: Context<unknown>) => Promise.resolve(
+export default (_: Context) => Promise.resolve(
 layout({
     header: html`<h1>Welcome!</h1>`,
     nav: "Home",

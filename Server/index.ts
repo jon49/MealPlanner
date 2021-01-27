@@ -1,18 +1,10 @@
 import { Application } from "./backend/application.ts"
-import { getCookies, setCookie } from "https://deno.land/std@0.82.0/http/cookie.ts"
-import { v4 } from "https://deno.land/std@0.82.0/uuid/mod.ts"
+import { getCookies } from "https://deno.land/std@0.82.0/http/cookie.ts"
 import { redirect } from "./backend/http.ts"
-// import router from "./router.ts"
-
-interface State {
-  auth: string
-  url: URL
-}
+import router from "./router.ts"
+import { SessionUser } from "./features/shared/types.d.ts"
 
 const app = new Application()
-//   {
-//   keys: ["auth"]
-// })
 
 app.use(async function*(ctx) {
   const start = Date.now()
@@ -28,30 +20,45 @@ app.use(async function*(ctx) {
 app.use(async function*(ctx) {
   const cookies = getCookies(ctx)
   const userSession = cookies["user"]
-  if (!userSession || ctx.uri.pathname !== "/login") {
-    const now = new Date()
-    const expires = new Date(now.getFullYear(), now.getMonth() + 1, now.getDate())
-    ctx.response.cookies.push({
-      name: "user",
-      value: v4.generate(),
-      httpOnly: true,
-      sameSite: "Strict",
-      path: "/app",
-      secure: true,
-      expires
+  let session : SessionUser | undefined = void 0
+  if (!userSession) {
+    const response = await fetch("http://localhost:55665", {
+      method: "POST",
+      headers: new Headers({
+        "Content-Length": "0",
+        "Content-Type": "application/json",
+        body: ""
+      })
     })
+    if (response.ok) {
+      session = JSON.parse(await response.json())
+      if (session?.id)
+        ctx.state[session.id] = session
+    }
+  }
 
-    // TODO: save cookie value to db for later look up on restart of server makes sure to get
-    // all cookies on start up
+  const now = new Date((session?.expiration || 0) * 1e3)
+  const expires = new Date(now.getFullYear(), now.getMonth() + 1, now.getDate())
+  ctx.response.cookies.push({
+    name: "user",
+    value: session?.id || "",
+    httpOnly: true,
+    sameSite: "Strict",
+    path: "/",
+    secure: true,
+    expires
+  })
 
+  if (!session?.isLoggedIn && !(ctx.uri.pathname === "/login" || ctx.uri.pathname === "/register")) {
     redirect(ctx, "/login")
-
     yield "break"
   }
+
 })
 
 app.use(async function*(ctx) {
-  // Run router
+  await router(ctx)
+  yield "break"
 })
 
 app.use(async function*(ctx) {
@@ -61,25 +68,3 @@ app.use(async function*(ctx) {
 const start = async () => await app.listen({ port: 4333 })
 
 start()
-
-// const port = 54321
-// const server = serve({ port });
-// const url = `http://localhost:${port}/`
-
-// Deno.run({
-//   cmd: ["explorer", url]
-// })
-
-// console.log(url)
-
-// const start = async () => {
-//   for await (const req of server) {
-//     router(req)
-//     .catch(x => {
-//       console.error(x)
-//       req.respond({body: "Doh!"})
-//     })
-//   }
-// }
-
-// start()
