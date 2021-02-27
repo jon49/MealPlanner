@@ -17,6 +17,7 @@ app.use(async function*(ctx) {
   ctx.response.headers["Cache-Control"] = "max-age=0"
 })
 
+const states : Record<string, any> = {}
 app.use(async function*(ctx) {
   const cookies = getCookies(ctx)
   const userSession = cookies["user"]
@@ -32,8 +33,16 @@ app.use(async function*(ctx) {
     })
     if (response.ok) {
       session = JSON.parse(await response.json())
-      if (session?.id)
-        ctx.state[session.id] = session
+      if (session?.id) {
+        const s = { session }
+        states[session.id] = s
+        ctx.state = s
+      }
+    }
+  } else {
+    const state = states[userSession]
+    if (session) {
+      ctx.state = { }
     }
   }
 

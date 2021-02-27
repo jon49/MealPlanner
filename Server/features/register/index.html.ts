@@ -1,15 +1,17 @@
 import html from "../../backend/html.ts"
 import layout from "../shared/layout.html.ts"
 
-function getRandomInt(min: number, max: number) {
-    min = Math.ceil(min)
-    max = Math.floor(max)
-    return Math.floor(Math.random() * (max - min + 1)) + min
+interface RegisterOption {
+    uuid: string
+    question: [number, number]
+    errors?: {
+        email: boolean
+        password: boolean
+        confirmPassword: boolean
+    }
 }
 
-export default async () => {
-    const first = getRandomInt(0, 10)
-    const last = getRandomInt(0, 10)
+export default async (o: RegisterOption) => {
     return layout({
         header: html`<h1>Login</h1>`,
         nav: undefined,
@@ -17,24 +19,16 @@ export default async () => {
         body:
     html`
 <form id=register method=post>
-    <label>
-        Email:&nbsp;
-        <input type=email name=email>
-    </label><br>
-    <label>
-        Password:&nbsp;
-        <input type=password name=password>
-    </label>
-    <label>
-        Confirm Password:&nbsp;
-        <input type=password name=confirmationPassword>
-    </label>
-    <input type=hidden value=${""+(first + last)} name=total>
-    <label>
-        I am human add ${""+first} + ${""+last} =&nbsp;
-        <input type=number name=userTotal>
-    </label>
+    <label for=email>Email:</label><br>
+    <input id=email type=email name=email><br>
+    <label for=password>Password:</label><br>
+    <input id=password type=password name=password><br>
+    <label for=confirmation-password>Confirm Password:</label><br>
+    <input id=confirmation-password type=password name=confirmationPassword><br>
+    <label>I am human so I can add $${""+o.question[0]} + $${""+o.question[1]} =</label><br>
+    <input type=number name=userTotal><br>
     <input type=hidden name=ok>
+    <input type=hidden name=key value=$${o.uuid}>
     <input type=submit value=Submit>
 </form>
 <script>
