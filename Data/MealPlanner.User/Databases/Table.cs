@@ -37,6 +37,9 @@
 
             public const string Deleted = "Deleted";
             public const string _Deleted = "$Deleted";
+
+            public const string SessionId = "SessionId";
+            public const string _SessionId = "$SessionId";
         }
     }
 }

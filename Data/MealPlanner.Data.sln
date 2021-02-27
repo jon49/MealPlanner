@@ -7,14 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MealPlanner.Data", "MealPla
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MealPlanner.User", "MealPlanner.User\MealPlanner.User.csproj", "{053E7781-2AB5-4AC1-987D-F0B946D79156}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DBMigrations", "DBMigrations", "{461F717D-6823-40B4-93B0-6AF28944DA18}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UserDB", "UserDB", "{72E0A02E-443D-4676-8CD3-2DCB6737FAAC}"
-	ProjectSection(SolutionItems) = preProject
-		01_CreateDB.psql = 01_CreateDB.psql
-		02_DBMigration.psql = 02_DBMigration.psql
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,9 +24,6 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{72E0A02E-443D-4676-8CD3-2DCB6737FAAC} = {461F717D-6823-40B4-93B0-6AF28944DA18}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {66551EDC-8A3D-4ED4-AEFD-968D2AB6B938}

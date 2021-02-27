@@ -147,15 +147,7 @@ namespace MealPlanner.User.Actors
 
             SessionDB.GetAll(session =>
             {
-                if (S.ContainsKey(session.Id))
-                {
-                    if (session.Deleted) S.Remove(session.Id);
-                    else S[session.Id] = session;
-                }
-                else if (!session.Deleted)
-                {
-                    S.Add(session.Id, session);
-                }
+                S[session.Id] = session;
             });
 
             return Unit.Default;

@@ -18,3 +18,30 @@ WHERE a.GUID = $GUID
   AND a.Expiration < $CurrentTime;
 ```
 
+WITH OrderedSession AS (
+	SELECT ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) Idd, *
+	FROM session
+), Duplicates AS (
+	SELECT *, ROW_NUMBER() OVER (PARTITION BY Id ORDER BY Idd DESC) DupNum
+	FROM OrderedSession
+)
+SELECT Id, Expiration, Deleted, UserId
+FROM Duplicates d
+WHERE DupNum = 1
+  AND Deleted = 0
+  AND Expiration > 16138000;
+
+
+
+WasDeleted AS (
+	SELECT *
+	FROM Duplicates
+	WHERE deleted = 1
+	   OR expiration < 16138000
+), ActiveSession AS (
+	SELECT s.*
+	FROM session s
+	LEFT JOIN WasDeleted d
+		ON s.Id = d.Id
+	WHERE d.Id is NULL
+
