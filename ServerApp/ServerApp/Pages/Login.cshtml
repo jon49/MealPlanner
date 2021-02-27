@@ -1,0 +1,20 @@
+﻿@page
+@model ServerApp.Pages.LoginModel
+@{
+}
+
+@if (Model.ErrorMessage.Length > 0)
+{
+    <p class=error>@Model.ErrorMessage</p>
+}
+
+<form method=post asp-route-returnurl="@ViewData["ReturnUrl"]">
+    <label asp-for="UserLogin.Email">Email</label><br>
+    <input type=email asp-for="UserLogin.Email" /><br>
+    <label asp-for="UserLogin.Password">Password</label><br>
+    <input type=password asp-for="UserLogin.Password" /><br>
+    <br>
+    <input type=submit value=OK><br>
+    <p>First time to this site? <a href="Register">Register here!</a></p>
+</form>
+
