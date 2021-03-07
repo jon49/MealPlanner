@@ -1,7 +1,6 @@
 ﻿using MealPlanner.Core;
 using MealPlanner.User.Databases;
 using Proto;
-using System.Threading.Channels;
 using System.Threading.Tasks;
 
 #nullable enable
@@ -20,38 +19,24 @@ namespace MealPlanner.User.Actors
 
     public class UserActor : IActor
     {
-        private UserDB userDB;
+        private readonly UserDB userDB;
 
         public UserActor()
         {
             userDB = new UserDB();
         }
 
-        public async Task ReceiveAsync(IContext context)
-        {
-            _ = context.Message switch
+        public Task ReceiveAsync(IContext context)
+            => context.Message switch
             {
-                LoginUser loginUser => await ProcessLoginUser(context, loginUser),
-                RegisterUser registerUser => await ProcessRegisterUser(context, registerUser),
-                Started _ => await Init(),
-                Stopped _ => await Dispose(),
-                _ => Unit.Default,
+                LoginUser loginUser => ProcessLoginUser(context, loginUser),
+                RegisterUser registerUser => ProcessRegisterUser(context, registerUser),
+                Started _ => userDB.Init(),
+                Stopped _ => userDB.Dispose(),
+                _ => Task.CompletedTask,
             };
-        }
 
-        private async Task<Unit> Dispose()
-        {
-            await userDB.Dispose();
-            return Unit.Default;
-        }
-
-        private async Task<Unit> Init()
-        {
-            await userDB.Init();
-            return Unit.Default;
-        }
-
-        private async Task<Unit> ProcessRegisterUser(IContext context, RegisterUser registerUser)
+        private async Task ProcessRegisterUser(IContext context, RegisterUser registerUser)
         {
             var userId = await userDB.CreateUser(
                 email: registerUser.Email,
@@ -59,14 +44,12 @@ namespace MealPlanner.User.Actors
                 firstName: registerUser.FirstName,
                 lastName: registerUser.LastName );
             context.Respond(userId);
-            return Unit.Default;
         }
 
-        private async Task<Unit> ProcessLoginUser(IContext context, LoginUser loginUser)
+        private async Task ProcessLoginUser(IContext context, LoginUser loginUser)
         {
             var userId = await userDB.ValidateUser(loginUser.Email, loginUser.EncryptedPassword);
             context.Respond(userId);
-            return Unit.Default;
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using Microsoft.Data.Sqlite;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 #nullable enable
@@ -8,17 +10,7 @@ using System.Threading.Tasks;
 namespace MealPlanner.User.Databases
 {
 
-    public struct DBParams
-    {
-        public DBParams(string name, object value)
-        {
-            Name = name;
-            Value = value;
-        }
-
-        public readonly string Name;
-        public readonly object Value;
-    }
+    public record DBParams(string Name, object? Value);
 
     public static class Database
     {
@@ -166,6 +158,42 @@ namespace MealPlanner.User.Databases
             command.Prepare();
 
             return (T)command.ExecuteScalar();
+        }
+
+        public static void BulkInsert(
+            SqliteConnection connection,
+            string sql,
+            IEnumerable<DBParams[]> @params)
+        {
+            if (!@params.Any())
+            {
+                return;
+            }
+
+            using var transaction = connection.BeginTransaction();
+            using var command = connection.CreateCommand();
+            command.CommandText = sql;
+
+            var paramList = @params.First().Select(x =>
+            {
+                var sqliteParam = command.CreateParameter();
+                sqliteParam.ParameterName = x.Name;
+                command.Parameters.Add(sqliteParam);
+                return sqliteParam;
+            }).ToList();
+
+            var length = paramList.Count();
+            foreach (var p in @params)
+            {
+                for (int i = 0; i < length; i++)
+                {
+                    var val = p[i].Value;
+                    paramList[i].Value = val ?? DBNull.Value;
+                }
+                command.ExecuteNonQuery();
+            }
+
+            transaction.Commit();
         }
 
     }

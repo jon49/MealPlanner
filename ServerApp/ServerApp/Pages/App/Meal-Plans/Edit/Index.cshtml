@@ -1,0 +1,47 @@
+﻿@page
+@model ServerApp.Pages.App.Meal_Plans.IndexModel
+@{
+}
+
+@section Head {
+<style>
+    .meal-edit {
+        min-width: 22em;
+    }
+    .meal-edit h2, .meal-edit p {
+        height: 1.25em;
+        overflow: hidden;
+    }
+    main { width: 100%; }
+    @@media (max-width: 481px) {
+        .meal-edit h2, .meal-edit p {
+            height: auto; overflow: none;
+        }
+        .meal-edit {
+            min-width: auto;
+        }
+    }
+</style>
+}
+
+<form method=get>
+    <label asp-for="StartDate">Start Date:&nbsp;</label>
+    <input type=date asp-for="StartDate" required onchange="hf.debounce(hf.click, 100)">
+    <br><button>Submit</button>
+</form>
+
+<section id=_meal-selections class=cards>
+    @foreach (var mealPlan in @Model.MealPlans)
+    {
+        if (mealPlan?.Recipes?.FirstOrDefault() is { })
+        {
+            <partial name="_RecipeTemplate" model="mealPlan" />
+        }
+        else
+        {
+            <partial name="_CancelledTemplate" model="mealPlan" />
+        }
+    }
+    <div><a href="/app/meals/add">Add New Meal</a></div>
+</section>
+

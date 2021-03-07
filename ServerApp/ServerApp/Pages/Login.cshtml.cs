@@ -12,7 +12,6 @@ using System.Text;
 using Microsoft.Extensions.Options;
 using ServerApp.System;
 using ServerApp.Actors;
-using Microsoft.Extensions.Configuration;
 
 namespace ServerApp.Pages
 {

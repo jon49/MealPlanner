@@ -1,0 +1,31 @@
+﻿@model MealPlanner.Data.Actors.Models.MealPlanModel
+
+@{ 
+    var recipe = @Model.Recipes.FirstOrDefault();
+    var recipeLocation = recipe?.OtherSource?.Title
+        ?? (recipe?.BookSource?.Title is { } ? $"{recipe.BookSource.Title} page {recipe.BookSource.Page}" : null)
+        ?? "";
+    var url = recipe?.WebSource?.Url.ToString() ?? "";
+    var urlTitle = recipe?.WebSource?.Title ?? "";
+    var date = Model.Date;
+}
+
+
+<div class="meal-edit" id=@date>
+    <p>@date</p>
+    <h2 data-ref=name,title|text title="@recipe?.Name">@recipe?.Name</h2>
+    <p>
+        <small>
+            <span data-ref=recipeLocation,title|text title="@recipeLocation">@recipeLocation</span>
+            <a data-ref=url,href;urlTitle,title|text href="@url" title="@urlTitle">@urlTitle</a>
+        </small>
+    </p>
+    <div>
+        <form class=inline method=post >
+            <button asp-page-handler="cancel" asp-route-id="@date">Cancel</button>&nbsp;
+            <button asp-page-handler="previous" asp-route-id="@date">&laquo; Back</button>&nbsp;
+            @*<button formmethod=get formaction="/app/recipes/search?date=@date">Search</button>&nbsp;*@
+            <button asp-page-handler="next" asp-route-id="@date">Next &raquo;</button>
+        </form>
+    </div>
+</div>
