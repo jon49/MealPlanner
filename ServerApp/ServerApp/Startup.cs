@@ -27,12 +27,14 @@ namespace ServerApp
                 .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
                 {
-                    options.AccessDeniedPath = "/app";
                     options.LoginPath = "/login";
                     options.LogoutPath = "/logout";
                 });
             services.AddSession();
-            services.AddRazorPages();
+            services.AddRazorPages(options =>
+            {
+                options.Conventions.AuthorizeFolder("/App");
+            });
             services.AddMemoryCache();
 
             services.Configure<UserSettings>(Configuration);

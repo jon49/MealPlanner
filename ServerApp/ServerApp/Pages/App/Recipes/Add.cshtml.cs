@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using MealPlanner.Data.Data;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using ServerApp.Actions;
@@ -13,7 +12,6 @@ using Model = MealPlanner.Data.Data;
 
 namespace ServerApp.Pages.App.Recipes
 {
-    [Authorize]
     public class AddModel : PageModel
     {
         private readonly UserData _data;
