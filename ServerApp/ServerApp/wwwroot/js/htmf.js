@@ -1,34 +1,38 @@
-﻿; (function () {
+﻿(function () {
 
-    export function debounce(func, waitMilliseconds = 50, option) {
-        let timeoutId;
-        const options = Object.assign({
-            isImmediate: false,
-            runImmediatelyFirstTimeOnly: false
-        }, option);
-        return function (...args) {
-            const context = this;
-            const doLater = function () {
-                timeoutId = undefined;
-                if (!options.isImmediate) {
-                    func.apply(context, args);
-                }
-            };
-            const shouldCallNow = (options.isImmediate || options.runImmediatelyFirstTimeOnly) && timeoutId === undefined;
-            options.runImmediatelyFirstTimeOnly = false;
-            if (timeoutId !== undefined) {
-                clearTimeout(timeoutId);
+    const debounced = {}
+    function debounce(func, key, option = { args: [], wait: 50, isImmediate: false, immediateFirst: false }) {
+        if (!debounced[key]) {
+            debounced[key] = option
+        }
+        const options = debounced[key]
+        let timeoutId = options.timeoutId
+        const context = this
+        const doLater = function () {
+            timeoutId = undefined
+            if (!options.isImmediate) {
+                func.apply(context, options.args);
             }
-            timeoutId = setTimeout(doLater, waitMilliseconds);
-            if (shouldCallNow) {
-                func.apply(context, args);
-            }
+        };
+        const shouldCallNow = (options.isImmediate || options.immediateFirst) && timeoutId === undefined;
+        options.immediateFirst = false;
+        if (timeoutId !== undefined) {
+            clearTimeout(timeoutId);
+        }
+        options.timeoutId = setTimeout(doLater, options.wait);
+        if (shouldCallNow) {
+            func.apply(context, options.args);
         }
     }
 
-    hf.click = function (e) {
-        e.target
+    function click(self) {
+        var $form = self.form
+        if (!$form) return
+        ($form.querySelector("button") || $form.querySelector("[type='submit']"))?.click()
     }
 
-}());
+    document.querySelectorAll("[hf-hidden]").forEach(x => x.style.visibility = "hidden")
 
+    self.hf = { debounce, click }
+
+}());

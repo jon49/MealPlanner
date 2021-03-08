@@ -27,8 +27,12 @@
 
 <form method=get>
     <label asp-for="StartDate">Start Date:&nbsp;</label>
-    <input type=date asp-for="StartDate" required onchange="hf.debounce(hf.click, 100)">
-    <br><button>Submit</button>
+    <input
+           type=date
+           asp-for="StartDate"
+           required
+           onchange="hf.debounce(hf.click, 'start-date', { immediateFirst: true, wait: 100, args: [this] })">
+    <br><input type=submit value=Submit hf-hidden>
 </form>
 
 <section id=_meal-selections class=cards>
