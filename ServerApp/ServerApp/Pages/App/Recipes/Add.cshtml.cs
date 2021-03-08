@@ -1,13 +1,13 @@
-using A = MealPlanner.Data.Actors.Actions.Action;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using MealPlanner.Data.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using ServerApp.Actors;
-using Model = MealPlanner.Data.Actors;
+using ServerApp.Actions;
+using Model = MealPlanner.Data.Data;
 
 #nullable enable
 
@@ -16,14 +16,15 @@ namespace ServerApp.Pages.App.Recipes
     [Authorize]
     public class AddModel : PageModel
     {
-        private readonly UserData data;
+        private readonly UserData _data;
 
-        public AddModel(SystemActor actor)
+        public AddModel(UserData data)
         {
-            data = actor.Data;
+            _data = data;
         }
 
         private long UserId => long.Parse(User.Claims.First(x => x.Type == "userId").Value);
+        private Task<UserDataAction> UserAction => _data.GetUserData(UserId);
 
         [ViewData]
         public string Title => "Add Meal";
@@ -40,12 +41,13 @@ namespace ServerApp.Pages.App.Recipes
 
         public Task OnGetAsync()
         {
-            return SetInitials(UserId);
+            return SetInitials();
         }
 
-        private async Task SetInitials(long userId)
+        private async Task SetInitials()
         {
-            var mealTimes = await data.RequestAsync<Model.MealTime[]>(userId, A.GetAllMealTimes.Default);
+            var action = await UserAction;
+            var mealTimes = action.GetAllMealTimes();
             MealTimes = mealTimes?.ToMealTimeViewModel() ?? Array.Empty<MealTime>();
         }
 
@@ -53,16 +55,18 @@ namespace ServerApp.Pages.App.Recipes
         {
             if (!ModelState.IsValid || Recipe is null)
             {
-                await SetInitials(UserId);
+                await SetInitials();
                 return Page();
             }
 
+            var action = await UserAction;
+
             var recipe = Recipe.ToModel(SelectedMealTimes);
-            var id = await data.RequestAsync<long?>(UserId, recipe);
+            var id = action.Save(recipe);
 
             if (id is null)
             {
-                await SetInitials(UserId);
+                await SetInitials();
                 ModelState.AddModelError("Recipe.Name", "Recipe name already exists.");
                 return Page();
             }
@@ -107,7 +111,7 @@ namespace ServerApp.Pages.App.Recipes
 
     public static class MealTimeExtensions
     {
-        public static MealTime[] ToMealTimeViewModel(this MealPlanner.Data.Actors.MealTime[] mealTimes)
+        public static MealTime[] ToMealTimeViewModel(this Model.MealTime[] mealTimes)
         {
             var length = mealTimes.Length;
             var view = new MealTime[length];
@@ -127,13 +131,13 @@ namespace ServerApp.Pages.App.Recipes
     public static class RecipeExtensions
     {
         public static Model.BookSource? ToModel(this BookSource? x)
-            => x?.Title is { } ? new MealPlanner.Data.Actors.BookSource(Title: x.Title, Page: x.Page) : null;
+            => x?.Title is { } ? new(Title: x.Title, Page: x.Page) : null;
 
         public static Model.OtherSource? ToModel(this OtherSource? x)
-            => x?.Title is { } ? new MealPlanner.Data.Actors.OtherSource(Title: x.Title) : null;
+            => x?.Title is { } ? new(Title: x.Title) : null;
 
         public static Model.WebSource? ToModel(this WebSource? x)
-            => x?.Url is { } ? new Model.WebSource(Title: x.Title ?? x.Url.ToString(), Url: x.Url) : null;
+            => x?.Url is { } ? new(Title: x.Title ?? x.Url.ToString(), Url: x.Url) : null;
 
         public static Model.Recipe ToModel(this Recipe recipe, long[] mealTimes)
             => new(

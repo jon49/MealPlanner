@@ -1,13 +1,12 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using ServerApp.Actors;
-using A = MealPlanner.Data.Actors.Actions.Action;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using System.Threading.Tasks;
 using System;
-using MealPlanner.Data.Actors.Models;
-using MealPlanner.Data.Actors;
-using Proto;
+using ServerApp.Actions;
+using MealPlanner.Data.Data.Models;
+using MealPlanner.Data.Data;
+using static MealPlanner.Data.Shared;
 
 #nullable enable
 
@@ -15,41 +14,45 @@ namespace ServerApp.Pages.App.Meal_Plans
 {
     public class IndexModel : PageModel
     {
-        private readonly UserData data;
+        private readonly UserData _data;
 
-        public IndexModel(SystemActor actor)
+        public IndexModel(UserData data)
         {
-            data = actor.Data;
+            _data = data;
         }
 
         private long UserId => long.Parse(User.Claims.First(x => x.Type == "userId").Value);
+        private Task<UserDataAction> UserAction => _data.GetUserData(UserId);
 
         [ViewData]
         public string Title => "Meal Plan";
         [ViewData]
         public string Header => "Meal Planner";
 
-        public MealPlanModel[] MealPlans { get; set; } = Array.Empty<MealPlanModel>();
+        public MealPlanModel?[] MealPlans { get; set; } = Array.Empty<MealPlanModel>();
 
         [BindProperty(SupportsGet = true)]
-        public string? StartDate { get; set; }
+        public DateTime? StartDate { get; set; }
+        public string? StartDateView => ToMealPlanId(StartDate);
 
-        public async Task<IActionResult> OnGetAsync()
+        public async Task<IActionResult> OnGetAsync(string? startDate = null)
         {
-            await SetMealPlans();
+            SetMealPlans(await UserAction, startDate);
             return Page();
         }
 
-        public async Task<IActionResult> OnPostCancelAsync(string id)
+        public async Task<IActionResult> OnPostCancelAsync(string id, string? startDate = null)
         {
-            await data.RequestAsync<string?>(UserId, new MealPlan(id, Array.Empty<long>()));
-            await SetMealPlans();
+            var action = await UserAction;
+            action.Save(new MealPlan(id, Array.Empty<long>()));
+            SetMealPlans(action, startDate);
             return Page();
         }
 
-        public async Task<IActionResult> OnPostPreviousAsync(string id)
+        public async Task<IActionResult> OnPostPreviousAsync(string id, string? startDate = null)
         {
-            var recipeIds = await GetMealSelections(id);
+            var action = await UserAction;
+            var recipeIds = GetMealSelections(id, action);
             if (recipeIds is { } && recipeIds.Length > 1)
             {
                 var idx = recipeIds[0]!.Value - 1;
@@ -57,50 +60,52 @@ namespace ServerApp.Pages.App.Meal_Plans
                 {
                     recipeIds[0] = idx;
                     var recipeId = recipeIds[idx]!.Value;
-                    data.Send(UserId, new MealPlan(id, new[] { recipeId }));
+                    action.Save(new MealPlan(id, new[] { recipeId }));
                 }
             }
 
-            await SetMealPlans();
+            SetMealPlans(action, startDate);
             return Page();
         }
 
-        public async Task<IActionResult> OnPostNextAsync(string id)
+        public async Task<IActionResult> OnPostNextAsync(string id, string? startDate = null)
         {
-            var recipeIds = (await GetMealSelections(id)) ?? new long?[] { 0L };
+            var action = await UserAction;
+
+            var recipeIds = (GetMealSelections(id, action)) ?? new long?[] { 0L };
 
             var idx = recipeIds[0] + 1;
             if (idx < recipeIds.Length)
             {
                 recipeIds[0] = idx;
                 var recipeId = recipeIds[(int)idx]!.Value;
-                data.Send(UserId, new MealPlan(id, new[] { recipeId }));
+                action.Save(new MealPlan(id, new[] { recipeId }));
             }
             else
             {
-                var randomRecipe = await data.RequestAsync<Recipe?>(UserId, A.GetRandomRecipe.Default);
+                var randomRecipe = action.GetRandomRecipe();
                 if (randomRecipe?.Id is { })
                 {
                     var newRecipeIds = new long?[recipeIds.Length + 1];
                     recipeIds.CopyTo(newRecipeIds, 0);
                     newRecipeIds[^1] = randomRecipe.Id;
                     newRecipeIds[0] = idx;
-                    data.Send(UserId, new TempData(id, newRecipeIds));
-                    data.Send(UserId, new MealPlan(id, new[] { randomRecipe.Id.Value }));
+                    action.SetTempData(new TempData(id, newRecipeIds));
+                    action.Save(new MealPlan(id, new[] { randomRecipe.Id.Value }));
                 }
             }
 
-            await SetMealPlans();
+            SetMealPlans(action, startDate);
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAddRecipeAsync(string id)
+        public async Task<IActionResult> OnPostAddRecipeAsync(string id, string? startDate = null)
         {
-            var recipeIdsTask = GetMealSelections(id);
-            var randomRecipe = await data.RequestAsync<Recipe?>(UserId, A.GetRandomRecipe.Default);
+            var action = await UserAction;
+            var randomRecipe = action.GetRandomRecipe();
             if (randomRecipe?.Id is { })
             {
-                var recipeIds = await recipeIdsTask;
+                var recipeIds = GetMealSelections(id, action);
                 if (recipeIds?.Length > 0)
                 {
                     var newRecipeIds = new long?[recipeIds.Length + 1];
@@ -113,26 +118,27 @@ namespace ServerApp.Pages.App.Meal_Plans
                 {
                     recipeIds = new long?[] { 0, randomRecipe.Id.Value };
                 }
-                data.Send(UserId, new TempData(id, recipeIds));
-                data.Send(UserId, new MealPlan(id, new[] { randomRecipe.Id.Value }));
+                action.SetTempData(new TempData(id, recipeIds));
+                action.Save(new MealPlan(id, new[] { randomRecipe.Id.Value }));
             }
 
-            await SetMealPlans();
+            SetMealPlans(action, startDate);
             return Page();
         }
 
-        private async Task SetMealPlans()
+        private void SetMealPlans(UserDataAction action, string? startDate)
         {
-            MealPlans = await data.RequestAsync<MealPlanModel[]>(UserId, new A.GetMealPlansForWeek(StartDate)) ?? Array.Empty<MealPlanModel>();
+            StartDate = FromMealPlanId(startDate);
+            MealPlans = action.GetMealPlansForWeek(StartDate);
             if (StartDate is null)
             {
-                StartDate = MealPlans.FirstOrDefault()?.Date;
+                StartDate = action.FromMealPlanId(MealPlans.FirstOrDefault()?.Date);
             }
         }
 
-        private async Task<long?[]?> GetMealSelections(string id)
+        private static long?[]? GetMealSelections(string id, UserDataAction action)
         {
-            var tempData = await data.RequestAsync<object[]>(UserId, new A.GetTempData(new[] { id }));
+            var tempData = action.GetTempData(new[] { id });
             var tempData2 = tempData?[0];
             var longData = tempData2 as long?[];
             return longData;

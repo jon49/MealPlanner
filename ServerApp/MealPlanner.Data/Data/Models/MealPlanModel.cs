@@ -1,4 +1,4 @@
-﻿namespace MealPlanner.Data.Actors.Models
+﻿namespace MealPlanner.Data.Data.Models
 {
     public record MealPlanModel
         ( string Date

@@ -1,4 +1,3 @@
-using MealPlanner.User.Actors;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -11,19 +10,19 @@ using System.Threading.Tasks;
 using System.Text;
 using Microsoft.Extensions.Options;
 using ServerApp.System;
-using ServerApp.Actors;
+using MealPlanner.User.Actions;
 
 namespace ServerApp.Pages
 {
     public class LoginModel : PageModel
     {
         private readonly byte[] _salt;
-        private readonly UserProcess _user;
+        private readonly UserAction _user;
 
-        public LoginModel(IOptions<UserSettings> userSettings, SystemActor actor)
+        public LoginModel(IOptions<UserSettings> userSettings, UserAction user)
         {
             _salt = Encoding.UTF8.GetBytes(userSettings.Value.Salt);
-            _user = actor.User;
+            _user = user;
         }
 
         [BindProperty]
@@ -67,7 +66,7 @@ namespace ServerApp.Pages
         private Task<long?> ValidateLogin(UserLogin user)
         {
             var hashedUser = user.ToDBUser(_salt);
-            return _user.LoginUser(hashedUser);
+            return _user.ProcessLoginUser(hashedUser);
         }
     }
 

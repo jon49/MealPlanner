@@ -4,6 +4,7 @@ using Microsoft.Data.Sqlite;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.IO;
+using System;
 
 #nullable enable
 
@@ -11,7 +12,7 @@ namespace MealPlanner.Data.Databases
 {
     public record AllUserData(string? Type, byte[]? Value);
 
-    public class ReadDataDB
+    public class ReadDataDB : IDisposable
     {
         private readonly SqliteConnection ReadOnlyConnection;
 
@@ -19,13 +20,11 @@ namespace MealPlanner.Data.Databases
         {
             var connectionString = $"Data Source={Path.Combine(AppDir, "user-data.db")}";
             ReadOnlyConnection = new SqliteConnection($"{connectionString};Mode=ReadOnly;");
+            ReadOnlyConnection.Open();
         }
 
-        public Task Init()
-            => ReadOnlyConnection.OpenAsync();
-
-        public Task Dispose()
-            => ReadOnlyConnection.CloseAsync();
+        public void Dispose()
+            => ReadOnlyConnection.Close();
 
         private static readonly string GetAllUserDataQuery = $@"
 WITH Duplicates AS (

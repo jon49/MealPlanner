@@ -20,7 +20,7 @@ namespace MealPlanner.User.Databases
         ( string Email,
           string Password );
 
-    public class UserDB
+    public class UserDB : IDisposable
     {
         private readonly SqliteConnection ReadWriteConnection;
         private readonly SqliteConnection ReadOnlyConnection;
@@ -38,21 +38,15 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_user_email ON {T.User.Table} ({T.User.Emai
             var connectionString = $"Data Source={Path.Combine(AppDir, "users.db")}";
             ExecuteCommand($"{connectionString};Mode=ReadWriteCreate;", commandCreateDatabase);
             ReadWriteConnection = new SqliteConnection($"{connectionString};Mode=ReadWrite;");
+            ReadWriteConnection.Open();
             ReadOnlyConnection = new SqliteConnection($"{connectionString};Mode=ReadOnly;");
+            ReadOnlyConnection.Open();
         }
 
-        public Task Init()
+        public void Dispose()
         {
-            var open1Task = ReadWriteConnection.OpenAsync();
-            var open2Task = ReadOnlyConnection.OpenAsync();
-            return Task.WhenAll(open1Task, open2Task);
-        }
-
-        public Task Dispose()
-        {
-            var close1Task = ReadOnlyConnection.CloseAsync();
-            var close2Task = ReadWriteConnection.CloseAsync();
-            return Task.WhenAll(close1Task, close2Task);
+            ReadOnlyConnection.Close();
+            ReadWriteConnection.Close();
         }
 
         private static readonly string createUserCommand = $@"

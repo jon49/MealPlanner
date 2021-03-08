@@ -2,9 +2,9 @@
 using Microsoft.Data.Sqlite;
 using System.IO;
 using static MealPlanner.User.Databases.Database;
-using System.Threading.Tasks;
 using System.Linq;
 using MealPlanner.User.Databases;
+using System;
 
 #nullable enable
 
@@ -18,7 +18,7 @@ namespace MealPlanner.Data.Databases
         , long UserId
         , byte[] Value );
 
-    public class WriteDataDB
+    public class WriteDataDB : IDisposable
     {
         private readonly SqliteConnection ReadWriteConnection;
         private static readonly string commandCreateDatabase = $@"
@@ -37,13 +37,11 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_fetch ON {Event.Table} ({Event.UserId}, {E
             var connectionString = $"Data Source={Path.Combine(AppDir, "user-data.db")}";
             ExecuteCommand($"{connectionString};Mode=ReadWriteCreate;", commandCreateDatabase);
             ReadWriteConnection = new SqliteConnection($"{connectionString};Mode=ReadWrite;");
+            ReadWriteConnection.Open();
         }
 
-        public Task Init()
-            => ReadWriteConnection.OpenAsync();
-
-        public Task Dispose()
-            => ReadWriteConnection.CloseAsync();
+        public void Dispose()
+            => ReadWriteConnection.Close();
 
         private static readonly string CreateEventCommand = $@"
 INSERT INTO {Event.Table} ({Event.Deleted}, {Event.ItemId}, {Event.ItemType}, {Event.Source}, {Event.UserId}, {Event.Value})
