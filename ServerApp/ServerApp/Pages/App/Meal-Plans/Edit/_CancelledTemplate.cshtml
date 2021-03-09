@@ -1,13 +1,15 @@
 ﻿@model MealPlanner.Data.Data.Models.MealPlanModel
 
-<div id=@Model.Date>
+<div id=_@Model.Date>
     <p>@Model.Date</p>
     <h2>No Recipe Chosen</h2>
     <form class=inline
           method=post
           asp-page-handler="AddRecipe"
           asp-route-id="@Model.Date"
-          asp-route-startDate=@ViewData["StartDate"]>
+          asp-route-startDate=@ViewData["StartDate"]
+          hx-post='/app/meal-plans/edit?handler=AddRecipe&startDate=@ViewData["StartDate"]&id=@Model.Date'
+          hx-target="#_@Model.Date">
         <button>Add Recipe</button>
     </form>
 </div>

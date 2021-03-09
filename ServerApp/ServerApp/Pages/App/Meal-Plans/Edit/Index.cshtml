@@ -31,11 +31,14 @@
            type=date
            asp-for="StartDate"
            required
-           onchange="hf.debounce(hf.click, 'start-date', { immediateFirst: true, wait: 100, args: [this] })">
+           hx-get="/app/meal-plans/edit"
+           hx-select="#meal-selections"
+           hx-push-url="true"
+           hx-target="#meal-selections">
     <br><input type=submit value=Submit hf-hidden>
 </form>
 
-<section id=_meal-selections class=cards>
+<section id=meal-selections class=cards>
     @foreach (var mealPlan in @Model.MealPlans)
     {
         if (mealPlan?.Recipes?.FirstOrDefault() is { })
@@ -47,6 +50,6 @@
             <partial name="_CancelledTemplate" model="mealPlan" />
         }
     }
-    <div><a href="/app/meals/add">Add New Meal</a></div>
+    <div><a href="/app/recipes/add">Add New Meal</a></div>
 </section>
 

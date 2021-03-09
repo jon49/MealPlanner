@@ -8,10 +8,11 @@
     var url = recipe?.WebSource?.Url.ToString() ?? "";
     var urlTitle = recipe?.WebSource?.Title ?? "";
     var date = Model.Date;
+    var startDate = ViewData["StartDate"];
 }
 
 
-<div class="meal-edit" id=@date>
+<div class="meal-edit" id=_@date>
     <p>@date</p>
     <h2 data-ref=name,title|text title="@recipe?.Name">@recipe?.Name</h2>
     <p>
@@ -22,10 +23,28 @@
     </p>
     <div>
         <form class=inline method=post >
-            <button asp-page-handler="cancel" asp-route-id="@date" asp-route-startDate=@ViewData["StartDate"]>Cancel</button>&nbsp;
-            <button asp-page-handler="previous" asp-route-id="@date" asp-route-startDate=@ViewData["StartDate"]>&laquo; Back</button>&nbsp;
+            <button
+                    asp-page-handler="cancel"
+                    asp-route-id="@date"
+                    asp-route-startDate=@ViewData["StartDate"]
+                    hx-post="/app/meal-plans/edit?handler=cancel&startDate=@startDate&id=@Model.Date"
+                    hx-target="#_@Model.Date"
+                    >Cancel</button>&nbsp;
+            <button
+                    asp-page-handler="previous"
+                    asp-route-id="@date"
+                    asp-route-startDate=@ViewData["StartDate"]
+                    hx-post="/app/meal-plans/edit?handler=previous&startDate=@startDate&id=@Model.Date"
+                    hx-target="#_@Model.Date"
+                    >&laquo; Back</button>&nbsp;
             @*<button formmethod=get formaction="/app/recipes/search?date=@date" asp-route-startDate=@ViewData["StartDate"]>Search</button>&nbsp;*@
-            <button asp-page-handler="next" asp-route-id="@date" asp-route-startDate=@ViewData["StartDate"]>Next &raquo;</button>
+            <button
+                    asp-page-handler="next"
+                    asp-route-id="@date"
+                    asp-route-startDate=@ViewData["StartDate"]
+                    hx-post="/app/meal-plans/edit?handler=next&startDate=@startDate&id=@Model.Date"
+                    hx-target="#_@Model.Date"
+                    >Next &raquo;</button>
         </form>
     </div>
 </div>

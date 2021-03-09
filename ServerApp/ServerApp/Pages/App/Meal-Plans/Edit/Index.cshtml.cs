@@ -37,7 +37,8 @@ namespace ServerApp.Pages.App.Meal_Plans
 
         public async Task<IActionResult> OnGetAsync(string? startDate = null)
         {
-            SetMealPlans(await UserAction, startDate);
+            var action = await UserAction;
+            SetMealPlans(action, startDate);
             return Page();
         }
 
@@ -46,6 +47,13 @@ namespace ServerApp.Pages.App.Meal_Plans
             var action = await UserAction;
             action.Save(new MealPlan(id, Array.Empty<long>()));
             SetMealPlans(action, startDate);
+
+            if (HttpContext.Request.Headers.ContainsKey("HX-Request"))
+            {
+                var model = MealPlans.First(x => x?.Date == id);
+                return Partial("_CancelledTemplate", model);
+            }
+
             return Page();
         }
 
@@ -65,6 +73,13 @@ namespace ServerApp.Pages.App.Meal_Plans
             }
 
             SetMealPlans(action, startDate);
+
+            if (HttpContext.Request.Headers.ContainsKey("HX-Request"))
+            {
+                var model = MealPlans.First(x => x?.Date == id);
+                return Partial("_RecipeTemplate", model);
+            }
+
             return Page();
         }
 
@@ -96,6 +111,13 @@ namespace ServerApp.Pages.App.Meal_Plans
             }
 
             SetMealPlans(action, startDate);
+
+            if (HttpContext.Request.Headers.ContainsKey("HX-Request"))
+            {
+                var model = MealPlans.First(x => x?.Date == id);
+                return Partial("_RecipeTemplate", model);
+            }
+
             return Page();
         }
 
@@ -123,6 +145,13 @@ namespace ServerApp.Pages.App.Meal_Plans
             }
 
             SetMealPlans(action, startDate);
+
+            if (HttpContext.Request.Headers.ContainsKey("HX-Request"))
+            {
+                var model = MealPlans.First(x => x?.Date == id);
+                return Partial("_RecipeTemplate", model);
+            }
+
             return Page();
         }
 
@@ -132,7 +161,7 @@ namespace ServerApp.Pages.App.Meal_Plans
             MealPlans = action.GetMealPlansForWeek(StartDate);
             if (StartDate is null)
             {
-                StartDate = action.FromMealPlanId(MealPlans.FirstOrDefault()?.Date);
+                StartDate = FromMealPlanId(MealPlans.FirstOrDefault()?.Date);
             }
         }
 

@@ -35,4 +35,6 @@
 
     self.hf = { debounce, click }
 
+    htmx.config.defaultSwapStyle = "outerHTML"
+
 }());

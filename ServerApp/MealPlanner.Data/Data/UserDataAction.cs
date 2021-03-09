@@ -89,8 +89,6 @@ namespace MealPlanner.Data.Data
         }
 
         public MealTime[] GetAllMealTimes() => MealTimes.Values.ToArray();
-        public string? ToMealPlanId(DateTime? date) => ToMealPlanId(date);
-        public DateTime? FromMealPlanId(string? date) => FromMealPlanId(date);
         public MealPlanModel?[] GetMealPlansForWeek(DateTime? startDate)
             => MealPlans.GetMealPlansForWeek(this, startDate, MealTimes, Recipes);
         public Recipe GetRandomRecipe() => Recipes.RandomValue(new Random());
