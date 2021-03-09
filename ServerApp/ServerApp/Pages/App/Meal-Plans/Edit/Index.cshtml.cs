@@ -51,7 +51,7 @@ namespace ServerApp.Pages.App.Meal_Plans
             action.Save(new MealPlan(id, Array.Empty<long>()));
             SetMealPlans(action, startDate);
 
-            if (HttpContext.Request.Headers.ContainsKey("HX-Request"))
+            if (HttpContext.Request.Headers.ContainsKey("HF-Request"))
             {
                 var model = MealPlans.First(x => x?.Date == id);
                 return Partial("_CancelledTemplate", model);
@@ -77,7 +77,7 @@ namespace ServerApp.Pages.App.Meal_Plans
 
             SetMealPlans(action, startDate);
 
-            if (HttpContext.Request.Headers.ContainsKey("HX-Request"))
+            if (HttpContext.Request.Headers.ContainsKey("HF-Request"))
             {
                 var model = MealPlans.First(x => x?.Date == id);
                 return Partial("_RecipeTemplate", model);
@@ -115,7 +115,7 @@ namespace ServerApp.Pages.App.Meal_Plans
 
             SetMealPlans(action, startDate);
 
-            if (HttpContext.Request.Headers.ContainsKey("HX-Request"))
+            if (HttpContext.Request.Headers.ContainsKey("HF-Request"))
             {
                 var model = MealPlans.First(x => x?.Date == id);
                 return Partial("_RecipeTemplate", model);
@@ -149,7 +149,7 @@ namespace ServerApp.Pages.App.Meal_Plans
 
             SetMealPlans(action, startDate);
 
-            if (HttpContext.Request.Headers.ContainsKey("HX-Request"))
+            if (HttpContext.Request.Headers.ContainsKey("HF-Request"))
             {
                 var model = MealPlans.First(x => x?.Date == id);
                 return Partial("_RecipeTemplate", model);

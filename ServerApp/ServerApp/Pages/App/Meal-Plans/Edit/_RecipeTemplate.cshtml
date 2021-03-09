@@ -23,28 +23,16 @@
     </p>
     <div>
         <form class=inline method=post >
-            <button
-                    asp-page-handler="cancel"
+            <button asp-page-handler="cancel"
                     asp-route-id="@date"
-                    asp-route-startDate=@startDate
-                    hx-post="/app/meal-plans/edit?handler=cancel&startDate=@startDate&id=@Model.Date"
-                    hx-target="#_@Model.Date"
-                    >Cancel</button>&nbsp;
-            <button
-                    asp-page-handler="previous"
+                    asp-route-startDate=@startDate>Cancel</button>&nbsp;
+            <button asp-page-handler="previous"
                     asp-route-id="@date"
-                    asp-route-startDate=@startDate
-                    hx-post="/app/meal-plans/edit?handler=previous&startDate=@startDate&id=@Model.Date"
-                    hx-target="#_@Model.Date"
-                    >&laquo; Back</button>&nbsp;
+                    asp-route-startDate=@startDate>&laquo; Back</button>&nbsp;
             @*<button formmethod=get formaction="/app/recipes/search?date=@date" asp-route-startDate=@startDate>Search</button>&nbsp;*@
-            <button
-                    asp-page-handler="next"
+            <button asp-page-handler="next"
                     asp-route-id="@date"
-                    asp-route-startDate=@startDate
-                    hx-post="/app/meal-plans/edit?handler=next&startDate=@startDate&id=@Model.Date"
-                    hx-target="#_@Model.Date"
-                    >Next &raquo;</button>
+                    asp-route-startDate=@startDate>Next &raquo;</button>
         </form>
     </div>
 </div>

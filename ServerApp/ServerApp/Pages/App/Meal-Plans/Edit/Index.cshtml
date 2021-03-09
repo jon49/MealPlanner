@@ -25,16 +25,13 @@
 </style>
 }
 
-<form method=get>
+<form method=get hf-ignore>
     <label asp-for="StartDate">Start Date:&nbsp;</label>
     <input
            type=date
            asp-for="StartDate"
            required
-           hx-get="/app/meal-plans/edit"
-           hx-select="#meal-selections"
-           hx-push-url="true"
-           hx-target="#meal-selections">
+           onchange="hf.debounce(hf.click, 'start-date', { immediateFirst: true, wait: 100, args: [this] })">
     <br><input type=submit value=Submit hf-hidden>
 </form>
 

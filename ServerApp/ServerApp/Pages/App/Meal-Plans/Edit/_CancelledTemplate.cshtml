@@ -11,9 +11,7 @@
           method=post
           asp-page-handler="AddRecipe"
           asp-route-id="@Model.Date"
-          asp-route-startDate=@startDate
-          hx-post='/app/meal-plans/edit?handler=AddRecipe&startDate=@startDate&id=@Model.Date'
-          hx-target="#_@Model.Date">
-        <button>Add Recipe</button>
+          asp-route-startDate=@startDate>
+        <input type=submit value="Add Recipe">
     </form>
 </div>

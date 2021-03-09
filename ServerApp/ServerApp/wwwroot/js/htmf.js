@@ -33,8 +33,137 @@
 
     document.querySelectorAll("[hf-hidden]").forEach(x => x.style.visibility = "hidden")
 
-    self.hf = { debounce, click }
+    var hf = { debounce, click }
 
-    htmx.config.defaultSwapStyle = "outerHTML"
+    /**
+     * @typedef PreData
+     * @property {string} event
+     * @property {FormData} data
+     * @property {HTMLFormElement} form
+     * @property {HTMLButtonElement} target
+     */
+
+    /**
+     * @typedef PostData
+     * @property {string} event
+     * @property {*} data
+     * @property {string} text
+     * @property {HTMLFormElement} form
+     * @property {true} postEvent
+     * @property {HTMLButtonElement} target
+     * @property {"html"|"json"|"text"} contentType
+     */
+
+    /**
+     * @typedef EventData
+     * @type {PreData|PostData}
+     */
+
+    const events = {}
+    const hooks = []
+
+    function addFormEvent(name, f) {
+        if (events[name]) {
+            console.error(`The event ${name} has already been registered! ${f.name}`)
+            return
+        }
+        events[name] = f
+    }
+
+    /**
+     * @param {(data: EventData) => Promise<void> | void} f 
+     */
+    function addHook(f) {
+        hooks.push(f)
+    }
+
+    document.addEventListener("submit", async e => {
+
+        /**
+         * @type {HTMLFormElement}
+         */
+        const $form = e.target
+        const $button = document.activeElement
+
+        if ($form.hasAttribute("hf-ignore")) return
+        e.preventDefault()
+
+        const preData = new FormData($form)
+        /** @type {string} */
+        const preEvent = $button.dataset.event ?? $form.dataset.event
+        const shouldRunEvent = preEvent && events[preEvent]
+        /** @type {PreData} */
+        const preEventData = { event: preEvent, data: preData, form: $form , target: $button }
+        if (shouldRunEvent) {
+            await events[preEvent](preEventData)
+        }
+        for (const hook of hooks) {
+            await hook(preEventData)
+        }
+
+        const method = $button.formMethod || $form.method
+        const url = new URL(($button.getAttribute("formAction") && $button.formAction) || $form.action)
+        const options = { method, credentials: "same-origin", headers: new Headers({ "HF-Request": "true" }) }
+        if (method === "post") {
+            options.body = new URLSearchParams([...preData])
+        } else if (!($button.hasAttribute("data-skip-query") || $form.hasAttribute("data-skip-query"))) {
+            const query = new URLSearchParams(preData).toString()
+            if (query) {
+                url.search += (url.search ? "&" : "?") + query.toString()
+            }
+        }
+        const response = await fetch(url.href, options)
+
+        const event = response.headers.get("event")
+        const contentType = response.headers.get("content-type")
+        let data, text
+
+        const simpleContentType =
+            contentType.indexOf("application/json") !== -1
+                ? "json"
+            : contentType.indexOf("html") !== -1
+                ? "html"
+            : "text"
+        if (contentType && contentType.indexOf("application/json") !== -1) {
+            data = JSON.parse(await response.json())
+        } else {
+            text = await response.text()
+        }
+
+        /** @type {PostData} */
+        const postData = {
+            event: preEvent,
+            data,
+            text,
+            form: $form,
+            postEvent: true,
+            target: $button,
+            contentType: simpleContentType }
+        if (shouldRunEvent) {
+            await event[preEvent](postData)
+        }
+        for (const hook of hooks) {
+            await hook(postData)
+        }
+
+    })
+
+     self.hf = Object.assign(hf, {
+        addFormEvent,
+        addHook
+    })
+
+    hf.addHook(function htmlSwap(data) {
+        if (!data.postEvent || data.contentType !== "html") return
+
+        const template = document.createElement("template")
+        template.innerHTML = data.text.trim()
+        for (const el of template.content.childNodes) {
+            const query = el.getAttribute("target")
+            const target = query ? document.querySelector(query) : document.getElementById(el.id)
+            if (!target) { target = data.form }
+            target.replaceWith(el)
+        }
+    })
 
 }());
