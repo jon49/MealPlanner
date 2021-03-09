@@ -30,7 +30,6 @@ namespace ServerApp
                     options.LoginPath = "/login";
                     options.LogoutPath = "/logout";
                 });
-            services.AddSession();
             services.AddRazorPages(options =>
             {
                 options.Conventions.AuthorizeFolder("/App");
