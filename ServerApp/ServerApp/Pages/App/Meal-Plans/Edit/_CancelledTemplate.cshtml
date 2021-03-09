@@ -1,4 +1,8 @@
-﻿@model MealPlanner.Data.Data.Models.MealPlanModel
+﻿@model ServerApp.Pages.App.Meal_Plans.MealViewModel
+
+@{ 
+    var startDate = Model.StartDate;
+}
 
 <div id=_@Model.Date>
     <p>@Model.Date</p>
@@ -7,8 +11,8 @@
           method=post
           asp-page-handler="AddRecipe"
           asp-route-id="@Model.Date"
-          asp-route-startDate=@ViewData["StartDate"]
-          hx-post='/app/meal-plans/edit?handler=AddRecipe&startDate=@ViewData["StartDate"]&id=@Model.Date'
+          asp-route-startDate=@startDate
+          hx-post='/app/meal-plans/edit?handler=AddRecipe&startDate=@startDate&id=@Model.Date'
           hx-target="#_@Model.Date">
         <button>Add Recipe</button>
     </form>

@@ -7,6 +7,7 @@ using ServerApp.Actions;
 using MealPlanner.Data.Data.Models;
 using MealPlanner.Data.Data;
 using static MealPlanner.Data.Shared;
+using System.Collections.Generic;
 
 #nullable enable
 
@@ -29,7 +30,9 @@ namespace ServerApp.Pages.App.Meal_Plans
         [ViewData]
         public string Header => "Meal Planner";
 
-        public MealPlanModel?[] MealPlans { get; set; } = Array.Empty<MealPlanModel>();
+        //public MealPlanModel?[] MealPlans { get; set; } = Array.Empty<MealPlanModel>();
+
+        public IEnumerable<MealViewModel?> MealPlans { get; set; } = Array.Empty<MealViewModel>();
 
         [BindProperty(SupportsGet = true)]
         public DateTime? StartDate { get; set; }
@@ -157,8 +160,9 @@ namespace ServerApp.Pages.App.Meal_Plans
 
         private void SetMealPlans(UserDataAction action, string? startDate)
         {
+            ViewData["StartDate"] = startDate;
             StartDate = FromMealPlanId(startDate);
-            MealPlans = action.GetMealPlansForWeek(StartDate);
+            MealPlans = action.GetMealPlansForWeek(StartDate).Select(x => x?.ToMealViewModel(startDate: startDate));
             if (StartDate is null)
             {
                 StartDate = FromMealPlanId(MealPlans.FirstOrDefault()?.Date);
@@ -183,6 +187,20 @@ namespace ServerApp.Pages.App.Meal_Plans
         public string? Recipe { get; set; }
         // TODO
         //public string MealTime { get; set; }
+    }
+
+    public record MealViewModel
+        ( string Date
+        , Recipe[] Recipes 
+        , string StartDate );
+
+    public static class MealViewModelExtensions
+    {
+        public static MealViewModel ToMealViewModel(this MealPlanModel plan, string? startDate)
+            => new
+            ( Date: plan.Date
+            , Recipes: plan.Recipes
+            , StartDate: startDate);
     }
 
 }

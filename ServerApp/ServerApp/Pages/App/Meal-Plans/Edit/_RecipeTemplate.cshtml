@@ -1,4 +1,4 @@
-﻿@model MealPlanner.Data.Data.Models.MealPlanModel
+﻿@model ServerApp.Pages.App.Meal_Plans.MealViewModel
 
 @{ 
     var recipe = @Model.Recipes.FirstOrDefault();
@@ -8,7 +8,7 @@
     var url = recipe?.WebSource?.Url.ToString() ?? "";
     var urlTitle = recipe?.WebSource?.Title ?? "";
     var date = Model.Date;
-    var startDate = ViewData["StartDate"];
+    var startDate = Model.StartDate;
 }
 
 
@@ -26,22 +26,22 @@
             <button
                     asp-page-handler="cancel"
                     asp-route-id="@date"
-                    asp-route-startDate=@ViewData["StartDate"]
+                    asp-route-startDate=@startDate
                     hx-post="/app/meal-plans/edit?handler=cancel&startDate=@startDate&id=@Model.Date"
                     hx-target="#_@Model.Date"
                     >Cancel</button>&nbsp;
             <button
                     asp-page-handler="previous"
                     asp-route-id="@date"
-                    asp-route-startDate=@ViewData["StartDate"]
+                    asp-route-startDate=@startDate
                     hx-post="/app/meal-plans/edit?handler=previous&startDate=@startDate&id=@Model.Date"
                     hx-target="#_@Model.Date"
                     >&laquo; Back</button>&nbsp;
-            @*<button formmethod=get formaction="/app/recipes/search?date=@date" asp-route-startDate=@ViewData["StartDate"]>Search</button>&nbsp;*@
+            @*<button formmethod=get formaction="/app/recipes/search?date=@date" asp-route-startDate=@startDate>Search</button>&nbsp;*@
             <button
                     asp-page-handler="next"
                     asp-route-id="@date"
-                    asp-route-startDate=@ViewData["StartDate"]
+                    asp-route-startDate=@startDate
                     hx-post="/app/meal-plans/edit?handler=next&startDate=@startDate&id=@Model.Date"
                     hx-target="#_@Model.Date"
                     >Next &raquo;</button>
