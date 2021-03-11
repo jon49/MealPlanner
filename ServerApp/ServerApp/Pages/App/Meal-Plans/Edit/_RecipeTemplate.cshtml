@@ -1,4 +1,5 @@
 ﻿@model ServerApp.Pages.App.Meal_Plans.MealViewModel
+@using ServerApp.Pages.App.Meal_Plans
 
 @{ 
     var recipe = @Model.Recipes.FirstOrDefault();
@@ -25,14 +26,19 @@
         <form class=inline method=post >
             <button asp-page-handler="cancel"
                     asp-route-id="@date"
-                    asp-route-startDate=@startDate>Cancel</button>&nbsp;
+                    asp-route-startDate=@startDate
+                    >Cancel</button>&nbsp;
             <button asp-page-handler="previous"
                     asp-route-id="@date"
-                    asp-route-startDate=@startDate>&laquo; Back</button>&nbsp;
+                    asp-route-startDate=@startDate
+                    data-focus="@(Model.ChangeSource == ChangeSource.Previous)"
+                    >&laquo; Back</button>&nbsp;
             @*<button formmethod=get formaction="/app/recipes/search?date=@date" asp-route-startDate=@startDate>Search</button>&nbsp;*@
             <button asp-page-handler="next"
                     asp-route-id="@date"
-                    asp-route-startDate=@startDate>Next &raquo;</button>
+                    asp-route-startDate=@startDate
+                    data-focus="@(Model.ChangeSource == ChangeSource.Next || Model.ChangeSource == ChangeSource.AddRecipe)"
+                    >Next &raquo;</button>
         </form>
     </div>
 </div>

@@ -34,9 +34,11 @@ namespace ServerApp
             {
                 options.Conventions.AuthorizeFolder("/App");
             });
+            services.AddControllers();
             services.AddMemoryCache();
 
             services.Configure<UserSettings>(Configuration);
+            services.Configure<AdminSettings>(Configuration);
             services.AddSingleton<UserData>();
             services.AddSingleton<UserAction>();
         }
@@ -58,7 +60,7 @@ namespace ServerApp
 
             app.UseEndpoints(endpoints =>
             {
-                //endpoints.MapControllers();
+                endpoints.MapControllers();
                 endpoints.MapRazorPages();
             });
         }

@@ -4,6 +4,8 @@ using T = MealPlanner.User.Databases.Table;
 using static MealPlanner.User.Databases.Database;
 using System.IO;
 using Microsoft.Data.Sqlite;
+using System.Collections.Generic;
+using System.Linq;
 
 #nullable enable
 
@@ -31,7 +33,10 @@ CREATE TABLE IF NOT EXISTS {T.User.Table} (
     {T.User.Password} TEXT NOT NULL,
     {T.User.FirstName} TEXT NULL,
     {T.User.LastName} TEXT NULL);
-CREATE UNIQUE INDEX IF NOT EXISTS idx_user_email ON {T.User.Table} ({T.User.Email});";
+CREATE UNIQUE INDEX IF NOT EXISTS idx_user_email ON {T.User.Table} ({T.User.Email});
+CREATE TABLE IF NOT EXISTS {T.BetaUser.Table} (
+    {T.BetaUser.Id} INTEGER NOT NULL PRIMARY KEY,
+    {T.BetaUser.Email} TEXT NOT NULL);";
 
         public UserDB()
         {
@@ -54,8 +59,10 @@ INSERT INTO {T.User.Table} ({T.User.Email}, {T.User.FirstName}, {T.User.LastName
 SELECT {T.User._Email}, {T.User._FirstName}, {T.User._LastName}, {T.User._Password}
 WHERE NOT EXISTS (SELECT * FROM {T.User.Table} WHERE {T.User.Email} = {T.User._Email});
 SELECT last_insert_rowid();";
-        public Task<long?> CreateUser(string email, string password, string? firstName, string? lastName)
+        public async Task<long?> CreateUser(string email, string password, string? firstName, string? lastName)
         {
+            if ((await IsBetaUser(email)) is null) return null;
+
             var @params = new DBParams[]
             {
                 new(T.User._Email, email),
@@ -64,7 +71,51 @@ SELECT last_insert_rowid();";
                 new(T.User._LastName, (lastName as object) ?? DBNull.Value),
             };
 
-            return ExecuteCommandAsync<long?>(ReadWriteConnection, createUserCommand, @params);
+            return await ExecuteCommandAsync<long?>(ReadWriteConnection, createUserCommand, @params);
+        }
+
+        private static readonly string addBetaUser = $@"
+INSERT INTO {T.BetaUser.Table} ({T.BetaUser.Email})
+VALUES ({T.BetaUser._Email});
+SELECT last_insert_rowid();";
+        public Task<long?> AddBetaUser(string email)
+        {
+            var @params = new DBParams[]
+            {
+                new(T.BetaUser._Email, email),
+            };
+
+            return ExecuteCommandAsync<long?>(ReadWriteConnection, addBetaUser, @params);
+        }
+
+        private static readonly string getBetaUsers = $@"
+SELECT {T.BetaUser.Email}
+FROM {T.BetaUser.Table};";
+        public async Task<IEnumerable<string>> GetBetaUsers()
+        {
+            var list = new List<string?>();
+            await ExecuteCommandAsync(
+                ReadOnlyConnection,
+                getBetaUsers,
+                x => list.Add(x[T.BetaUser.Email] as string)
+                ,Array.Empty<DBParams>());
+#pragma warning disable CS8619 // Nullability of reference types in value doesn't match target type.
+            return list.Where(x => x is { });
+#pragma warning restore CS8619 // Nullability of reference types in value doesn't match target type.
+        }
+
+        private static readonly string isBetaUserQuery = $@"
+SELECT {T.BetaUser.Id}
+FROM {T.BetaUser.Table}
+WHERE {T.BetaUser.Email} = {T.BetaUser._Email}";
+        private Task<long?> IsBetaUser(string email)
+        {
+            var @params = new DBParams[]
+            {
+                new(T.BetaUser._Email, email),
+            };
+
+            return ExecuteCommandAsync<long?>(ReadOnlyConnection, isBetaUserQuery, @params);
         }
 
         private static readonly string loginCommand = $@"
@@ -72,16 +123,15 @@ SELECT {T.User.Id}
 FROM {T.User.Table}
 WHERE {T.User.Email} = {T.User._Email}
   AND {T.User.Password} = {T.User._Password}";
-        public async Task<long?> ValidateUser(string email, string encryptedPassword)
+        public Task<long?> ValidateUser(string email, string encryptedPassword)
         {
             var @params = new DBParams[]
             {
                 new(T.User._Email, email),
                 new(T.User._Password, encryptedPassword),
             };
-            var result = await ExecuteCommandAsync<long?>(ReadOnlyConnection, loginCommand, @params);
 
-            return result;
+            return ExecuteCommandAsync<long?>(ReadOnlyConnection, loginCommand, @params);
         }
     }
 }

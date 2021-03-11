@@ -21,5 +21,16 @@
             public const string LastName = "LastName";
             public const string _LastName = "$LastName";
         }
+
+        public static class BetaUser
+        {
+            public const string Table = "BetaUsers";
+
+            public const string Id = "Id";
+            public const string _Id = "$Id";
+
+            public const string Email = "email";
+            public const string _Email = "$email";
+        }
     }
 }

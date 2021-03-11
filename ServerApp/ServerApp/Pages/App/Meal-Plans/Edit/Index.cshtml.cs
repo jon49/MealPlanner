@@ -8,6 +8,7 @@ using MealPlanner.Data.Data.Models;
 using MealPlanner.Data.Data;
 using static MealPlanner.Data.Shared;
 using System.Collections.Generic;
+using static ServerApp.Utils.HTMF;
 
 #nullable enable
 
@@ -41,7 +42,12 @@ namespace ServerApp.Pages.App.Meal_Plans
         public async Task<IActionResult> OnGetAsync(string? startDate = null)
         {
             var action = await UserAction;
-            SetMealPlans(action, startDate);
+            SetMealPlans(action, startDate, ChangeSource.None);
+            foreach (var mealPlan in MealPlans)
+            {
+                if (mealPlan is { })
+                    action.Save(new TempData(mealPlan.Date, new[] { 1L, mealPlan.Recipes[0].Id }));
+            }
             return Page();
         }
 
@@ -49,9 +55,9 @@ namespace ServerApp.Pages.App.Meal_Plans
         {
             var action = await UserAction;
             action.Save(new MealPlan(id, Array.Empty<long>()));
-            SetMealPlans(action, startDate);
+            SetMealPlans(action, startDate, ChangeSource.AddRecipe);
 
-            if (HttpContext.Request.Headers.ContainsKey("HF-Request"))
+            if (IsHTMFRequest(HttpContext))
             {
                 var model = MealPlans.First(x => x?.Date == id);
                 return Partial("_CancelledTemplate", model);
@@ -75,9 +81,9 @@ namespace ServerApp.Pages.App.Meal_Plans
                 }
             }
 
-            SetMealPlans(action, startDate);
+            SetMealPlans(action, startDate, ChangeSource.Previous);
 
-            if (HttpContext.Request.Headers.ContainsKey("HF-Request"))
+            if (IsHTMFRequest(HttpContext))
             {
                 var model = MealPlans.First(x => x?.Date == id);
                 return Partial("_RecipeTemplate", model);
@@ -108,14 +114,14 @@ namespace ServerApp.Pages.App.Meal_Plans
                     recipeIds.CopyTo(newRecipeIds, 0);
                     newRecipeIds[^1] = randomRecipe.Id;
                     newRecipeIds[0] = idx;
-                    action.SetTempData(new TempData(id, newRecipeIds));
+                    action.Save(new TempData(id, newRecipeIds));
                     action.Save(new MealPlan(id, new[] { randomRecipe.Id.Value }));
                 }
             }
 
-            SetMealPlans(action, startDate);
+            SetMealPlans(action, startDate, ChangeSource.Next);
 
-            if (HttpContext.Request.Headers.ContainsKey("HF-Request"))
+            if (IsHTMFRequest(HttpContext))
             {
                 var model = MealPlans.First(x => x?.Date == id);
                 return Partial("_RecipeTemplate", model);
@@ -143,13 +149,13 @@ namespace ServerApp.Pages.App.Meal_Plans
                 {
                     recipeIds = new long?[] { 0, randomRecipe.Id.Value };
                 }
-                action.SetTempData(new TempData(id, recipeIds));
+                action.Save(new TempData(id, recipeIds));
                 action.Save(new MealPlan(id, new[] { randomRecipe.Id.Value }));
             }
 
-            SetMealPlans(action, startDate);
+            SetMealPlans(action, startDate, ChangeSource.Next);
 
-            if (HttpContext.Request.Headers.ContainsKey("HF-Request"))
+            if (IsHTMFRequest(HttpContext))
             {
                 var model = MealPlans.First(x => x?.Date == id);
                 return Partial("_RecipeTemplate", model);
@@ -158,11 +164,11 @@ namespace ServerApp.Pages.App.Meal_Plans
             return Page();
         }
 
-        private void SetMealPlans(UserDataAction action, string? startDate)
+        private void SetMealPlans(UserDataAction action, string? startDate, ChangeSource source)
         {
             ViewData["StartDate"] = startDate;
             StartDate = FromMealPlanId(startDate);
-            MealPlans = action.GetMealPlansForWeek(StartDate).Select(x => x?.ToMealViewModel(startDate: startDate));
+            MealPlans = action.GetMealPlansForWeek(StartDate).Select(x => x?.ToMealViewModel(startDate: startDate, source));
             if (StartDate is null)
             {
                 StartDate = FromMealPlanId(MealPlans.FirstOrDefault()?.Date);
@@ -192,15 +198,25 @@ namespace ServerApp.Pages.App.Meal_Plans
     public record MealViewModel
         ( string Date
         , Recipe[] Recipes 
-        , string StartDate );
+        , string? StartDate
+        , ChangeSource ChangeSource);
 
     public static class MealViewModelExtensions
     {
-        public static MealViewModel ToMealViewModel(this MealPlanModel plan, string? startDate)
+        public static MealViewModel ToMealViewModel(this MealPlanModel plan, string? startDate, ChangeSource changeSource)
             => new
             ( Date: plan.Date
             , Recipes: plan.Recipes
-            , StartDate: startDate);
+            , StartDate: startDate
+            , ChangeSource: changeSource);
+    }
+
+    public enum ChangeSource
+    {
+        Next,
+        Previous,
+        None,
+        AddRecipe,
     }
 
 }

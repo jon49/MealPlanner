@@ -93,7 +93,7 @@ namespace MealPlanner.Data.Data
             => MealPlans.GetMealPlansForWeek(this, startDate, MealTimes, Recipes);
         public Recipe GetRandomRecipe() => Recipes.RandomValue(new Random());
         public object[] GetTempData(string[] keys) => TempData.TryGetValuesOrDefault(keys);
-        public void SetTempData(TempData data) => TempData.AddOrUpdate(data.Key, data.Value);
+        public void Save(TempData data) => TempData.AddOrUpdate(data.Key, data.Value);
 
         private T? AddOrUpdate<T>(Dictionary<long, T> dic, T? item, Func<long, T, T> updateId) where T : class, IId, IName
         {

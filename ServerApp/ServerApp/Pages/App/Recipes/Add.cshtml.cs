@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using ServerApp.Actions;
 using Model = MealPlanner.Data.Data;
+using static ServerApp.Utils.HTMF;
 
 #nullable enable
 
@@ -67,6 +68,11 @@ namespace ServerApp.Pages.App.Recipes
                 await SetInitials();
                 ModelState.AddModelError("Recipe.Name", "Recipe name already exists.");
                 return Page();
+            }
+
+            if (IsHTMFRequest(HttpContext))
+            {
+                return Content($@"<p target=""#added-recipes"" hf-swap=""prepend""><a href=""/app/recipes/{id}"">{recipe.Name}</a></p>", "text/html");
             }
 
             return Redirect("./add");

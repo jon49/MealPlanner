@@ -1,5 +1,6 @@
 ﻿using MealPlanner.User.Databases;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 #nullable enable
@@ -27,17 +28,20 @@ namespace MealPlanner.User.Actions
 
         public void Dispose() => userDB.Dispose();
 
-        public async Task<long?> ProcessRegisterUser(RegisterUser registerUser)
-        {
-            var userId = await userDB.CreateUser(
+        public Task<long?> ProcessRegisterUser(RegisterUser registerUser)
+            => userDB.CreateUser(
                 email: registerUser.Email,
                 password: registerUser.EncryptedPassword,
                 firstName: registerUser.FirstName,
                 lastName: registerUser.LastName );
-            return userId;
-        }
 
         public Task<long?> ProcessLoginUser(LoginUser loginUser)
             => userDB.ValidateUser(loginUser.Email, loginUser.EncryptedPassword);
+
+        public Task<long?> AddBetaUser(string email)
+            => userDB.AddBetaUser(email);
+
+        public Task<IEnumerable<string>> GetBetaUsers()
+            => userDB.GetBetaUsers();
     }
 }

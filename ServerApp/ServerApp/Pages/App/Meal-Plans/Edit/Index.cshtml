@@ -31,7 +31,7 @@
            type=date
            asp-for="StartDate"
            required
-           onchange="hf.debounce(hf.click, 'start-date', { immediateFirst: true, wait: 100, args: [this] })">
+           onchange="this.form.submit()">
     <br><input type=submit value=Submit hf-hidden>
 </form>
 

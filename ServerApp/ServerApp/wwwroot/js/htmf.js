@@ -78,74 +78,82 @@
     }
 
     document.addEventListener("submit", async e => {
+        try {
 
-        /**
-         * @type {HTMLFormElement}
-         */
-        const $form = e.target
-        const $button = document.activeElement
+            /**
+             * @type {HTMLFormElement}
+             */
+            const $form = e.target
+            const $button = document.activeElement
 
-        if ($form.hasAttribute("hf-ignore")) return
-        e.preventDefault()
+            if ($form.hasAttribute("hf-ignore")) return
+            e.preventDefault()
 
-        const preData = new FormData($form)
-        /** @type {string} */
-        const preEvent = $button.dataset.event ?? $form.dataset.event
-        const shouldRunEvent = preEvent && events[preEvent]
-        /** @type {PreData} */
-        const preEventData = { event: preEvent, data: preData, form: $form , target: $button }
-        if (shouldRunEvent) {
-            await events[preEvent](preEventData)
-        }
-        for (const hook of hooks) {
-            await hook(preEventData)
-        }
-
-        const method = $button.formMethod || $form.method
-        const url = new URL(($button.getAttribute("formAction") && $button.formAction) || $form.action)
-        const options = { method, credentials: "same-origin", headers: new Headers({ "HF-Request": "true" }) }
-        if (method === "post") {
-            options.body = new URLSearchParams([...preData])
-        } else if (!($button.hasAttribute("data-skip-query") || $form.hasAttribute("data-skip-query"))) {
-            const query = new URLSearchParams(preData).toString()
-            if (query) {
-                url.search += (url.search ? "&" : "?") + query.toString()
+            const preData = new FormData($form)
+            /** @type {string} */
+            const preEvent = $button.dataset.event ?? $form.dataset.event
+            const shouldRunEvent = preEvent && events[preEvent]
+            /** @type {PreData} */
+            const preEventData = { event: preEvent, data: preData, form: $form, target: $button }
+            if (shouldRunEvent) {
+                await events[preEvent](preEventData)
             }
-        }
-        const response = await fetch(url.href, options)
+            for (const hook of hooks) {
+                await hook(preEventData)
+            }
 
-        const event = response.headers.get("event")
-        const contentType = response.headers.get("content-type")
-        let data, text
+            const method = $button.formMethod || $form.method
+            const url = new URL(($button.getAttribute("formAction") && $button.formAction) || $form.action)
+            const options = { method, credentials: "same-origin", headers: new Headers({ "HF-Request": "true" }) }
+            if (method === "post") {
+                options.body = new URLSearchParams([...preData])
+            } else if (!($button.hasAttribute("data-skip-query") || $form.hasAttribute("data-skip-query"))) {
+                const query = new URLSearchParams(preData).toString()
+                if (query) {
+                    url.search += (url.search ? "&" : "?") + query.toString()
+                }
+            }
+            const response = await fetch(url.href, options)
 
-        const simpleContentType =
-            contentType.indexOf("application/json") !== -1
-                ? "json"
-            : contentType.indexOf("html") !== -1
-                ? "html"
-            : "text"
-        if (contentType && contentType.indexOf("application/json") !== -1) {
-            data = JSON.parse(await response.json())
-        } else {
-            text = await response.text()
-        }
+            const event = response.headers.get("event")
+            const contentType = response.headers.get("content-type")
+            let data, text
 
-        /** @type {PostData} */
-        const postData = {
-            event: preEvent,
-            data,
-            text,
-            form: $form,
-            postEvent: true,
-            target: $button,
-            contentType: simpleContentType }
-        if (shouldRunEvent) {
-            await event[preEvent](postData)
-        }
-        for (const hook of hooks) {
-            await hook(postData)
-        }
+            const simpleContentType =
+                contentType.indexOf("application/json") !== -1
+                    ? "json"
+                    : contentType.indexOf("html") !== -1
+                        ? "html"
+                        : "text"
+            if (contentType && contentType.indexOf("application/json") !== -1) {
+                data = JSON.parse(await response.json())
+            } else {
+                text = await response.text()
+            }
 
+            /** @type {PostData} */
+            const postData = {
+                event: preEvent,
+                data,
+                text,
+                form: $form,
+                postEvent: true,
+                target: $button,
+                contentType: simpleContentType
+            }
+            if (shouldRunEvent) {
+                await event[preEvent](postData)
+            }
+            for (const hook of hooks) {
+                await hook(postData)
+            }
+
+        }
+        catch (ex) {
+            console.error(ex)
+            var $form = e?.target
+            if ($form instanceof HTMLFormElement) $form.submit()
+        }
     })
 
      self.hf = Object.assign(hf, {
@@ -159,10 +167,33 @@
         const template = document.createElement("template")
         template.innerHTML = data.text.trim()
         for (const el of template.content.childNodes) {
+            if (!el.getAttribute) continue
             const query = el.getAttribute("target")
-            const target = query ? document.querySelector(query) : document.getElementById(el.id)
+            let target
+            let swapType
+            if (query) {
+                target = document.querySelector(query)
+                swapType = el.getAttribute("hf-swap") || "append"
+            } else {
+                target = document.getElementById(el.id)
+            }
             if (!target) { target = data.form }
-            target.replaceWith(el)
+            switch (swapType) {
+                case "append":
+                    target.append(el)
+                    break
+                case "prepend":
+                    target.prepend(el)
+                    break
+                case "replace":
+                default:
+                    target.replaceWith(el)
+            }
+        }
+        var $focus = document.querySelector("[data-focus=True]")
+        if ($focus) {
+            $focus.removeAttribute("data-focus")
+            $focus.focus()
         }
     })
 
