@@ -16,6 +16,7 @@ namespace MealPlanner.Data.Data
     public interface IName { public string Name { get; } }
 
     public record Recipe
+        (long? Id
         , string Name
         , BookSource? BookSource
         , OtherSource? OtherSource
