@@ -4,7 +4,9 @@ using MealPlanner.Data.Data.Models;
 using MealPlanner.Data.Databases;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -82,6 +84,14 @@ namespace MealPlanner.Data.Data
             return recipe.Id;
         }
 
+        public bool Delete(Recipe recipe)
+        {
+            if (!recipe.Id.HasValue) return false;
+            var result = Recipes.Remove(recipe.Id.Value);
+            if (result) Persist<Recipe>(recipe.Id.ToString(), null, false);
+            return result;
+        }
+
         public string? Save(MealPlan? mealPlan)
         {
             if (mealPlan is null) return null;
@@ -102,7 +112,8 @@ namespace MealPlanner.Data.Data
             if (item is null) return null;
             if (item.Id is null)
             {
-                if (dic.Values.Any(x => x.Name == item.Name)) return null;
+                if (item.Id is null && dic.Values.Any(x => x.Name == item.Name)) return null;
+                if (item.Id is { } && dic.Values.Any(x => x.Name == item.Name && x.Id != item.Id)) return null;
                 item = updateId(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), item);
             }
             dic.AddOrUpdate(item.Id!.Value, item);
@@ -110,7 +121,7 @@ namespace MealPlanner.Data.Data
             return item;
         }
 
-        private void Persist<T>(string key, T @class, bool deleted = false)
+        private void Persist<T>(string key, T? @class, bool deleted = false)
         {
             if (!_initializing)
             {
@@ -159,5 +170,8 @@ namespace MealPlanner.Data.Data
 
         public Recipe[] GetAllRecipes()
             => Recipes.Values.ToArray();
+
+        public Recipe? GetRecipe(long id)
+            => Recipes.GetValueOrDefault(id);
     }
 }

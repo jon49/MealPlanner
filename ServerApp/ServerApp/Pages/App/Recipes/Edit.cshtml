@@ -1,4 +1,11 @@
 ﻿@page
 @model ServerApp.Pages.App.Recipes.EditModel
-@{
+
+@section H1 { <h1>Edit Recipe</h1> }
+
+<partial name="Shared/_Edit" model="@Model" />
+
+@if (Model.Message.Length > 0)
+{
+    <p>@Model.Message</p>
 }

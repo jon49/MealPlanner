@@ -1,29 +1,19 @@
 using System;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Threading.Tasks;
-using MealPlanner.Data.Data;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using ServerApp.Actions;
 using static ServerApp.Utils.HTMF;
 using ServerApp.Pages.App.Recipes.Shared;
+using ServerApp.Pages.Shared;
 
 #nullable enable
 
 namespace ServerApp.Pages.App.Recipes
 {
-    public class AddModel : PageModel
+    public class AddModel : BaseUserPage, IRecipeViewModel
     {
-        private readonly UserData _data;
-
-        public AddModel(UserData data)
-        {
-            _data = data;
-        }
-
-        private long UserId => long.Parse(User.Claims.First(x => x.Type == "userId").Value);
-        private Task<UserDataAction> UserAction => _data.GetUserData(UserId);
+        public AddModel(UserData data) : base(data) { }
 
         [ViewData]
         public string Title => "Add Meal";
@@ -47,7 +37,7 @@ namespace ServerApp.Pages.App.Recipes
         {
             var action = await UserAction;
             var mealTimes = action.GetAllMealTimes();
-            MealTimes = mealTimes?.ToMealTimeViewModel() ?? Array.Empty<MealTimeViewModel>();
+            MealTimes = mealTimes?.ToMealTimeViewModel(Array.Empty<long>()) ?? Array.Empty<MealTimeViewModel>();
         }
 
         public async Task<IActionResult> OnPostAsync()
@@ -72,7 +62,7 @@ namespace ServerApp.Pages.App.Recipes
 
             if (IsHTMFRequest(HttpContext))
             {
-                return Content($@"<p target=""#added-recipes"" hf-swap=""prepend""><a href=""/app/recipes/{id}"">{recipe.Name}</a></p>", "text/html");
+                return Content($@"<p target=""#added-recipes"" hf-swap=""prepend""><a href=""/app/recipes/edit?id={id}"">{recipe.Name}</a></p>", "text/html");
             }
 
             return Redirect("./add");

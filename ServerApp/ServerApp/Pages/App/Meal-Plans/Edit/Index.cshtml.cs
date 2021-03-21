@@ -9,22 +9,15 @@ using MealPlanner.Data.Data;
 using static MealPlanner.Data.Shared;
 using System.Collections.Generic;
 using static ServerApp.Utils.HTMF;
+using ServerApp.Pages.Shared;
 
 #nullable enable
 
 namespace ServerApp.Pages.App.Meal_Plans
 {
-    public class IndexModel : PageModel
+    public class IndexModel : BaseUserPage
     {
-        private readonly UserData _data;
-
-        public IndexModel(UserData data)
-        {
-            _data = data;
-        }
-
-        private long UserId => long.Parse(User.Claims.First(x => x.Type == "userId").Value);
-        private Task<UserDataAction> UserAction => _data.GetUserData(UserId);
+        public IndexModel(UserData data) : base(data) { }
 
         [ViewData]
         public string Title => "Meal Plan";

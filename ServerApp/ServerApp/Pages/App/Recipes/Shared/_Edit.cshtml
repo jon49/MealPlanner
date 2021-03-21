@@ -1,6 +1,4 @@
-﻿@model ServerApp.Pages.App.Recipes.AddModel
-
-@section H1 { <h1>Add Recipes</h1> }
+﻿@model ServerApp.Pages.App.Recipes.Shared.IRecipeViewModel
 
 <div class=error asp-validation-summary="All"></div>
 
@@ -40,19 +38,27 @@
 
     <fieldset id="meal-times">
         <legend>Meal Times</legend>
-        @{ var mealTimeCount = Model.MealTimes.Length; }
-        @for (int i = 0; i < mealTimeCount; i++)
+        @foreach (var mealTime in Model.MealTimes)
         {
-            var mealTime = Model.MealTimes[i];
-            <input id=@mealTime.Id type=checkbox name=SelectedMealTimes value="@mealTime.Id" checked="@(mealTimeCount == 1)">
+            <input id=@mealTime.Id
+                   type=checkbox
+                   name=SelectedMealTimes
+                   value="@mealTime.Id"
+                   checked="@mealTime.Selected">
             <label for=@mealTime.Id>@mealTime.Name</label><br>
         }
     </fieldset>
 
-    <br><input type=reset value=Clear>&nbsp;
-    <input id=save-once type=submit value=Save>&nbsp;
+    <input type=hidden asp-for="Recipe.Id">
+
+    <br>
+    @if (Model.Recipe?.Id is null)
+    {
+        <input type=reset value=Clear>
+    }
+    else
+    {
+        <input type=submit asp-page-handler=delete asp-route-id="@Model.Recipe.Id" value=Delete hf-confirm>
+    }
+    &nbsp;<input id=save-once type=submit value=Save>&nbsp;
 </form>
-<br>
-<p>Recently Added Recipes</p>
-<div id=added-recipes>
-</div>

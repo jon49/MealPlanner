@@ -6,7 +6,7 @@
     var recipeLocation = recipe?.Other
         ?? (recipe?.BookName is { } ? $"{recipe.BookName} page {recipe.BookPage}" : null)
         ?? "";
-    var url = recipe?.Url.ToString() ?? "";
+    var url = recipe?.Url?.ToString() ?? "";
     var date = Model.Date;
     var startDate = Model.StartDate;
 }

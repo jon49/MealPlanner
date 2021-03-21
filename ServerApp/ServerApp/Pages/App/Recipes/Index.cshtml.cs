@@ -29,7 +29,7 @@ namespace ServerApp.Pages.App.Recipes
             var action = await UserAction;
             var recipes = action.GetAllRecipes();
             Array.Sort(recipes);
-            Recipes = recipes.Where(x => x is { }).Select(x => x.ToViewModel());
+            Recipes = recipes.Where(x => x is { }).Select(x => x.ToListViewModel());
         }
     }
 
@@ -40,7 +40,7 @@ namespace ServerApp.Pages.App.Recipes
 
     public static class RecipeViewModelExtensions
     {
-        public static RecipeListViewModel ToViewModel(this Recipe recipe)
+        public static RecipeListViewModel ToListViewModel(this Recipe recipe)
             => new(
                 Title: recipe.Name!,
                 Id: recipe.Id!.Value,

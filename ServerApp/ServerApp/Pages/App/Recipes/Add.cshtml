@@ -3,56 +3,8 @@
 
 @section H1 { <h1>Add Recipes</h1> }
 
-<div class=error asp-validation-summary="All"></div>
+<partial name="Shared/_Edit" model="@Model" />
 
-<form method=post id="_add-recipe">
-    <label asp-for="Recipe.Name">Recipe Name</label>
-    <input asp-for="Recipe.Name" placeholder="Spaghetti with Meatballs" autofocus required>
-    <fieldset>
-        <legend>Recipe Source</legend>
-
-        <details>
-            <summary>Website</summary>
-            <fieldset>
-                <label asp-for="Recipe.Url">Url</label><br>
-                <input type=url asp-for="Recipe.Url" placeholder="https://example.com" data-required>
-            </fieldset>
-        </details>
-
-        <details>
-            <summary>Book</summary>
-            <fieldset>
-                <label asp-for="Recipe.BookName">Name</label><br>
-                <input asp-for="Recipe.BookName" placeholder="My Favorite Recipe Book">
-                <br>
-                <label asp-for="Recipe.BookPage">Page</label><br>
-                <input asp-for="Recipe.BookPage" type=number placeholder=125>
-            </fieldset>
-        </details>
-
-        <details>
-            <summary>Other</summary>
-            <fieldset>
-                <input asp-for="Recipe.Other" placeholder="I made this recipe!">
-            </fieldset>
-        </details>
-
-    </fieldset>
-
-    <fieldset id="meal-times">
-        <legend>Meal Times</legend>
-        @{ var mealTimeCount = Model.MealTimes.Length; }
-        @for (int i = 0; i < mealTimeCount; i++)
-        {
-            var mealTime = Model.MealTimes[i];
-            <input id=@mealTime.Id type=checkbox name=SelectedMealTimes value="@mealTime.Id" checked="@(mealTimeCount == 1)">
-            <label for=@mealTime.Id>@mealTime.Name</label><br>
-        }
-    </fieldset>
-
-    <br><input type=reset value=Clear>&nbsp;
-    <input id=save-once type=submit value=Save>&nbsp;
-</form>
 <br>
 <p>Recently Added Recipes</p>
 <div id=added-recipes>
