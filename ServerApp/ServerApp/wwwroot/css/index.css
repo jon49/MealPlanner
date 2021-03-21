@@ -203,4 +203,10 @@ aside {
     display: inline-block;
 }
 
+a.external {
+    background-image: url(/images/external-link.svg);
+    background-position: center right;
+    background-repeat: no-repeat;
+    padding-right: 20px;
+}
 

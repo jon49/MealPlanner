@@ -9,11 +9,11 @@
     <link rel="stylesheet" type="text/css" href="~/css/index.css">
     @RenderSection("Head", false)
 </head>
-<body>
+<body data-instant-allow-query-string>
     <header>
-        <h1>Meal Planner</h1>
+        @RenderSection("H1", false)
         <nav>
-            <a href="/">Home</a> | <a href="/login?handler=logout">Logout</a>
+            <a href="/">Home</a> | <a href="/app">Site Map</a> | <a href="/login?handler=logout">Logout</a>
         </nav>
     </header>
     <main id=_main>@RenderBody()</main>

@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using static MealPlanner.Data.Shared;
 
 #nullable enable
 
@@ -17,12 +16,17 @@ namespace MealPlanner.Data.Data
     public interface IName { public string Name { get; } }
 
     public record Recipe
-        ( long? Id
         , string Name
         , BookSource? BookSource
         , OtherSource? OtherSource
         , WebSource? WebSource
-        , long[] MealTimes ) : IId, IName;
+        , long[] MealTimes) : IId, IName, IComparable
+    {
+        public int CompareTo(object obj)
+            => obj is Recipe recipe
+                ? Name.CompareTo(recipe.Name)
+            : -1;
+    }
 
     public record BookSource(string Title, int? Page);
     public record OtherSource(string Title);
@@ -154,5 +158,8 @@ namespace MealPlanner.Data.Data
                 Save(new MealTime(Id: null, Name: "Dinner"));
             }
         }
+
+        public Recipe[] GetAllRecipes()
+            => Recipes.Values.ToArray();
     }
 }

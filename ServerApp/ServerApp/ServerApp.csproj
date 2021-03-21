@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="wwwroot\Index.html" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\MealPlanner.Data\MealPlanner.Data.csproj" />
     <ProjectReference Include="..\MealPlanner.User\MealPlanner.User.csproj" />
   </ItemGroup>

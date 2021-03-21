@@ -1,7 +1,16 @@
 ﻿@page
 @model ServerApp.Pages.App.IndexModel
 
-<h1>Hello!</h1>
+@section H1 { <h1>Site Map</h1> }
 
-<p>You should be authenticated to view this page.</p>
+<ul>
+    <li>
+        <a href="/app/recipes">List of Recipes</a>
+        <ul>
+            <li><a href="/app/recipes/add">Add</a></li>
+        </ul>
+    </li>
+
+    <li><a href="/app/meal-plans/edit">Meal Plans</a></li>
+</ul>
 

@@ -1,0 +1,25 @@
+﻿@page
+@model ServerApp.Pages.App.Recipes.IndexModel
+@{
+    ViewData["Title"] = "Recipes";
+}
+
+@section H1 { <h1>Recipes</h1> }
+
+@if (Model.Recipes.Any())
+{
+    foreach(var recipe in Model.Recipes)
+    {
+        var internalLink = $"/app/recipes/edit?id={recipe.Id}";
+        if (recipe.Url is { })
+        {
+            <p><a href="@internalLink">@recipe.Title</a> &#8224;
+            <a class=external href="@recipe.Url" target=_blank>Link</a></p>
+        }
+        else
+        {
+            <p><a href="@internalLink">@recipe.Title</a></p>
+        }
+    }
+}
+
