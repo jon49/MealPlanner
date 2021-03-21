@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
 
+#nullable enable
+
 namespace MealPlanner.Data
 {
     public static class Shared
