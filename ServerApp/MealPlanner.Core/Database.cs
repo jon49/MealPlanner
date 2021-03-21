@@ -14,8 +14,17 @@ namespace MealPlanner.User.Databases
 
     public static class Database
     {
-        public static readonly string AppDir =
-            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "meal-planner");
+        public static string GetAppDir()
+        {
+            var mealPlannerDirectoryName = "meal-planner";
+            var localAppPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            var path =
+                string.IsNullOrWhiteSpace(localAppPath)
+                    ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), ".local", mealPlannerDirectoryName)
+                : Path.Combine(localAppPath, mealPlannerDirectoryName);
+            Directory.CreateDirectory(path);
+            return path;
+        }
 
         public static async Task ExecuteCommandAsync(string connectionString, string sql, params DBParams[] @params)
         {
