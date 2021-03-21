@@ -6,8 +6,8 @@ using MealPlanner.Data.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using ServerApp.Actions;
-using Model = MealPlanner.Data.Data;
 using static ServerApp.Utils.HTMF;
+using ServerApp.Pages.App.Recipes.Shared;
 
 #nullable enable
 
@@ -31,9 +31,9 @@ namespace ServerApp.Pages.App.Recipes
         public string Header => "Add Meal";
 
         [BindProperty]
-        public Recipe? Recipe { get; set; }
+        public RecipeViewModel? Recipe { get; set; }
 
-        public MealTime[] MealTimes { get; set; } = Array.Empty<MealTime>();
+        public MealTimeViewModel[] MealTimes { get; set; } = Array.Empty<MealTimeViewModel>();
         [BindProperty]
         [Required, MinLength(1)]
         public long[] SelectedMealTimes { get; set; } = Array.Empty<long>();
@@ -47,7 +47,7 @@ namespace ServerApp.Pages.App.Recipes
         {
             var action = await UserAction;
             var mealTimes = action.GetAllMealTimes();
-            MealTimes = mealTimes?.ToMealTimeViewModel() ?? Array.Empty<MealTime>();
+            MealTimes = mealTimes?.ToMealTimeViewModel() ?? Array.Empty<MealTimeViewModel>();
         }
 
         public async Task<IActionResult> OnPostAsync()
@@ -77,79 +77,5 @@ namespace ServerApp.Pages.App.Recipes
 
             return Redirect("./add");
         }
-    }
-
-    public class Recipe
-    {
-        public int? Id { get; set; }
-        [Required, MinLength(1)]
-        public string? Name { get; set; }
-        public bool[]? MealTimes { get; set; }
-        public WebSource? WebSource { get; set; }
-        public BookSource? BookSource { get; set; }
-        public OtherSource? OtherSource { get; set; }
-    }
-
-    public class WebSource
-    {
-        public string? Title { get; set; }
-        public Uri? Url { get; set; }
-    }
-
-    public class BookSource
-    {
-        public string? Title { get; set; }
-        public int? Page { get; set; }
-    }
-
-    public class OtherSource
-    {
-        public string? Title { get; set; }
-    }
-
-    public record MealTime
-        ( string Id
-        , string Name );
-
-    public record Links(string Name, Uri Link);
-
-    public static class MealTimeExtensions
-    {
-        public static MealTime[] ToMealTimeViewModel(this Model.MealTime[] mealTimes)
-        {
-            var length = mealTimes.Length;
-            var view = new MealTime[length];
-
-            for (int i = 0; i < length; i++)
-            {
-                var model = mealTimes[i];
-                view[i] = new MealTime
-                    ( Id: model.Id!.Value.ToString(),
-                        Name: model.Name );
-            }
-
-            return view;
-        }
-    }
-
-    public static class RecipeExtensions
-    {
-        public static Model.BookSource? ToModel(this BookSource? x)
-            => x?.Title is { } ? new(Title: x.Title, Page: x.Page) : null;
-
-        public static Model.OtherSource? ToModel(this OtherSource? x)
-            => x?.Title is { } ? new(Title: x.Title) : null;
-
-        public static Model.WebSource? ToModel(this WebSource? x)
-            => x?.Url is { } ? new(Title: x.Title ?? x.Url.ToString(), Url: x.Url) : null;
-
-        public static Model.Recipe ToModel(this Recipe recipe, long[] mealTimes)
-            => new(
-                Id: null,
-                Name: recipe.Name!,
-                BookSource: recipe.BookSource.ToModel(),
-                OtherSource: recipe.OtherSource.ToModel(),
-                WebSource: recipe.WebSource.ToModel(),
-                MealTimes: mealTimes);
     }
 }

@@ -22,7 +22,7 @@ namespace ServerApp.Pages.App.Recipes
         private long UserId => long.Parse(User.Claims.First(x => x.Type == "userId").Value);
         private Task<UserDataAction> UserAction => _data.GetUserData(UserId);
 
-        public IEnumerable<RecipeViewModel> Recipes { get; set; } = Array.Empty<RecipeViewModel>();
+        public IEnumerable<RecipeListViewModel> Recipes { get; set; } = Array.Empty<RecipeListViewModel>();
 
         public async Task OnGetAsync()
         {
@@ -33,17 +33,17 @@ namespace ServerApp.Pages.App.Recipes
         }
     }
 
-    public record RecipeViewModel
+    public record RecipeListViewModel
         ( string Title
         , long Id
         , Uri? Url);
 
     public static class RecipeViewModelExtensions
     {
-        public static RecipeViewModel ToViewModel(this MealPlanner.Data.Data.Recipe recipe)
+        public static RecipeListViewModel ToViewModel(this Recipe recipe)
             => new(
                 Title: recipe.Name!,
                 Id: recipe.Id!.Value,
-                Url: recipe.WebSource?.Url );
+                Url: recipe.Url );
     }
 }

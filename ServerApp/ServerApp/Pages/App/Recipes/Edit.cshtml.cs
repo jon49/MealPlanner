@@ -6,8 +6,8 @@ namespace ServerApp.Pages.App.Recipes
 {
     public class EditModel : PageModel
     {
-        public void OnGet(long id)
-        {
-        }
+        //public void OnGet(long id)
+        //{
+        //}
     }
 }

@@ -18,9 +18,10 @@ namespace MealPlanner.Data.Data
     public record Recipe
         ( long? Id
         , string Name
-        , BookSource? BookSource
-        , OtherSource? OtherSource
-        , WebSource? WebSource
+        , string? BookName
+        , int? BookPage
+        , string? Other
+        , Uri? Url
         , long[] MealTimes) : IId, IName, IComparable
     {
         public int CompareTo(object obj)
@@ -28,10 +29,6 @@ namespace MealPlanner.Data.Data
                 ? Name.CompareTo(recipe.Name)
             : -1;
     }
-
-    public record BookSource(string Title, int? Page);
-    public record OtherSource(string Title);
-    public record WebSource(string? Title, Uri Url);
 
     public record MealTime(long? Id, string Name) : IId, IName;
 

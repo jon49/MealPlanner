@@ -3,11 +3,10 @@
 
 @{ 
     var recipe = @Model.Recipes.FirstOrDefault();
-    var recipeLocation = recipe?.OtherSource?.Title
-        ?? (recipe?.BookSource?.Title is { } ? $"{recipe.BookSource.Title} page {recipe.BookSource.Page}" : null)
+    var recipeLocation = recipe?.Other
+        ?? (recipe?.BookName is { } ? $"{recipe.BookName} page {recipe.BookPage}" : null)
         ?? "";
-    var url = recipe?.WebSource?.Url.ToString() ?? "";
-    var urlTitle = recipe?.WebSource?.Title ?? "";
+    var url = recipe?.Url.ToString() ?? "";
     var date = Model.Date;
     var startDate = Model.StartDate;
 }
@@ -15,13 +14,15 @@
 
 <div class="meal-edit" id=_@date>
     <p>@date</p>
-    <h2 data-ref=name,title|text title="@recipe?.Name">@recipe?.Name</h2>
-    <p>
-        <small>
-            <span data-ref=recipeLocation,title|text title="@recipeLocation">@recipeLocation</span>
-            <a data-ref=url,href;urlTitle,title|text href="@url" title="@urlTitle">@urlTitle</a>
-        </small>
-    </p>
+    @if (url is { })
+    {
+        <h2 title="@recipe?.Name"><a href="@url">@recipe?.Name</a></h2>
+    }
+    else
+    {
+        <h2 title="@recipe?.Name">@recipe?.Name</h2>
+    }
+    <br>
     <div>
         <form class=inline method=post >
             <button asp-page-handler="cancel"
