@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS {T.BetaUser.Table} (
 
         public UserDB()
         {
-            var connectionString = $"Data Source={Path.Combine(AppDir, "users.db")}";
+            var connectionString = $"Data Source={Path.Combine(GetAppDir(), "users.db")}";
             ExecuteCommand($"{connectionString};Mode=ReadWriteCreate;", commandCreateDatabase);
             ReadWriteConnection = new SqliteConnection($"{connectionString};Mode=ReadWrite;");
             ReadWriteConnection.Open();

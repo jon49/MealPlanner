@@ -34,7 +34,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_fetch ON {Event.Table} ({Event.UserId}, {E
 
         public WriteDataDB()
         {
-            var connectionString = $"Data Source={Path.Combine(AppDir, "user-data.db")}";
+            var connectionString = $"Data Source={Path.Combine(GetAppDir(), "user-data.db")}";
             ExecuteCommand($"{connectionString};Mode=ReadWriteCreate;", commandCreateDatabase);
             ReadWriteConnection = new SqliteConnection($"{connectionString};Mode=ReadWrite;");
             ReadWriteConnection.Open();

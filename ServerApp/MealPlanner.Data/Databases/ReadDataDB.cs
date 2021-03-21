@@ -18,7 +18,7 @@ namespace MealPlanner.Data.Databases
 
         public ReadDataDB()
         {
-            var connectionString = $"Data Source={Path.Combine(AppDir, "user-data.db")}";
+            var connectionString = $"Data Source={Path.Combine(GetAppDir(), "user-data.db")}";
             ReadOnlyConnection = new SqliteConnection($"{connectionString};Mode=ReadOnly;");
             ReadOnlyConnection.Open();
         }
