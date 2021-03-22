@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="wwwroot\Index.html" />
+    <None Include="wwwroot\index.html" />
   </ItemGroup>
 
   <ItemGroup>
