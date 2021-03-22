@@ -24,8 +24,6 @@ namespace ServerApp.Pages.App.Meal_Plans
         [ViewData]
         public string Header => "Meal Planner";
 
-        //public MealPlanModel?[] MealPlans { get; set; } = Array.Empty<MealPlanModel>();
-
         public IEnumerable<MealViewModel?> MealPlans { get; set; } = Array.Empty<MealViewModel>();
 
         [BindProperty(SupportsGet = true)]
@@ -38,8 +36,10 @@ namespace ServerApp.Pages.App.Meal_Plans
             SetMealPlans(action, startDate, ChangeSource.None);
             foreach (var mealPlan in MealPlans)
             {
-                if (mealPlan is { })
+                if (mealPlan?.Recipes.Any() ?? false)
+                {
                     action.Save(new TempData(mealPlan.Date, new[] { 1L, mealPlan.Recipes[0].Id }));
+                }
             }
             return Page();
         }
@@ -159,7 +159,6 @@ namespace ServerApp.Pages.App.Meal_Plans
 
         private void SetMealPlans(UserDataAction action, string? startDate, ChangeSource source)
         {
-            ViewData["StartDate"] = startDate;
             StartDate = FromMealPlanId(startDate);
             MealPlans = action.GetMealPlansForWeek(StartDate).Select(x => x?.ToMealViewModel(startDate: startDate, source));
             if (StartDate is null)

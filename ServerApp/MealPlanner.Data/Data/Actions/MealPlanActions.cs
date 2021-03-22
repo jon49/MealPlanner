@@ -46,7 +46,7 @@ namespace MealPlanner.Data.Data.Actions
                 if (d is { } && MealPlans.TryGetValue(d, out var value))
                 {
                     var recipes = Recipes.TryGetValuesOrDefault(value.RecipeIds);
-                    mealPlans[count++] = new(Date: d, recipes);
+                    mealPlans[count++] = new(Date: d, recipes.Where(x => x is { }).ToArray());
                 }
                 else
                 {

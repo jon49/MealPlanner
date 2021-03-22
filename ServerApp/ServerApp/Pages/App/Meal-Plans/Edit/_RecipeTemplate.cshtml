@@ -14,7 +14,7 @@
 
 <div class="meal-edit" id=_@date>
     <p>@date</p>
-    @if (url is { })
+    @if (url.Length > 0)
     {
         <h2 title="@recipe?.Name"><a href="@url">@recipe?.Name</a></h2>
     }
