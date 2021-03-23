@@ -1,5 +1,6 @@
 ﻿@page
 @model ServerApp.Pages.App.Meal_Plans.IndexModel
+@using MealPlanner.Data
 @{
     ViewData["StartDate"] = Model.StartDateView;
 }
@@ -49,6 +50,6 @@
             <partial name="_CancelledTemplate" model="mealPlan" />
         }
     }
-    <div><a href="/app/meal-plans/startDate=@(Model.StartDate.Value.AddDays(7).ToString("yyyy-MM-dd"))">Next Week</a></div>
+    <div><a href="/app/meal-plans/startDate=@(Shared.ToMealPlanId(Model.StartDate.Value.AddDays(7)))">Next Week</a></div>
 </section>
 

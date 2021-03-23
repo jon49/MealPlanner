@@ -18,50 +18,56 @@ namespace MealPlanner.Data.Data.Actions
             Dictionary<long, MealTime> MealTimes,
             Dictionary<long, Recipe> Recipes)
         {
+            var today = DateTime.UtcNow.AddDays(-1);
             if (MealTimes.Count == 0)
             {
                 return new MealPlanModel[7];
             }
 
-            DateTime? date = null;
+            DateTime? start = null;
             if (startDate is { })
             {
-                date = startDate;
+                start = startDate;
             }
 
-            if (!date.HasValue)
+            if (!start.HasValue)
             {
-                date = DateTime.UtcNow;
+                start = DateTime.UtcNow;
             }
 
             var dates =
                 Enumerable.Range(0, 7)
-                .Select(x => ToMealPlanId(date.Value.AddDays(x)));
+                .Select(x => start.Value.AddDays(x));
 
             var mealPlans = new MealPlanModel[7];
             var count = 0;
             var rand = new Random();
-            foreach (var d in dates)
+            foreach (var date in dates)
             {
-                if (d is { } && MealPlans.TryGetValue(d, out var value))
+                var d = ToMealPlanId(date);
+                if (date is { } && MealPlans.TryGetValue(d ?? "", out var value))
                 {
                     var recipes = Recipes.TryGetValuesOrDefault(value.RecipeIds);
                     mealPlans[count++] = new(Date: d, recipes.Where(x => x is { }).ToArray());
                 }
                 else
                 {
-                    var recipe = Recipes.RandomValue(rand);
+                    Recipe? recipe = null;
+                    if (date >= today)
+                    {
+                        recipe = Recipes.RandomValue(rand);
+                    }
                     MealPlanModel newPlan;
                     if (recipe is { })
                     {
                         newPlan = new MealPlanModel(Date: d, new[] { recipe });
+                        userAction.Save(new MealPlan(newPlan.Date, newPlan.Recipes.Select(x => x.Id ?? 0).ToArray()));
                     }
                     else
                     {
                         newPlan = new MealPlanModel(Date: d, Array.Empty<Recipe>());
                     }
                     mealPlans[count++] = newPlan;
-                    userAction.Save(new MealPlan(newPlan.Date, newPlan.Recipes.Select(x => x.Id ?? 0).ToArray()));
                 }
             }
 
