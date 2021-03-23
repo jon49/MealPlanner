@@ -50,6 +50,6 @@
             <partial name="_CancelledTemplate" model="mealPlan" />
         }
     }
-    <div><a href="/app/meal-plans/startDate=@(Shared.ToMealPlanId(Model.StartDate.Value.AddDays(7)))">Next Week</a></div>
+    <div><a href="/app/meal-plans/edit?startDate=@(Shared.ToMealPlanId(Model.StartDate.Value.AddDays(7)))">Next Week</a></div>
 </section>
 
