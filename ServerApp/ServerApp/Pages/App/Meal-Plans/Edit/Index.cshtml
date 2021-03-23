@@ -40,7 +40,7 @@
 <section id=meal-selections class=cards>
     @foreach (var mealPlan in @Model.MealPlans)
     {
-        if (mealPlan?.Recipes?.FirstOrDefault() is { })
+        if (mealPlan?.Recipes?.Any() ?? false)
         {
             <partial name="_RecipeTemplate" model="mealPlan" />
         }
@@ -49,6 +49,6 @@
             <partial name="_CancelledTemplate" model="mealPlan" />
         }
     }
-    <div><a href="/app/recipes/add">Add New Meal</a></div>
+    <div><a href="/app/meal-plans/startDate=@(Model.StartDate.Value.AddDays(7).ToString("yyyy-MM-dd"))">Next Week</a></div>
 </section>
 
