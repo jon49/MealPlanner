@@ -1,0 +1,16 @@
+﻿@model ServerApp.Pages.App.Meal_Plans.MealViewModel
+@using ServerApp.Pages.App.Meal_Plans
+@{
+    var recipe = Model.Recipes.FirstOrDefault();
+    var url = recipe?.Url?.ToString();
+    var id = $"_{Model.Date}_title";
+}
+
+@if (url?.Length > 0)
+{
+	<h2 id=@id title="@recipe?.Name"><a href="@url">@recipe?.Name</a></h2>
+}
+else
+{
+	<h2 id=@id title="@recipe?.Name">@recipe?.Name</h2>
+}

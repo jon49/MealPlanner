@@ -33,7 +33,7 @@ namespace ServerApp.Pages.App.Meal_Plans
         public async Task<IActionResult> OnGetAsync(string? startDate = null)
         {
             var action = await UserAction;
-            SetMealPlans(action, startDate, ChangeSource.None);
+            SetMealPlans(action, startDate, ChangeSource.None, "");
             foreach (var mealPlan in MealPlans)
             {
                 if (mealPlan?.Recipes.Any() ?? false)
@@ -48,7 +48,7 @@ namespace ServerApp.Pages.App.Meal_Plans
         {
             var action = await UserAction;
             action.Save(new MealPlan(id, Array.Empty<long>()));
-            SetMealPlans(action, startDate, ChangeSource.AddRecipe);
+            SetMealPlans(action, startDate, ChangeSource.AddRecipe, id);
 
             if (IsHTMFRequest(HttpContext))
             {
@@ -74,12 +74,12 @@ namespace ServerApp.Pages.App.Meal_Plans
                 }
             }
 
-            SetMealPlans(action, startDate, ChangeSource.Previous);
+            SetMealPlans(action, startDate, ChangeSource.Previous, id);
 
             if (IsHTMFRequest(HttpContext))
             {
                 var model = MealPlans.First(x => x?.Date == id);
-                return Partial("_RecipeTemplate", model);
+                return Partial("_RecipeTitleTemplate", model);
             }
 
             return Page();
@@ -112,12 +112,12 @@ namespace ServerApp.Pages.App.Meal_Plans
                 }
             }
 
-            SetMealPlans(action, startDate, ChangeSource.Next);
+            SetMealPlans(action, startDate, ChangeSource.Next, id);
 
             if (IsHTMFRequest(HttpContext))
             {
                 var model = MealPlans.First(x => x?.Date == id);
-                return Partial("_RecipeTemplate", model);
+                return Partial("_RecipeTitleTemplate", model);
             }
 
             return Page();
@@ -146,7 +146,7 @@ namespace ServerApp.Pages.App.Meal_Plans
                 action.Save(new MealPlan(id, new[] { randomRecipe.Id.Value }));
             }
 
-            SetMealPlans(action, startDate, ChangeSource.Next);
+            SetMealPlans(action, startDate, ChangeSource.Next, id);
 
             if (IsHTMFRequest(HttpContext))
             {
@@ -157,10 +157,10 @@ namespace ServerApp.Pages.App.Meal_Plans
             return Page();
         }
 
-        private void SetMealPlans(UserDataAction action, string? startDate, ChangeSource source)
+        private void SetMealPlans(UserDataAction action, string? startDate, ChangeSource source, string dateSelection)
         {
             StartDate = FromMealPlanId(startDate);
-            MealPlans = action.GetMealPlansForWeek(StartDate).Select(x => x?.ToMealViewModel(startDate: startDate, source));
+            MealPlans = action.GetMealPlansForWeek(StartDate).Select(x => x?.ToMealViewModel(startDate: startDate, source, dateSelection));
             if (StartDate is null)
             {
                 StartDate = FromMealPlanId(MealPlans.FirstOrDefault()?.Date);
@@ -191,17 +191,25 @@ namespace ServerApp.Pages.App.Meal_Plans
         ( string Date
         , Recipe[] Recipes 
         , string? StartDate
-        , ChangeSource ChangeSource);
+        , CurrentSelection ChangeSource);
 
     public static class MealViewModelExtensions
     {
-        public static MealViewModel ToMealViewModel(this MealPlanModel plan, string? startDate, ChangeSource changeSource)
+        public static MealViewModel ToMealViewModel(
+            this MealPlanModel plan,
+            string? startDate,
+            ChangeSource changeSource,
+            string dateSelection)
             => new
             ( Date: plan.Date
             , Recipes: plan.Recipes
             , StartDate: startDate
-            , ChangeSource: changeSource);
+            , ChangeSource: new CurrentSelection(changeSource, dateSelection));
     }
+
+    public record CurrentSelection
+        ( ChangeSource Source
+        , string Date );
 
     public enum ChangeSource
     {

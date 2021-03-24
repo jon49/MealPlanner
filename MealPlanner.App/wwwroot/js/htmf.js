@@ -190,9 +190,9 @@
                     target.replaceWith(el)
             }
         }
-        var $focus = document.querySelector("[data-focus=True]")
+        var $focus = document.querySelector("[autofocus]")
         if ($focus) {
-            $focus.removeAttribute("data-focus")
+            $focus.removeAttribute("autofocus")
             $focus.focus()
         }
     })
