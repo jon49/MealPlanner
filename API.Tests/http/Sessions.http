@@ -1,9 +1,0 @@
-
-###
-
-POST http://localhost:55665/api/sessions
-
-###
-
-POST http://localhost:55665/api/sessions
-    ?sessionId=63ecc842-b214-4d77-9e2d-1ab8f6ca1440
