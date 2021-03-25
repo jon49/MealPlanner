@@ -58,7 +58,13 @@
     }
     else
     {
-        <input type=submit asp-page-handler=delete asp-route-id="@Model.Recipe.Id" value=Delete hf-confirm onsubmit="return confirm('Are you sure you would like to delete this recipe?')">
+        <input
+            type=submit
+            asp-page-handler=delete
+            asp-route-id="@Model.Recipe.Id"
+            value=Delete
+            hf-ignore
+            onclick="return confirm('Are you sure you would like to delete this recipe?')">
     }
     &nbsp;<input id=save-once type=submit value=Save>&nbsp;
 </form>

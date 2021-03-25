@@ -77,7 +77,7 @@ namespace ServerApp.Pages.App.Recipes
         {
             if (Recipe?.Id is null)
             {
-                Message = "Could not delete recipe, unknow recipe.";
+                Message = "Could not delete recipe, unknown recipe.";
                 return await Init(Recipe?.Id);
             }
 
