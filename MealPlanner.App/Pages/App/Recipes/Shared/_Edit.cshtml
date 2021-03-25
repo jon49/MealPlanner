@@ -8,7 +8,7 @@
     <fieldset>
         <legend>Recipe Source</legend>
 
-        <details>
+        <details open="@(Model.Recipe.Url is { })">
             <summary>Website</summary>
             <fieldset>
                 <label asp-for="Recipe.Url">Url</label><br>
@@ -16,7 +16,7 @@
             </fieldset>
         </details>
 
-        <details>
+        <details open="@(Model.Recipe.BookName is { } || Model.Recipe.BookPage is { })">
             <summary>Book</summary>
             <fieldset>
                 <label asp-for="Recipe.BookName">Name</label><br>
@@ -27,7 +27,7 @@
             </fieldset>
         </details>
 
-        <details>
+        <details open="@(Model.Recipe.Other is { })">
             <summary>Other</summary>
             <fieldset>
                 <input asp-for="Recipe.Other" placeholder="I made this recipe!">
