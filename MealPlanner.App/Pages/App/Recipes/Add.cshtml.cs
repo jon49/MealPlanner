@@ -10,6 +10,7 @@ using ServerApp.Pages.Shared;
 
 namespace ServerApp.Pages.App.Recipes
 {
+    [ResponseCache(Duration = 5, Location = ResponseCacheLocation.Client, NoStore = false)]
     public class AddModel : BaseUserPage, IRecipeViewModel
     {
         public AddModel(UserData data) : base(data) { }

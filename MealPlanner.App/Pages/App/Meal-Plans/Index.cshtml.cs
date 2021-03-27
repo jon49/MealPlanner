@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,6 +13,7 @@ using ServerApp.Pages.Shared;
 
 namespace ServerApp.Pages.App.Meal_Plans
 {
+    [ResponseCache(Duration = 5, Location = ResponseCacheLocation.Client, NoStore = false)]
     public class IndexModel : BaseUserPage
     {
         public IndexModel(UserData data) : base(data) { }

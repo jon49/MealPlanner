@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace ServerApp.Pages.App.Recipes
 {
+    [ResponseCache(Duration = 5, Location = ResponseCacheLocation.Client, NoStore = false)]
     public class EditModel : BaseUserPage, IRecipeViewModel
     {
         public EditModel(UserData data) : base(data) { }
