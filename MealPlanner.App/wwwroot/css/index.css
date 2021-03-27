@@ -210,3 +210,8 @@ a.external {
     padding-right: 20px;
 }
 
+.reverse {
+    display: flex;
+    flex-direction: row-reverse;
+}
+
