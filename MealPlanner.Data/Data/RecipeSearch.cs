@@ -29,8 +29,6 @@ VALUES ($id, $name);", recipes.Select(x => new DBParams[]
                                       }));
         }
 
-        private static readonly string[] _keywords = new[] { "AND", "OR" };
-        private static readonly Regex _wordsOnly = new(@"[^A-Za-z0-9]", RegexOptions.Compiled);
         private static readonly string searchQuery = $@"
 SELECT id
 FROM search
@@ -52,25 +50,39 @@ limit 10;";
             return list;
         }
 
+        private static readonly string[] _keywords = new[] { "AND", "OR" };
+        private static readonly Regex _wordsOnly = new(@"[^A-Za-z0-9]", RegexOptions.Compiled);
         private string CleanSearchTerm(string s)
         {
-            var split = _wordsOnly.Replace(s, " ").Split(' ');
+            var split = _wordsOnly.Replace(s, " ").Trim().Split(' ');
             var length = split.Length;
-            var clean = new string[length];
+            var clean = new string?[length];
             for (int i = 0; i < length; i++)
             {
                 var toClean = split[i].Trim();
                 if (toClean.Length > 0)
                 {
                     clean[i] = toClean;
-                    if (char.IsLetterOrDigit(toClean[^1]) && Array.IndexOf(_keywords, toClean) == -1)
+                    if (Array.IndexOf(_keywords, toClean) == -1)
                     {
                         clean[i] += '*';
                     }
                 }
             }
 
-            return string.Join(' ', clean);
+            for (int i = length - 1; i > -1; i--)
+            {
+                if (clean[i]?.Length > 0 && Array.IndexOf(_keywords, clean[i]) == -1)
+                {
+                    break;
+                }
+                else
+                {
+                    clean[i] = null;
+                }
+            }
+
+            return string.Join(' ', clean).Trim();
         }
 
     }
