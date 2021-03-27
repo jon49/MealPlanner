@@ -1,12 +1,12 @@
-﻿using MealPlanner.Data.Data;
-using MealPlanner.User.Actions;
+﻿using MealPlanner.User.Actions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using ServerApp.Actions;
 using ServerApp.System;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -20,11 +20,16 @@ namespace ServerApp.Controllers
     {
         private readonly AdminSettings _adminSettings;
         private readonly UserAction _user;
+        private readonly IHostApplicationLifetime _appLifetime;
 
-        public AdminController(IOptions<AdminSettings> adminSettings, UserAction user)
+        public AdminController(
+            IOptions<AdminSettings> adminSettings,
+            UserAction user,
+            IHostApplicationLifetime appLifetime)
         {
             _adminSettings = adminSettings.Value;
             _user = user ?? throw new ArgumentNullException(nameof(user));
+            _appLifetime = appLifetime ?? throw new ArgumentNullException(nameof(appLifetime));
         }
 
         [HttpPost]
@@ -53,6 +58,16 @@ namespace ServerApp.Controllers
             var authResult = IsNotAuthorized();
             if (authResult is { }) return authResult;
             return Ok(await _user.GetBetaUsers());
+        }
+
+        [HttpPost]
+        [Route("shutdown")]
+        public IActionResult PostShutdown()
+        {
+            var authResult = IsNotAuthorized();
+            if (authResult is { }) return authResult;
+            _appLifetime.StopApplication();
+            return Ok();
         }
 
         private IActionResult? IsNotAuthorized()

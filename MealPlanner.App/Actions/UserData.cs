@@ -1,6 +1,8 @@
 ﻿using MealPlanner.Data.Data;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Hosting;
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 #nullable enable
@@ -14,7 +16,7 @@ namespace ServerApp.Actions
         private readonly IMemoryCache _cache;
         private readonly MemoryCacheEntryOptions _option;
 
-        public UserData(IMemoryCache cache)
+        public UserData(IMemoryCache cache, IHostApplicationLifetime appLifetime)
         {
             persistenceRef = new();
             fetchRef = new();
@@ -24,6 +26,7 @@ namespace ServerApp.Actions
                 Priority = CacheItemPriority.High
             };
             _option.SetSlidingExpiration(TimeSpan.FromMinutes(20));
+            appLifetime.ApplicationStopped.Register(Dispose);
         }
 
         public async Task<UserDataAction> GetUserData(long userId)
@@ -44,5 +47,8 @@ namespace ServerApp.Actions
                 return newUser;
             }
         }
+
+        private void Dispose()
+            => persistenceRef.Dispose();
     }
 }
