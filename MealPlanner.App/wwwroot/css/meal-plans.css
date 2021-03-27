@@ -1,0 +1,16 @@
+﻿.meal-edit {
+    min-width: 22em;
+}
+.meal-edit h2, .meal-edit p {
+    height: 1.25em;
+    overflow: hidden;
+}
+main { width: 100%; }
+@media (max-width: 481px) {
+    .meal-edit h2, .meal-edit p {
+        height: auto; overflow: hidden;
+    }
+    .meal-edit {
+        min-width: auto;
+    }
+}
