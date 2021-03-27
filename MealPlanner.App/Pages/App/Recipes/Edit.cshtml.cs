@@ -29,29 +29,6 @@ namespace ServerApp.Pages.App.Recipes
         public Task<IActionResult> OnGetAsync(long id)
             => Init(id);
 
-        private async Task<IActionResult> Init(long? id)
-        {
-            var action = await UserAction;
-
-            if (id is null)
-            {
-                return NotFound();
-            }
-
-            var recipe = action.GetRecipe(id.Value);
-            if (recipe is null)
-            {
-                return NotFound();
-            }
-
-            var mealTimes = action.GetAllMealTimes();
-
-            Recipe = recipe.ToViewModel();
-            MealTimes = mealTimes?.ToMealTimeViewModel(recipe.MealTimes) ?? Array.Empty<MealTimeViewModel>();
-
-            return Page();
-        }
-
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid || Recipe is null)
@@ -69,8 +46,7 @@ namespace ServerApp.Pages.App.Recipes
                 ModelState.AddModelError("Recipe.Name", "Recipe name already exists.");
             }
 
-            Message = "This recipe has been saved!";
-            return await Init(id);
+            return Redirect("/app/recipes");
         }
 
         public async Task<IActionResult> OnPostDeleteAsync()
@@ -94,5 +70,27 @@ namespace ServerApp.Pages.App.Recipes
             return Page();
         }
 
+        private async Task<IActionResult> Init(long? id)
+        {
+            var action = await UserAction;
+
+            if (id is null)
+            {
+                return NotFound();
+            }
+
+            var recipe = action.GetRecipe(id.Value);
+            if (recipe is null)
+            {
+                return NotFound();
+            }
+
+            var mealTimes = action.GetAllMealTimes();
+
+            Recipe = recipe.ToViewModel();
+            MealTimes = mealTimes?.ToMealTimeViewModel(recipe.MealTimes) ?? Array.Empty<MealTimeViewModel>();
+
+            return Page();
+        }
     }
 }
