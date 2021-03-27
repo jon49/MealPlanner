@@ -8,7 +8,6 @@ using MealPlanner.Data.Data.Models;
 using MealPlanner.Data.Data;
 using static MealPlanner.Data.Shared;
 using System.Collections.Generic;
-using static ServerApp.Utils.HTMF;
 using ServerApp.Pages.Shared;
 
 #nullable enable
@@ -50,7 +49,7 @@ namespace ServerApp.Pages.App.Meal_Plans
             action.Save(new MealPlan(id, Array.Empty<long>()));
             SetMealPlans(action, startDate, ChangeSource.AddRecipe, id);
 
-            if (IsHTMFRequest(HttpContext))
+            if (IsHTMFRequest())
             {
                 var model = MealPlans.First(x => x?.Date == id);
                 return Partial("_CancelledTemplate", model);
@@ -76,7 +75,7 @@ namespace ServerApp.Pages.App.Meal_Plans
 
             SetMealPlans(action, startDate, ChangeSource.Previous, id);
 
-            if (IsHTMFRequest(HttpContext))
+            if (IsHTMFRequest())
             {
                 var model = MealPlans.First(x => x?.Date == id);
                 return Partial("_RecipeTitleTemplate", model);
@@ -114,7 +113,7 @@ namespace ServerApp.Pages.App.Meal_Plans
 
             SetMealPlans(action, startDate, ChangeSource.Next, id);
 
-            if (IsHTMFRequest(HttpContext))
+            if (IsHTMFRequest())
             {
                 var model = MealPlans.First(x => x?.Date == id);
                 return Partial("_RecipeTitleTemplate", model);
@@ -148,7 +147,7 @@ namespace ServerApp.Pages.App.Meal_Plans
 
             SetMealPlans(action, startDate, ChangeSource.Next, id);
 
-            if (IsHTMFRequest(HttpContext))
+            if (IsHTMFRequest())
             {
                 var model = MealPlans.First(x => x?.Date == id);
                 return Partial("_RecipeTemplate", model);

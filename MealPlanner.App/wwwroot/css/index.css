@@ -80,16 +80,23 @@ thead,tfoot{background: var(--c2)}
 
 /* Rounded Corners*/
 
-pre,code,input,select,textarea,button,img {border-radius: var(--rc)}
+a.button, a.button:hover, a.button:visited, a.button:focus, a.button:active  {
+  text-decoration: none;
+  color: inherit;
+  outline: 0;
+  cursor: pointer;
+}
+
+pre,code,input,select,textarea,.button,button,img {border-radius: var(--rc)}
 
 
 /* Forms */
 
 input,select,textarea{font-size: 1em; color:var(--c4); background: var(--c2); border: 0; padding: 0.6em}
 
-button, input[type=submit], input[type=reset] {font-size: 1em; display: inline-block; color: var(--c5); background: var(--c-button);  border: 0; margin: 0 4px;  padding: 0.6em; cursor: pointer; text-align: center}
+.button, button, input[type=submit], input[type=reset] {font-size: 1em; display: inline-block; color: var(--c5); background: var(--c-button);  border: 0; margin: 0 4px;  padding: 0.6em; cursor: pointer; text-align: center}
 
-button:hover,button:focus,input:hover,textarea:hover,select:hover {opacity: 0.8}
+.button:hover,.button:focus,button:hover,button:focus,input:hover,textarea:hover,select:hover {opacity: 0.8}
 
 /** END BASIC.CSS **/
 
@@ -121,7 +128,7 @@ input, select, textarea {
   font-size: inherit;
 }
 
-button, input[type=submit], input[type=reset] {
+.button, button, input[type=submit], input[type=reset] {
   margin-top: 4px;
 }
 

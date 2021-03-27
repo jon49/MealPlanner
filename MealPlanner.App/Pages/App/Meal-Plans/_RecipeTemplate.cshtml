@@ -25,12 +25,16 @@
                     asp-route-id="@date"
                     asp-route-startDate=@startDate
                     >Cancel</button>&nbsp;
+            <a class=button
+               asp-page="Search/Index"
+               asp-route-date="@date"
+               asp-route-returnurl="/app/meal-plans@(startDate is { } ? $"?startDate={startDate}" : "")"
+			   >Search</a>&nbsp;
             <button asp-page-handler="previous"
                     asp-route-id="@date"
                     asp-route-startDate=@startDate
                     autofocus="@(focusPrevious)"
                     >&laquo; Back</button>&nbsp;
-            @*<button formmethod=get formaction="/app/recipes/search?date=@date" asp-route-startDate=@startDate>Search</button>&nbsp;*@
             <button asp-page-handler="next"
                     asp-route-id="@date"
                     asp-route-startDate=@startDate

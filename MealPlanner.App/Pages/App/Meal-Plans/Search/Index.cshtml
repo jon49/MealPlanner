@@ -1,0 +1,24 @@
+﻿@page
+@model MealPlanner.App.Pages.App.Meal_Plans.Search.IndexModel
+
+@section H1 { <h1>Search</h1> }
+
+<partial name="_ErrorMessage" model="@Model.Message"/>
+
+<p><a href="@Model.ReturnUrl">Cancel</a></p>
+<form method=post
+      asp-route-returnurl="@Model.ReturnUrl"
+      asp-route-date="@Model.Date">
+    <input type=checkbox asp-for="StrictSearch"><label asp-for="StrictSearch">Strict Mode</label>
+    <label for=search>Search:</label><br>
+    <input style="width:100%"
+		id=search
+		type=search
+        name=Search
+        minlength=3
+        autocomplete="off"
+        autofocus
+		onkeypress="hf.debounce(hf.click, 'search', { args: [this], wait: 200 })"><br>
+		<input type=submit value=Search hf-hidden>
+</form>
+<partial name="_SearchResultItems" model="@Model.Results" />

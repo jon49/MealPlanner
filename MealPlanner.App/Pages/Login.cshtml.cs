@@ -48,9 +48,9 @@ namespace ServerApp.Pages
                 await HttpContext.SignInAsync(new ClaimsPrincipal(new ClaimsIdentity(claims, "Cookies", "user", "role")));
 
                 return
-                    Url.IsLocalUrl(returnUrl)
+                    Url.IsLocalUrl(returnUrl) && returnUrl != "/"
                         ? Redirect(returnUrl)
-                    : Redirect("/");
+                    : Redirect("/app");
             }
 
             ErrorMessage = "Incorrect email or password, try again!";

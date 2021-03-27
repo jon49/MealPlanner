@@ -19,5 +19,8 @@ namespace ServerApp.Pages.Shared
 
         protected long UserId => long.Parse(User.Claims.First(x => x.Type == "userId").Value);
         protected Task<UserDataAction> UserAction => _data.GetUserData(UserId);
+
+        protected bool IsHTMFRequest()
+            => HttpContext.Request.Headers.ContainsKey("HF-Request");
     }
 }

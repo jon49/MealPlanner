@@ -26,38 +26,6 @@ namespace MealPlanner.User.Databases
             return path;
         }
 
-        public static async Task ExecuteCommandAsync(string connectionString, string sql, params DBParams[] @params)
-        {
-            using var connection = new SqliteConnection(connectionString);
-            await connection.OpenAsync();
-            await ExecuteCommandAsync(connection, sql, @params);
-        }
-
-        public static async Task ExecuteCommandAsync(SqliteConnection connection, string sql, params DBParams[] @params)
-        {
-            var command = connection.CreateCommand();
-            command.CommandText = sql;
-
-            foreach (var p in @params)
-            {
-                command.Parameters.AddWithValue(p.Name, p.Value);
-            }
-            command.Prepare();
-
-            await command.ExecuteNonQueryAsync();
-        }
-
-        public static async Task ExecuteCommandAsync(
-            string connectionString,
-            string sql,
-            Action<SqliteDataReader> map,
-            params DBParams[] @params)
-        {
-            using var connection = new SqliteConnection(connectionString);
-            await connection.OpenAsync();
-            await ExecuteCommandAsync(connection, sql, map, @params);
-        }
-
         public static async Task ExecuteCommandAsync(
             SqliteConnection connection,
             string sql,
@@ -88,6 +56,15 @@ namespace MealPlanner.User.Databases
         {
             using var connection = new SqliteConnection(connectionString);
             connection.Open();
+            ExecuteCommand(connection, sql, map, @params);
+        }
+
+        public static void ExecuteCommand(
+            SqliteConnection connection,
+            string sql,
+            Action<SqliteDataReader>? map = null,
+            DBParams[]? @params = null)
+        {
             using var command = connection.CreateCommand();
             command.CommandText = sql;
 
@@ -112,16 +89,6 @@ namespace MealPlanner.User.Databases
             {
                 command.ExecuteNonQuery();
             }
-        }
-
-        public static async Task<T> ExecuteCommandAsync<T>(
-            string connectionString,
-            string sql,
-            DBParams[] @params)
-        {
-            using var connection = new SqliteConnection(connectionString);
-            await connection.OpenAsync();
-            return await ExecuteCommandAsync<T>(connection, sql, @params);
         }
 
         public static async Task<T> ExecuteCommandAsync<T>(

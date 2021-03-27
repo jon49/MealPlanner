@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using ServerApp.Actions;
-using static ServerApp.Utils.HTMF;
 using ServerApp.Pages.App.Recipes.Shared;
 using ServerApp.Pages.Shared;
 
@@ -60,12 +59,9 @@ namespace ServerApp.Pages.App.Recipes
                 return Page();
             }
 
-            if (IsHTMFRequest(HttpContext))
-            {
-                return Content($@"<p target=""#added-recipes"" hf-swap=""prepend""><a href=""/app/recipes/edit?id={id}"">{recipe.Name}</a></p>", "text/html");
-            }
-
-            return Redirect("./add");
+            return IsHTMFRequest()
+                ? Content($@"<p target=""#added-recipes"" hf-swap=""prepend""><a href=""/app/recipes/edit?id={id}"">{recipe.Name}</a></p>", "text/html")
+            : Redirect("./add");
         }
     }
 }

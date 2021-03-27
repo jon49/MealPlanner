@@ -49,6 +49,7 @@ namespace MealPlanner.Data.Data
         private readonly Dictionary<long, MealTime> MealTimes = new();
         private readonly Dictionary<string, MealPlan> MealPlans = new();
         private readonly Dictionary<string, object> TempData = new();
+        private RecipeSearch? RecipeSearch = null;
 
         private UserDataAction(UserDataPersistAction persist, UserDataFetchAction fetch, long userId)
         {
@@ -173,5 +174,24 @@ namespace MealPlanner.Data.Data
 
         public Recipe? GetRecipe(long id)
             => Recipes.GetValueOrDefault(id);
+
+        public List<Recipe> SearchRecipes(string search, bool strictSearch)
+        {
+            if (RecipeSearch is null)
+            {
+                RecipeSearch = new(Recipes.Values);
+            }
+            var ids = RecipeSearch.Search(search, strictSearch);
+            var recipes = new List<Recipe>();
+            foreach (var id in ids)
+            {
+                if (Recipes.TryGetValue(id, out var recipe))
+                {
+                    recipes.Add(recipe);
+                }
+            }
+
+            return recipes;
+        }
     }
 }

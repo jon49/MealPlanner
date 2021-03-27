@@ -1,0 +1,31 @@
+﻿@model MealPlanner.App.Pages.App.Meal_Plans.Search.ResultViewModel
+
+<div id=results>
+    @if (Model.recipes is { })
+    {
+        <form method=post>
+            @foreach(var recipe in Model.recipes)
+            {
+			<p>
+				<button asp-page-handler="Recipe"
+						asp-route-date="@Model.date"
+						asp-route-id="@recipe.Id"
+						asp-route-returnurl="@Model.returnUrl"
+						hf-ignore
+						style="width:100%"
+						>@recipe.Name<br>
+					@if (recipe.BookName is { })
+					{
+						<small>@recipe.BookName &dagger; @recipe.BookPage</small>
+					}
+					else
+					{
+						<small>@(recipe.Url?.ToString() ?? recipe.Other ?? "")&nbsp;</small>
+					}
+				</button>
+			</p>
+            }
+        </form>
+    }
+</div>
+
