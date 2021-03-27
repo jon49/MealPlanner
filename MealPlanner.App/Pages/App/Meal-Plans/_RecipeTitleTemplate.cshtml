@@ -8,9 +8,24 @@
 
 @if (url?.Length > 0)
 {
-	<h2 id=@id title="@recipe?.Name"><a href="@url">@recipe?.Name</a></h2>
+    <div id=@id>
+		<h2 title="@recipe?.Name"><a href="@url">@recipe?.Name</a></h2>
+        <p>&nbsp;</p>
+    </div>
 }
 else
 {
-	<h2 id=@id title="@recipe?.Name">@recipe?.Name</h2>
+	<div id=@id>
+		<h2 title="@recipe?.Name">@recipe?.Name</h2>
+		<p>
+		@if (recipe.BookName is { })
+		{
+			<small>@recipe.BookName &dagger; @recipe.BookPage</small>
+		}
+		else
+		{
+			<small>@(recipe.Other ?? "")&nbsp;</small>
+		}
+		</p>
+	</div>
 }
