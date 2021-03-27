@@ -1,4 +1,5 @@
 using MealPlanner.Data.Data;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using ServerApp.Actions;
 using System;
@@ -10,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace ServerApp.Pages.App.Recipes
 {
+    [ResponseCache(Duration = 10, Location = ResponseCacheLocation.Client, NoStore = false)]
     public class IndexModel : PageModel
     {
         private readonly UserData _data;
