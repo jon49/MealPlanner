@@ -49,9 +49,10 @@
         }
     </fieldset>
 
-    <input type=hidden asp-for="Recipe.Id">
+    <input type=hidden asp-for="Recipe.Id"><br>
 
-    <br>
+    <div class=reverse>
+    &nbsp;<input id=save-once type=submit value=Save>&nbsp;
     @if (Model.Recipe?.Id is null)
     {
         <input type=reset value=Clear>
@@ -66,5 +67,5 @@
             hf-ignore
             onclick="return confirm('Are you sure you would like to delete this recipe?')">
     }
-    &nbsp;<input id=save-once type=submit value=Save>&nbsp;
+    </div>
 </form>
