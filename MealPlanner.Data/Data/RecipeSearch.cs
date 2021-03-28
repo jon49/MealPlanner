@@ -50,8 +50,8 @@ limit 10;";
             return list;
         }
 
-        private static readonly string[] _keywords = new[] { "AND", "OR" };
-        private static readonly Regex _wordsOnly = new(@"[^A-Za-z0-9]", RegexOptions.Compiled);
+        private static readonly string[] _keywords = new[] { "AND", "OR", "NOT" };
+        private static readonly Regex _wordsOnly = new(@"[^A-Za-z0-9^:()]", RegexOptions.Compiled);
         private string CleanSearchTerm(string s)
         {
             var split = _wordsOnly.Replace(s, " ").Trim().Split(' ');
