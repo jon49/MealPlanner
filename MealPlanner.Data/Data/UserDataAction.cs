@@ -82,6 +82,10 @@ namespace MealPlanner.Data.Data
             recipe = AddOrUpdate(Recipes, recipe, (id, x) => x with { Id = id });
             if (recipe is null) return null;
             Persist(recipe.Id.ToString(), recipe);
+            if (RecipeSearch is { })
+            {
+                RecipeSearch.Save(recipe);
+            }
             return recipe.Id;
         }
 

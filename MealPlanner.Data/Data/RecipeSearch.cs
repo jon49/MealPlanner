@@ -14,20 +14,26 @@ namespace MealPlanner.Data.Data
     {
         private readonly SqliteConnection connection;
 
+        private const string SaveQuery = "INSERT INTO search (id, name) VALUES ($id, $name);";
+
         public RecipeSearch(IEnumerable<Recipe> recipes)
         {
             connection = new SqliteConnection("Data Source=:memory:");
             connection.Open();
 
             ExecuteCommand(connection, "CREATE VIRTUAL TABLE search USING fts5(id, name);");
-            BulkInsert(connection, $@"
-INSERT INTO search (id, name)
-VALUES ($id, $name);", recipes.Select(x => new DBParams[]
-                                      {
-                                          new(Name: "$name", Value: x.Name),
-                                          new(Name: "$id", Value: x.Id)
-                                      }));
+            BulkInsert(connection, SaveQuery, recipes.Select(CreateSaveParam));
         }
+
+        public void Save(Recipe recipe)
+            => ExecuteCommand(connection, SaveQuery, null, CreateSaveParam(recipe));
+
+        private DBParams[] CreateSaveParam(Recipe recipe)
+            => new DBParams[]
+            {
+                new(Name: "$id", Value: recipe.Id),
+                new(Name: "$name", Value: recipe.Name),
+            };
 
         private static readonly string searchQuery = $@"
 SELECT id
