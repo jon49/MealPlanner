@@ -33,11 +33,12 @@ namespace ServerApp.Pages.App.Meal_Plans
         {
             var action = await UserAction;
             SetMealPlans(action, startDate, ChangeSource.None, "");
+            var pickedRecipes = action.GetPickedRecipes();
             foreach (var mealPlan in MealPlans)
             {
                 if (mealPlan?.Recipes.Any() ?? false)
                 {
-                    action.Save(new TempData(mealPlan.Date, new[] { 1L, mealPlan.Recipes[0].Id }));
+                    pickedRecipes.Next(mealPlan.Date, mealPlan.Recipes[0]);
                 }
             }
             return Page();
@@ -61,17 +62,10 @@ namespace ServerApp.Pages.App.Meal_Plans
         public async Task<IActionResult> OnPostPreviousAsync(string id, string? startDate = null)
         {
             var action = await UserAction;
-            var recipeIds = GetMealSelections(id, action);
-            if (recipeIds is { } && recipeIds.Length > 1)
-            {
-                var idx = recipeIds[0]!.Value - 1;
-                if (idx > 0)
-                {
-                    recipeIds[0] = idx;
-                    var recipeId = recipeIds[idx]!.Value;
-                    action.Save(new MealPlan(id, new[] { recipeId }));
-                }
-            }
+            var pickedRecipes = action.GetPickedRecipes();
+
+            var recipeId = pickedRecipes.Previous(id);
+            action.Save(new MealPlan(id, new[] { recipeId }));
 
             SetMealPlans(action, startDate, ChangeSource.Previous, id);
 
@@ -88,28 +82,10 @@ namespace ServerApp.Pages.App.Meal_Plans
         {
             var action = await UserAction;
 
-            var recipeIds = (GetMealSelections(id, action)) ?? new long?[] { 0L };
+            var pickedRecipes = action.GetPickedRecipes();
 
-            var idx = recipeIds[0] + 1;
-            if (idx < recipeIds.Length)
-            {
-                recipeIds[0] = idx;
-                var recipeId = recipeIds[(int)idx]!.Value;
-                action.Save(new MealPlan(id, new[] { recipeId }));
-            }
-            else
-            {
-                var randomRecipe = action.GetRandomRecipe();
-                if (randomRecipe?.Id is { })
-                {
-                    var newRecipeIds = new long?[recipeIds.Length + 1];
-                    recipeIds.CopyTo(newRecipeIds, 0);
-                    newRecipeIds[^1] = randomRecipe.Id;
-                    newRecipeIds[0] = idx;
-                    action.Save(new TempData(id, newRecipeIds));
-                    action.Save(new MealPlan(id, new[] { randomRecipe.Id.Value }));
-                }
-            }
+            var recipeId = pickedRecipes.Next(id);
+            action.Save(new MealPlan(id, new[] { recipeId }));
 
             SetMealPlans(action, startDate, ChangeSource.Next, id);
 
@@ -125,25 +101,10 @@ namespace ServerApp.Pages.App.Meal_Plans
         public async Task<IActionResult> OnPostAddRecipeAsync(string id, string? startDate = null)
         {
             var action = await UserAction;
-            var randomRecipe = action.GetRandomRecipe();
-            if (randomRecipe?.Id is { })
-            {
-                var recipeIds = GetMealSelections(id, action);
-                if (recipeIds?.Length > 0)
-                {
-                    var newRecipeIds = new long?[recipeIds.Length + 1];
-                    recipeIds.CopyTo(newRecipeIds, 0);
-                    newRecipeIds[0] = newRecipeIds.Length - 1;
-                    newRecipeIds[^1] = randomRecipe.Id.Value;
-                    recipeIds = newRecipeIds;
-                }
-                else
-                {
-                    recipeIds = new long?[] { 0, randomRecipe.Id.Value };
-                }
-                action.Save(new TempData(id, recipeIds));
-                action.Save(new MealPlan(id, new[] { randomRecipe.Id.Value }));
-            }
+
+            var pickedRecipes = action.GetPickedRecipes();
+            var recipeId = pickedRecipes.Next(id);
+            action.Save(new MealPlan(id, new[] { recipeId }));
 
             SetMealPlans(action, startDate, ChangeSource.Next, id);
 
@@ -166,13 +127,6 @@ namespace ServerApp.Pages.App.Meal_Plans
             }
         }
 
-        private static long?[]? GetMealSelections(string id, UserDataAction action)
-        {
-            var tempData = action.GetTempData(new[] { id });
-            var tempData2 = tempData?[0];
-            var longData = tempData2 as long?[];
-            return longData;
-        }
     }
 
     public class MealPlanViewModel

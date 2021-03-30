@@ -4,9 +4,7 @@ using MealPlanner.Data.Data.Models;
 using MealPlanner.Data.Databases;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -18,7 +16,7 @@ namespace MealPlanner.Data.Data
     public interface IName { public string Name { get; } }
 
     public record Recipe
-        ( long? Id
+        (long? Id
         , string Name
         , string? BookName
         , int? BookPage
@@ -45,10 +43,11 @@ namespace MealPlanner.Data.Data
         private readonly UserDataFetchAction _fetch;
         private readonly long _userId;
         private bool _initializing = false;
+        private readonly Random _random = new();
         private readonly Dictionary<long, Recipe> Recipes = new();
         private readonly Dictionary<long, MealTime> MealTimes = new();
         private readonly Dictionary<string, MealPlan> MealPlans = new();
-        private readonly Dictionary<string, object> TempData = new();
+        private readonly PickedValues PickedRecipes;
         private RecipeSearch? RecipeSearch = null;
 
         private UserDataAction(UserDataPersistAction persist, UserDataFetchAction fetch, long userId)
@@ -56,6 +55,7 @@ namespace MealPlanner.Data.Data
             _persist = persist;
             _fetch = fetch;
             _userId = userId;
+            PickedRecipes = new(Recipes, _random);
         }
 
         public static async Task<UserDataAction> Create(UserDataPersistAction persist, UserDataFetchAction fetch, long userId)
@@ -103,10 +103,8 @@ namespace MealPlanner.Data.Data
 
         public MealTime[] GetAllMealTimes() => MealTimes.Values.ToArray();
         public MealPlanModel?[] GetMealPlansForWeek(DateTime? startDate)
-            => MealPlans.GetMealPlansForWeek(this, startDate, MealTimes, Recipes);
-        public Recipe GetRandomRecipe() => Recipes.RandomValue(new Random());
-        public object[] GetTempData(string[] keys) => TempData.TryGetValuesOrDefault(keys);
-        public void Save(TempData data) => TempData.AddOrUpdate(data.Key, data.Value);
+            => MealPlans.GetMealPlansForWeek(this, startDate, MealTimes, Recipes, _random);
+        public PickedValues GetPickedRecipes() => PickedRecipes;
 
         private T? AddOrUpdate<T>(Dictionary<long, T> dic, T? item, Func<long, T, T> updateId) where T : class, IId, IName
         {

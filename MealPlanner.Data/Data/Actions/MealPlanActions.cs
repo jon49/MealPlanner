@@ -16,7 +16,8 @@ namespace MealPlanner.Data.Data.Actions
             UserDataAction userAction,
             DateTime? startDate,
             Dictionary<long, MealTime> MealTimes,
-            Dictionary<long, Recipe> Recipes)
+            Dictionary<long, Recipe> Recipes,
+            Random rand)
         {
             var today = DateTime.UtcNow.AddDays(-1);
             if (MealTimes.Count == 0)
@@ -41,7 +42,6 @@ namespace MealPlanner.Data.Data.Actions
 
             var mealPlans = new MealPlanModel[7];
             var count = 0;
-            var rand = new Random();
             foreach (var date in dates)
             {
                 var d = ToMealPlanId(date);
