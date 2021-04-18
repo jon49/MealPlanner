@@ -26,7 +26,8 @@ namespace MealPlanner.User.Databases
     {
         private readonly SqliteConnection ReadWriteConnection;
         private readonly SqliteConnection ReadOnlyConnection;
-        private static readonly string commandCreateDatabase = $@"
+
+        private static readonly string commandCreateTable = $@"
 CREATE TABLE IF NOT EXISTS {T.User.Table} (
     {T.User.Id} INTEGER NOT NULL PRIMARY KEY,
     {T.User.Email} TEXT NOT NULL,
@@ -37,15 +38,14 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_user_email ON {T.User.Table} ({T.User.Emai
 CREATE TABLE IF NOT EXISTS {T.BetaUser.Table} (
     {T.BetaUser.Id} INTEGER NOT NULL PRIMARY KEY,
     {T.BetaUser.Email} TEXT NOT NULL);";
-
-        public UserDB()
+        public UserDB(
+            SqliteConnection connectionStringReadWriteCreate,
+            SqliteConnection connectionStringReadOnly,
+            SqliteConnection connectionStringReadWrite)
         {
-            var connectionString = $"Data Source={Path.Combine(GetAppDir(), "users.db")}";
-            ExecuteCommand($"{connectionString};Mode=ReadWriteCreate;", commandCreateDatabase);
-            ReadWriteConnection = new SqliteConnection($"{connectionString};Mode=ReadWrite;");
-            ReadWriteConnection.Open();
-            ReadOnlyConnection = new SqliteConnection($"{connectionString};Mode=ReadOnly;");
-            ReadOnlyConnection.Open();
+            ExecuteCommand(connectionStringReadWriteCreate, commandCreateTable);
+            ReadWriteConnection = connectionStringReadWrite;
+            ReadOnlyConnection = connectionStringReadOnly;
         }
 
         public void Dispose()

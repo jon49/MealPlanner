@@ -1,10 +1,10 @@
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using MealPlanner.User.Actions;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
@@ -40,16 +40,15 @@ namespace ServerApp.Pages
                 return Page();
             }
 
-            var id = await _user.ProcessRegisterUser(UserRegister.ToRegisterUser(_salt));
-            if (id > 0)
+            var user = await _user.ProcessRegisterUser(UserRegister.ToRegisterUser(_salt));
+            if (user?.UserId > 0)
             {
-                var claims = new List<Claim>
+                var claims = new Claim[]
                 {
-                    new("userId", id.ToString()),
-                    new("role", "Member"),
+                    new("session", user.UserId.ToString()),
                 };
 
-                await HttpContext.SignInAsync(new ClaimsPrincipal(new ClaimsIdentity(claims, "Cookies", "user", "role")));
+                await HttpContext.SignInAsync(new ClaimsPrincipal(new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme)));
 
                 return Redirect("/app");
             }

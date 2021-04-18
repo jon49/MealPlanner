@@ -1,6 +1,7 @@
 ﻿using Microsoft.Data.Sqlite;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -29,7 +30,7 @@ namespace MealPlanner.User.Databases
         public static async Task ExecuteCommandAsync(
             SqliteConnection connection,
             string sql,
-            Action<SqliteDataReader> map,
+            Action<SqliteDataReader>? map,
             params DBParams[] @params)
         {
             using var command = connection.CreateCommand();
@@ -41,10 +42,17 @@ namespace MealPlanner.User.Databases
             }
             command.Prepare();
 
-            using var reader = await command.ExecuteReaderAsync();
-            while (reader.Read())
+            if (map is { })
             {
-                map(reader);
+                using var reader = await command.ExecuteReaderAsync();
+                while (reader.Read())
+                {
+                    map(reader);
+                }
+            }
+            else
+            {
+                await command.ExecuteNonQueryAsync();
             }
         }
 
@@ -122,7 +130,7 @@ namespace MealPlanner.User.Databases
         public static T ExecuteCommand<T>(
             SqliteConnection connection,
             string sql,
-            DBParams[] @params)
+            params DBParams[] @params)
         {
             using var command = connection.CreateCommand();
             command.CommandText = sql;

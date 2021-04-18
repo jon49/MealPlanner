@@ -23,7 +23,7 @@ namespace MealPlanner.Data.Data.Models
     {
         private readonly Dictionary<long, Recipe> _recipes;
         private readonly Random _random;
-        private Dictionary<string, ListIndex> recipeDates = new();
+        private readonly Dictionary<string, ListIndex> recipeDates = new();
 
         public PickedValues(Dictionary<long, Recipe> recipes, Random random)
         {

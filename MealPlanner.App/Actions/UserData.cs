@@ -31,7 +31,7 @@ namespace ServerApp.Actions
 
         public async Task<UserDataAction> GetUserData(long userId)
         {
-            if (userId <= 0)
+            if (userId < 1)
             {
                 throw new ArgumentOutOfRangeException(nameof(userId));
             }

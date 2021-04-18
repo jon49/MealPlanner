@@ -1,7 +1,7 @@
 ﻿using MealPlanner.Data.Data;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using ServerApp.Actions;
-using System.Linq;
+using System;
 using System.Threading.Tasks;
 
 #nullable enable
@@ -14,11 +14,10 @@ namespace ServerApp.Pages.Shared
 
         public BaseUserPage(UserData data)
         {
-            _data = data ?? throw new global::System.ArgumentNullException(nameof(data));
+            _data = data ?? throw new ArgumentNullException(nameof(data));
         }
 
-        protected long UserId => long.Parse(User.Claims.First(x => x.Type == "userId").Value);
-        protected Task<UserDataAction> UserAction => _data.GetUserData(UserId);
+        protected Task<UserDataAction> UserAction => _data.GetUserData((long?)HttpContext.Items["userId"] ?? 0);
 
         protected bool IsHTMFRequest()
             => HttpContext.Request.Headers.ContainsKey("HF-Request");

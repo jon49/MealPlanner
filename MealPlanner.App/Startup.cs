@@ -1,3 +1,4 @@
+using MealPlanner.App.System;
 using MealPlanner.User.Actions;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
@@ -27,12 +28,15 @@ namespace ServerApp
                 .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
                 {
-                    options.LoginPath = "/login";
-                    options.LogoutPath = "/logout";
+                    options.LoginPath = "/app/login";
+                    options.LogoutPath = "/app/login?handler=logout";
+                    options.Cookie.Name = "user_session";
                 });
             services.AddRazorPages(options =>
             {
-                options.Conventions.AuthorizeFolder("/App");
+                options.Conventions.AllowAnonymousToPage("/app/login");
+                options.Conventions.AllowAnonymousToPage("/app/register");
+                options.Conventions.AuthorizeFolder("/app");
             });
             services.Configure<ForwardedHeadersOptions>(options =>
             {
@@ -65,6 +69,7 @@ namespace ServerApp
             app.UseRouting();
 
             app.UseAuthentication();
+            app.UseUserAuthenticationValidationMiddleware();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

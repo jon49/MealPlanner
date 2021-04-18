@@ -1,4 +1,6 @@
-﻿namespace MealPlanner.User.Databases
+﻿using System;
+
+namespace MealPlanner.User.Databases
 {
     public static class Table
     {
@@ -20,6 +22,24 @@
 
             public const string LastName = "LastName";
             public const string _LastName = "$LastName";
+
+            public const string CreatedDate = "CreatedDate";
+            public const string _CreatedDate = "$CreatedDate";
+        }
+
+        public static class Session
+        {
+            public const string Table = "Session";
+
+            /// Base64 Guid
+            public const string SessionId = "SessionId";
+            public const string _SessionId = "$SessionId";
+
+            public const string UserId = "UserId";
+            public const string _UserId = "$UserId";
+
+            public const string CreatedDate = "CreatedDate";
+            public const string _CreatedDate = "$CreatedDate";
         }
 
         public static class BetaUser

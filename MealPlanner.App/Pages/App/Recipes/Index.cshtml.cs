@@ -2,6 +2,7 @@ using MealPlanner.Data.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using ServerApp.Actions;
+using ServerApp.Pages.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,17 +13,11 @@ using System.Threading.Tasks;
 namespace ServerApp.Pages.App.Recipes
 {
     [ResponseCache(Duration = 10, Location = ResponseCacheLocation.Client, NoStore = false)]
-    public class IndexModel : PageModel
+    public class IndexModel : BaseUserPage
     {
-        private readonly UserData _data;
-
-        public IndexModel(UserData data)
+        public IndexModel(UserData data) : base(data)
         {
-            _data = data;
         }
-
-        private long UserId => long.Parse(User.Claims.First(x => x.Type == "userId").Value);
-        private Task<UserDataAction> UserAction => _data.GetUserData(UserId);
 
         public IEnumerable<RecipeListViewModel> Recipes { get; set; } = Array.Empty<RecipeListViewModel>();
 
