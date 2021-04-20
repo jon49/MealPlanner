@@ -9,7 +9,6 @@ using Microsoft.Data.Sqlite;
 
 namespace MealPlanner.User.Databases
 {
-
     public class SessionDB
     {
         private readonly SqliteConnection ConnectionStringReadOnly;
