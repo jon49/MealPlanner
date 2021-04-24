@@ -19,18 +19,25 @@
     <br><input type=submit value=Submit hf-hidden>
 </form>
 
-<section id=meal-selections class=cards>
-    @foreach (var mealPlan in @Model.MealPlans)
-    {
-        if (mealPlan?.Recipes?.Any() ?? false)
-        {
-            <partial name="_RecipeTemplate" model="mealPlan" />
-        }
-        else
-        {
-            <partial name="_CancelledTemplate" model="mealPlan" />
-        }
-    }
+<section id=meal-selections class=cards data-draggable>
+    <partial name="_MealsTemplate" model="Model" />
     <div><a href="/app/meal-plans?startDate=@(Shared.ToMealPlanId(Model.StartDate.Value.AddDays(7)))">Next Week</a></div>
 </section>
+
+<form id=swap method=post asp-page-handler="Swap" asp-route-startDate="@Model.StartDate" style="display:none;">
+    <input name=Source>
+    <input name=Target>
+    <button id=swap-button></button>
+</form>
+
+<script src="~/js/draggable.js"></script>
+
+<script>
+document.addEventListener("swapped", e => {
+    let form = document.forms["swap"]
+    form.Source.value = e.detail.source.id.slice(1)
+    form.Target.value = e.detail.target.id.slice(1)
+    form.querySelector("#swap-button").click()
+})
+</script>
 

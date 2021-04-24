@@ -222,3 +222,7 @@ a.external {
     flex-direction: row-reverse;
 }
 
+[draggable] {
+    cursor: move;
+}
+

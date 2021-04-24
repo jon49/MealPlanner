@@ -15,8 +15,8 @@
 		Model.ChangeSource.Source == ChangeSource.Previous && Model.ChangeSource.Date == Model.Date;
 }
 
-<div class="meal-edit" id=_@date>
-    <p>@date</p>
+<div class="meal-edit" data-highlight-draggable id=_@date>
+    <p draggable=true>@date</p>
     <partial name="_RecipeTitleTemplate" model="Model" />
     <br>
     <div>

@@ -117,6 +117,28 @@ namespace ServerApp.Pages.App.Meal_Plans
             return Page();
         }
 
+        [BindProperty]
+        public string Source { get; set; }
+        [BindProperty]
+        public string Target { get; set; }
+        public async Task<IActionResult> OnPostSwapAsync(string startDate)
+        {
+            var action = await UserAction;
+            var date = DateTime.Parse(startDate);
+            var mealPlans = action.GetMealPlansForWeek(date);
+            var source = mealPlans.First(x => x is { } && x.Date == Source);
+            var target = mealPlans.First(x => x is { } && x.Date == Target);
+            if (source is { } && target is { })
+            {
+                action.Save(new MealPlan(Target, source.Recipes.Where(x => x.Id.HasValue).Select(x => x.Id!.Value).ToArray()));
+                action.Save(new MealPlan(Source, target.Recipes.Where(x => x.Id.HasValue).Select(x => x.Id!.Value).ToArray()));
+            }
+
+            SetMealPlans(action, ToMealPlanId(date), ChangeSource.None, Target);
+
+            return Partial("_MealsTemplate", this);
+        }
+
         private void SetMealPlans(UserDataAction action, string? startDate, ChangeSource source, string dateSelection)
         {
             StartDate = FromMealPlanId(startDate);

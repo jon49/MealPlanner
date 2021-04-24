@@ -1,0 +1,15 @@
+﻿@model ServerApp.Pages.App.Meal_Plans.IndexModel
+@using MealPlanner.Data
+
+@foreach (var mealPlan in @Model.MealPlans)
+{
+    if (mealPlan?.Recipes?.Any() ?? false)
+    {
+        <partial name="_RecipeTemplate" model="mealPlan" />
+    }
+    else
+    {
+        <partial name="_CancelledTemplate" model="mealPlan" />
+    }
+}
+

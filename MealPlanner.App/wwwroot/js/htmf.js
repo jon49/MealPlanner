@@ -89,9 +89,6 @@
             if ($form.hasAttribute("hf-ignore") || $button.hasAttribute("hf-ignore")) return
             e.preventDefault()
 
-            //if (($button.hasAttribute("hf-confirm") || $form.hasAttribute("hf-confirm"))
-            //    && !confirm(($button.getAttribute("hf-confirm") || $form.getAttribute("hf-confirm")) || "Are you sure?")) return
-
             const preData = new FormData($form)
             /** @type {string} */
             const preEvent = $button.dataset.event ?? $form.dataset.event
