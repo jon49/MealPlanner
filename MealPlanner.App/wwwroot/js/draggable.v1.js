@@ -69,4 +69,14 @@
         return false
     }, false)
 
+    container?.addEventListener('click', e => {
+        if (source) {
+            let target = getTarget(e.target)
+            if (!target) return
+            e.preventDefault()
+            let event = new Event("drop", { bubbles: true })
+            target.dispatchEvent(event)
+        }
+    })
+
 })()
