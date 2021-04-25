@@ -64,6 +64,7 @@
             source.id = targetId
             let event = new CustomEvent("swapped", { detail: {source, target} })
             document.dispatchEvent(event)
+            source = null
         }
 
         return false
