@@ -166,6 +166,7 @@ namespace ServerApp.Pages.App.Meal_Plans
         ( string Date
         , Recipe[] Recipes 
         , string? StartDate
+        , string DayOfWeek
         , CurrentSelection ChangeSource);
 
     public static class MealViewModelExtensions
@@ -179,6 +180,7 @@ namespace ServerApp.Pages.App.Meal_Plans
             ( Date: plan.Date
             , Recipes: plan.Recipes
             , StartDate: startDate
+            , DayOfWeek: FromMealPlanId(plan.Date)?.DayOfWeek.ToString() ?? ""
             , ChangeSource: new CurrentSelection(changeSource, dateSelection));
     }
 
