@@ -47,7 +47,7 @@ namespace MealPlanner.Data.Data
         private readonly Dictionary<long, Recipe> Recipes = new();
         private readonly Dictionary<long, MealTime> MealTimes = new();
         private readonly Dictionary<string, MealPlan> MealPlans = new();
-        private readonly PickedValues PickedRecipes;
+        private readonly RecipePicker RecipePicker;
         private RecipeSearch? RecipeSearch = null;
 
         private UserDataAction(UserDataPersistAction persist, UserDataFetchAction fetch, long userId)
@@ -55,7 +55,7 @@ namespace MealPlanner.Data.Data
             _persist = persist;
             _fetch = fetch;
             _userId = userId;
-            PickedRecipes = new(Recipes, _random);
+            RecipePicker = new(Recipes, _random);
         }
 
         public static async Task<UserDataAction> Create(UserDataPersistAction persist, UserDataFetchAction fetch, long userId)
@@ -108,7 +108,7 @@ namespace MealPlanner.Data.Data
         public MealTime[] GetAllMealTimes() => MealTimes.Values.ToArray();
         public MealPlanModel?[] GetMealPlansForWeek(DateTime? startDate)
             => MealPlans.GetMealPlansForWeek(this, startDate, MealTimes, Recipes, _random);
-        public PickedValues GetPickedRecipes() => PickedRecipes;
+        public RecipePicker GetRecipePicker() => RecipePicker;
 
         private T? AddOrUpdate<T>(Dictionary<long, T> dic, T? item, Func<long, T, T> updateId) where T : class, IId, IName
         {

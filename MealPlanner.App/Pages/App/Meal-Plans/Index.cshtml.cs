@@ -29,18 +29,15 @@ namespace ServerApp.Pages.App.Meal_Plans
         public DateTime? StartDate { get; set; }
         public string? StartDateView => ToMealPlanId(StartDate);
 
+        [BindProperty]
+        public string ChosenRecipes { get; set; } = "";
+        [BindProperty]
+        public int ChosenRecipeIndex { get; set; } = -1;
+
         public async Task<IActionResult> OnGetAsync(string? startDate = null)
         {
             var action = await UserAction;
             SetMealPlans(action, startDate, ChangeSource.None, "");
-            var pickedRecipes = action.GetPickedRecipes();
-            foreach (var mealPlan in MealPlans)
-            {
-                if (mealPlan?.Recipes.Any() ?? false)
-                {
-                    pickedRecipes.Next(mealPlan.Date, mealPlan.Recipes[0]);
-                }
-            }
             return Page();
         }
 
@@ -62,16 +59,13 @@ namespace ServerApp.Pages.App.Meal_Plans
         public async Task<IActionResult> OnPostPreviousAsync(string id, string? startDate = null)
         {
             var action = await UserAction;
-            var pickedRecipes = action.GetPickedRecipes();
-
-            var recipeId = pickedRecipes.Previous(id);
-            action.Save(new MealPlan(id, new[] { recipeId }));
+            var (chosenRecipes, index) = GetRecipe(id, action, next: false);
 
             SetMealPlans(action, startDate, ChangeSource.Previous, id);
 
+            var model = SetRecipeState(id, chosenRecipes, index);
             if (IsHTMFRequest())
             {
-                var model = MealPlans.First(x => x?.Date == id);
                 return Partial("_RecipeTitleTemplate", model);
             }
 
@@ -82,16 +76,13 @@ namespace ServerApp.Pages.App.Meal_Plans
         {
             var action = await UserAction;
 
-            var pickedRecipes = action.GetPickedRecipes();
-
-            var recipeId = pickedRecipes.Next(id);
-            action.Save(new MealPlan(id, new[] { recipeId }));
+            var (chosenRecipes, index) = GetRecipe(id, action, next: true);
 
             SetMealPlans(action, startDate, ChangeSource.Next, id);
 
+            var model = SetRecipeState(id, chosenRecipes, index);
             if (IsHTMFRequest())
             {
-                var model = MealPlans.First(x => x?.Date == id);
                 return Partial("_RecipeTitleTemplate", model);
             }
 
@@ -102,15 +93,13 @@ namespace ServerApp.Pages.App.Meal_Plans
         {
             var action = await UserAction;
 
-            var pickedRecipes = action.GetPickedRecipes();
-            var recipeId = pickedRecipes.Next(id);
-            action.Save(new MealPlan(id, new[] { recipeId }));
+            var (chosenRecipes, index) = GetRecipe(id, action, next: true);
 
             SetMealPlans(action, startDate, ChangeSource.Next, id);
 
+            var model = SetRecipeState(id, chosenRecipes, index);
             if (IsHTMFRequest())
             {
-                var model = MealPlans.First(x => x?.Date == id);
                 return Partial("_RecipeTemplate", model);
             }
 
@@ -118,9 +107,9 @@ namespace ServerApp.Pages.App.Meal_Plans
         }
 
         [BindProperty]
-        public string Source { get; set; }
+        public string Source { get; set; } = "";
         [BindProperty]
-        public string Target { get; set; }
+        public string Target { get; set; } = "";
         public async Task<IActionResult> OnPostSwapAsync(string startDate)
         {
             var action = await UserAction;
@@ -149,6 +138,39 @@ namespace ServerApp.Pages.App.Meal_Plans
             }
         }
 
+        private IEnumerable<long> GetChosenRecipes()
+            => from x in ChosenRecipes.Split(",")
+               where x.Length > 0
+               select long.Parse(x);
+
+        private MealViewModel? SetRecipeState(string date, IEnumerable<long> chosenRecipes, int? index)
+        {
+            var model = MealPlans.First(x => x?.Date == date);
+
+            if (model is { })
+            {
+                model.RecipesState = chosenRecipes;
+                model.RecipeIndex = index;
+            }
+
+            return model;
+        }
+
+        private (IEnumerable<long>, int?) GetRecipe(string date, UserDataAction action, bool next)
+        {
+            var recipePicker = action.GetRecipePicker();
+            var (chosenRecipes, index) =
+                next
+                    ? recipePicker.Next(GetChosenRecipes(), ChosenRecipeIndex)
+                : recipePicker.Previous(GetChosenRecipes(), ChosenRecipeIndex);
+            if (index.HasValue)
+            {
+                action.Save(new MealPlan(date, new[] { chosenRecipes.ElementAt(index.Value) }));
+            }
+
+            return (chosenRecipes, index);
+        }
+
     }
 
     public class MealPlanViewModel
@@ -163,11 +185,15 @@ namespace ServerApp.Pages.App.Meal_Plans
     }
 
     public record MealViewModel
-        ( string Date
-        , Recipe[] Recipes 
+        (string Date
+        , Recipe[] Recipes
         , string? StartDate
         , string DayOfWeek
-        , CurrentSelection ChangeSource);
+        , CurrentSelection ChangeSource)
+    {
+        public IEnumerable<long> RecipesState { get; set; } = Array.Empty<long>();
+        public int? RecipeIndex { get; set; }
+    };
 
     public static class MealViewModelExtensions
     {

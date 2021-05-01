@@ -1,31 +1,32 @@
 ﻿@model ServerApp.Pages.App.Meal_Plans.MealViewModel
-@using ServerApp.Pages.App.Meal_Plans
 @{
     var recipe = Model.Recipes.FirstOrDefault();
     var url = recipe?.Url?.ToString();
     var id = $"_{Model.Date}_title";
+    var recipeState = Model.RecipesState.Any() ? string.Join(',', Model.RecipesState) : recipe.Id.ToString();
+    var recipeIndex = Model.RecipesState.Any() ? Model.RecipeIndex : 0;
 }
 
+<div id=@id>
+    <input type=hidden name=ChosenRecipes value=@recipeState>
+    <input type=hidden name=ChosenRecipeIndex value=@recipeIndex>
 @if (url?.Length > 0)
 {
-    <div id=@id>
-		<h2 title="@recipe?.Name"><a href="@url">@recipe?.Name</a></h2>
-        <p>&nbsp;</p>
-    </div>
+    <h2 title="@recipe?.Name"><a href="@url">@recipe?.Name</a></h2>
+    <p>&nbsp;</p>
 }
 else
 {
-	<div id=@id>
-		<h2 title="@recipe?.Name">@recipe?.Name</h2>
-		<p>
-		@if (recipe.BookName is { })
-		{
-			<small>@recipe.BookName @recipe.BookPage</small>
-		}
-		else
-		{
-			<small>@(recipe.Other ?? "")&nbsp;</small>
-		}
-		</p>
-	</div>
+    <h2 title="@recipe?.Name">@recipe?.Name</h2>
+    <p>
+    @if (recipe.BookName is { })
+    {
+        <small>@recipe.BookName @recipe.BookPage</small>
+    }
+    else
+    {
+        <small>@(recipe.Other ?? "")&nbsp;</small>
+    }
+    </p>
 }
+</div>

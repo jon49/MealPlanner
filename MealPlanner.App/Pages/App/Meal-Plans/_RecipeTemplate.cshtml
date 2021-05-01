@@ -17,10 +17,10 @@
 
 <div class="meal-edit" data-highlight-draggable id=_@date>
     <p draggable=true>&#8803; @date - @Model.DayOfWeek</p>
-    <partial name="_RecipeTitleTemplate" model="Model" />
-    <br>
     <div>
-        <form class=inline method=post >
+        <form class=inline method=post>
+            <partial name="_RecipeTitleTemplate" model="Model" />
+            <br>
             <button asp-page-handler="cancel"
                     asp-route-id="@date"
                     asp-route-startDate=@startDate
@@ -28,12 +28,12 @@
             <a class=button
                asp-page="Search/Index"
                asp-route-date="@date"
-               asp-route-returnurl="/app/meal-plans@(startDate is { } ? $"?startDate={startDate}" : "")"
+               asp-route-returnurl='/app/meal-plans@(startDate is { } ? $"?startDate={startDate}" : "")'
 			   >Search</a>&nbsp;
             <button asp-page-handler="previous"
                     asp-route-id="@date"
                     asp-route-startDate=@startDate
-                    autofocus="@(focusPrevious)"
+                    autofocus=@focusPrevious
                     >&laquo; Back</button>&nbsp;
             <button asp-page-handler="next"
                     asp-route-id="@date"
