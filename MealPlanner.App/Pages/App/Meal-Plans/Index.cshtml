@@ -9,6 +9,8 @@
 
 @section H1 { <h1>Meal Plans</h1> }
 
+<p><a href="/app/meal-plans?startDate=@(Shared.ToMealPlanId(Model.StartDate.Value.AddDays(-7)))">Previous Week</a></p>
+
 <form method=get>
     <label asp-for="StartDate">Start Date:&nbsp;</label>
     <input
