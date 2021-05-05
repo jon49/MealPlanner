@@ -5,7 +5,9 @@
 
 <partial name="_ErrorMessage" model="@Model.Message"/>
 
-<p><a href="@Model.ReturnUrl">Cancel</a></p>
+<p><a href="@Model.ReturnUrl">Cancel</a>
+    | Not finding what you are looking for?
+      <a asp-page="/app/recipes/add" asp-route-date="@Model.Date" asp-route-returnurl="@Model.ReturnUrl">Add a new recipe.</a></p>
 <form method=post
       asp-route-returnurl="@Model.ReturnUrl"
       asp-route-date="@Model.Date">

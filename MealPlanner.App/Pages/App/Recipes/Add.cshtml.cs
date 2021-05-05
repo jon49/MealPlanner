@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
+using MealPlanner.Data.Data;
 using Microsoft.AspNetCore.Mvc;
 using ServerApp.Actions;
 using ServerApp.Pages.App.Recipes.Shared;
@@ -40,7 +41,7 @@ namespace ServerApp.Pages.App.Recipes
             MealTimes = mealTimes?.ToMealTimeViewModel(Array.Empty<long>()) ?? Array.Empty<MealTimeViewModel>();
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public async Task<IActionResult> OnPostAsync(string? date, string? returnUrl)
         {
             if (!ModelState.IsValid || Recipe is null)
             {
@@ -58,6 +59,12 @@ namespace ServerApp.Pages.App.Recipes
                 await SetInitials();
                 ModelState.AddModelError("Recipe.Name", "Recipe name already exists.");
                 return Page();
+            }
+
+            if (date is { } && returnUrl is { })
+            {
+                action.Save(new MealPlan(date, new[] { id.Value }));
+                return Redirect(returnUrl);
             }
 
             return IsHTMFRequest()
