@@ -9,7 +9,8 @@
 
 @section H1 { <h1>Meal Plans</h1> }
 
-<p><a href="/app/meal-plans?startDate=@(Shared.ToMealPlanId(Model.StartDate.Value.AddDays(-7)))">Previous Week</a></p>
+<p><a href="/app/meal-plans?startDate=@(Shared.ToMealPlanId(Model.StartDate.Value.AddDays(-7)))">Previous Week</a> |
+<a href="/app/meal-plans?startDate=@(Shared.ToMealPlanId(Model.StartDate.Value.AddDays(7)))">Next Week</a></p>
 
 <form method=get>
     <label asp-for="StartDate">Start Date:&nbsp;</label>
@@ -23,7 +24,7 @@
 
 <section id=meal-selections class=cards data-draggable>
     <partial name="_MealsTemplate" model="Model" />
-    <div><a href="/app/meal-plans?startDate=@(Shared.ToMealPlanId(Model.StartDate.Value.AddDays(7)))">Next Week</a></div>
+    <div></div>
 </section>
 
 <form id=swap method=post asp-page-handler="Swap" asp-route-startDate="@Model.StartDate" style="display:none;">
