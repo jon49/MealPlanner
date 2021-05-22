@@ -5,7 +5,7 @@ using System.Linq;
 
 #nullable enable
 
-namespace MealPlanner.Data.Data.Models
+namespace MealPlanner.Data.Data.Actions
 {
     public class RecipePicker
     {
