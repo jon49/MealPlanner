@@ -1,4 +1,5 @@
 ﻿using MealPlanner.Core;
+using MealPlanner.Data.Data.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;

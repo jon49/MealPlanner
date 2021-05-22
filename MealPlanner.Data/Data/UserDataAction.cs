@@ -15,28 +15,6 @@ namespace MealPlanner.Data.Data
     public interface IId { public long? Id { get; } }
     public interface IName { public string Name { get; } }
 
-    public record Recipe
-        (long? Id
-        , string Name
-        , string? BookName
-        , int? BookPage
-        , string? Other
-        , Uri? Url
-        , long[] MealTimes) : IId, IName, IComparable
-    {
-        public int CompareTo(object obj)
-            => obj is Recipe recipe
-                ? Name.CompareTo(recipe.Name)
-            : -1;
-    }
-
-    public record MealTime(long? Id, string Name) : IId, IName;
-
-    public record MealPlan(string Date, long[] RecipeIds);
-
-    public record WithUser(long UserId);
-    public record TempData(string Key, object Value);
-
     public class UserDataAction
     {
         private readonly UserDataPersistAction _persist;

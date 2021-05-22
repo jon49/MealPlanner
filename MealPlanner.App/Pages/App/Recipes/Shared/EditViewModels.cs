@@ -1,4 +1,5 @@
 ﻿using MealPlanner.Data.Data;
+using MealPlanner.Data.Data.Models;
 using System;
 using System.ComponentModel.DataAnnotations;
 
