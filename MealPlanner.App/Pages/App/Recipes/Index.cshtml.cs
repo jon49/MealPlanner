@@ -1,5 +1,6 @@
 using MealPlanner.Data.Data;
 using MealPlanner.Data.Data.Models;
+using MealPlanner.Data.Data.Models.DatabaseModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using ServerApp.Actions;

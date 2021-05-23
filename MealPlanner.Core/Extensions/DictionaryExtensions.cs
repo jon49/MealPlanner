@@ -21,9 +21,9 @@ namespace MealPlanner.Core
         public static bool Remove<TKey, TValue>(this IDictionary<TKey, TValue> dic, TKey key)
             => dic.Remove(key);
 
-        public static TValue[] TryGetValuesOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dic, TKey[] keys)
+        public static TValue[] TryGetValuesOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dic, IEnumerable<TKey> keys)
         {
-            var values = new TValue[keys.Length];
+            var values = new TValue[keys.Count()];
             var count = 0;
             foreach (var key in keys)
             {

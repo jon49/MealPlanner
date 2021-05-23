@@ -1,5 +1,6 @@
 ﻿using MealPlanner.Core;
 using MealPlanner.Data.Data.Models;
+using MealPlanner.Data.Data.Models.DatabaseModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace MealPlanner.Data.Data.Actions
     internal static class MealPlanActions
     {
         public static MealPlanModel?[] GetMealPlansForWeek(
-            this Dictionary<string, MealPlan> MealPlans,
+            this Dictionary<string, MealPlanV2> MealPlans,
             UserDataAction userAction,
             DateTime? startDate,
             Dictionary<long, MealTime> MealTimes,
@@ -45,10 +46,13 @@ namespace MealPlanner.Data.Data.Actions
             foreach (var date in dates)
             {
                 var d = ToMealPlanId(date);
-                if (date is { } && MealPlans.TryGetValue(d ?? "", out var value))
+                if (MealPlans.TryGetValue(d ?? "", out var value))
                 {
-                    var recipes = Recipes.TryGetValuesOrDefault(value.RecipeIds);
-                    mealPlans[count++] = new(Date: d, recipes.Where(x => x is { }).ToArray());
+                    var recipes = Recipes.TryGetValuesOrDefault(value.MealPlanRecipes.Select(x => x.RecipeId));
+                    mealPlans[count++] = new(Date: d!, Recipes:
+                        from x in recipes
+                        where x.Id.HasValue
+                        select x.ToMealPlanRecipeModel(value.MealPlanRecipes.FirstOrDefault()?.Status ?? MealPlanRecipeStatus.ProgrammaticallyChosen));
                 }
                 else
                 {
@@ -60,12 +64,20 @@ namespace MealPlanner.Data.Data.Actions
                     MealPlanModel newPlan;
                     if (recipe is { })
                     {
-                        newPlan = new MealPlanModel(Date: d, new[] { recipe });
-                        userAction.Save(new MealPlan(newPlan.Date, newPlan.Recipes.Select(x => x.Id ?? 0).ToArray()));
+                        newPlan = new MealPlanModel(Date: d!, new[]
+                        {
+                            recipe.ToMealPlanRecipeModel(MealPlanRecipeStatus.ProgrammaticallyChosen)
+                        });
+                        userAction.Save(new MealPlanV2(
+                            newPlan.Date,
+                            (from x in newPlan.Recipes
+                            where x.Id.HasValue
+                            select new MealPlanRecipe(x.Id!.Value, x.MealPlanStatus))
+                            .ToArray()));
                     }
                     else
                     {
-                        newPlan = new MealPlanModel(Date: d, Array.Empty<Recipe>());
+                        newPlan = new MealPlanModel(Date: d!, Array.Empty<MealPlanRecipeModel>());
                     }
                     mealPlans[count++] = newPlan;
                 }

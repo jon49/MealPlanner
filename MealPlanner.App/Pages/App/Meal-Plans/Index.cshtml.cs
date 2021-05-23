@@ -8,6 +8,7 @@ using MealPlanner.Data.Data;
 using static MealPlanner.Data.Shared;
 using System.Collections.Generic;
 using ServerApp.Pages.Shared;
+using MealPlanner.Data.Data.Models.DatabaseModels;
 
 #nullable enable
 
@@ -44,7 +45,7 @@ namespace ServerApp.Pages.App.Meal_Plans
         public async Task<IActionResult> OnPostCancelAsync(string id, string? startDate = null)
         {
             var action = await UserAction;
-            action.Save(new MealPlan(id, Array.Empty<long>()));
+            action.Save(new MealPlanV2(id, Array.Empty<MealPlanRecipe>()));
             SetMealPlans(action, startDate, ChangeSource.AddRecipe, id);
 
             if (IsHTMFRequest())
@@ -89,6 +90,30 @@ namespace ServerApp.Pages.App.Meal_Plans
             return Page();
         }
 
+        public async Task<IActionResult> OnPostConfirmAsync(string id, string? startDate = null)
+        {
+            var action = await UserAction;
+
+            var plan = action.GetMealPlan(id)!;
+            var confirmedPlan =
+                plan with
+                {
+                    MealPlanRecipes =
+                    plan.MealPlanRecipes.Select(x => x with {
+                        Status = MealPlanRecipeStatus.Confirmed
+                    }).ToArray()
+                };
+            action.Save(confirmedPlan);
+            SetMealPlans(action, startDate, ChangeSource.None, id);
+
+            if (IsHTMFRequest())
+            {
+                var plann = MealPlans.First(x => x!.Date == id);
+                return Partial("_RecipeTitleTemplate", plann);
+            }
+            return Page();
+        }
+
         public async Task<IActionResult> OnPostAddRecipeAsync(string id, string? startDate = null)
         {
             var action = await UserAction;
@@ -119,8 +144,12 @@ namespace ServerApp.Pages.App.Meal_Plans
             var target = mealPlans.First(x => x is { } && x.Date == Target);
             if (source is { } && target is { })
             {
-                action.Save(new MealPlan(Target, source.Recipes.Where(x => x.Id.HasValue).Select(x => x.Id!.Value).ToArray()));
-                action.Save(new MealPlan(Source, target.Recipes.Where(x => x.Id.HasValue).Select(x => x.Id!.Value).ToArray()));
+                action.Save(new MealPlanV2(
+                    Target,
+                    source.Recipes.Select(x => x.ToMealPlanRecipe(MealPlanRecipeStatus.Confirmed)).ToArray()));
+                action.Save(new MealPlanV2(
+                    Source,
+                    target.Recipes.Select(x => x.ToMealPlanRecipe(MealPlanRecipeStatus.Confirmed)).ToArray()));
             }
 
             SetMealPlans(action, ToMealPlanId(date), ChangeSource.None, Target);
@@ -165,7 +194,11 @@ namespace ServerApp.Pages.App.Meal_Plans
                 : recipePicker.Previous(GetChosenRecipes(), ChosenRecipeIndex);
             if (index.HasValue)
             {
-                action.Save(new MealPlan(date, new[] { chosenRecipes.ElementAt(index.Value) }));
+                action.Save(new MealPlanV2(
+                    date, new[]
+                    {
+                        new MealPlanRecipe(chosenRecipes.ElementAt(index.Value), MealPlanRecipeStatus.Confirmed)
+                    }));
             }
 
             return (chosenRecipes, index);
@@ -186,7 +219,7 @@ namespace ServerApp.Pages.App.Meal_Plans
 
     public record MealViewModel
         (string Date
-        , Recipe[] Recipes
+        , IEnumerable<MealPlanRecipeModel> Recipes
         , string? StartDate
         , string DayOfWeek
         , CurrentSelection ChangeSource)

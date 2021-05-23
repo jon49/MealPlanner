@@ -1,5 +1,6 @@
 using MealPlanner.Data.Data;
 using MealPlanner.Data.Data.Models;
+using MealPlanner.Data.Data.Models.DatabaseModels;
 using Microsoft.AspNetCore.Mvc;
 using ServerApp.Actions;
 using ServerApp.Pages.Shared;
@@ -50,7 +51,7 @@ namespace MealPlanner.App.Pages.App.Meal_Plans.Search
         public async Task<IActionResult> OnPostRecipeAsync(string returnUrl, long id, string date)
         {
             var action = await UserAction;
-            action.Save(new MealPlan(date, new[] { id }));
+            action.Save(new MealPlanV2(date, new[] { new MealPlanRecipe(id, MealPlanRecipeStatus.Confirmed) }));
             return Redirect(returnUrl);
         }
     }

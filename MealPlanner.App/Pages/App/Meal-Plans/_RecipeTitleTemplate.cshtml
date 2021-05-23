@@ -1,4 +1,5 @@
 ﻿@model ServerApp.Pages.App.Meal_Plans.MealViewModel
+@using MealPlanner.Data.Data.Models.DatabaseModels
 @{
     var recipe = Model.Recipes.FirstOrDefault();
     var url = recipe?.Url?.ToString();
@@ -8,6 +9,13 @@
 }
 
 <div id=@id>
+	@if (recipe.MealPlanStatus == MealPlanRecipeStatus.ProgrammaticallyChosen)
+	{
+		<button asp-page-handler="confirm"
+				asp-route-id="@Model.Date"
+				asp-route-startDate="@Model.StartDate"
+				>New!</button>
+	}
     <input type=hidden name=ChosenRecipes value=@recipeState>
     <input type=hidden name=ChosenRecipeIndex value=@recipeIndex>
 @if (url?.Length > 0)

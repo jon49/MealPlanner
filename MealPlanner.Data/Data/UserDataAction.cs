@@ -1,6 +1,7 @@
 ﻿using MealPlanner.Core;
 using MealPlanner.Data.Data.Actions;
 using MealPlanner.Data.Data.Models;
+using MealPlanner.Data.Data.Models.DatabaseModels;
 using MealPlanner.Data.Databases;
 using System;
 using System.Collections.Generic;
@@ -24,7 +25,7 @@ namespace MealPlanner.Data.Data
         private readonly Random _random = new();
         private readonly Dictionary<long, Recipe> Recipes = new();
         private readonly Dictionary<long, MealTime> MealTimes = new();
-        private readonly Dictionary<string, MealPlan> MealPlans = new();
+        private readonly Dictionary<string, MealPlanV2> MealPlans = new();
         private readonly RecipePicker RecipePicker;
         private RecipeSearch? RecipeSearch = null;
 
@@ -75,7 +76,7 @@ namespace MealPlanner.Data.Data
             return result;
         }
 
-        public string? Save(MealPlan? mealPlan)
+        public string? Save(MealPlanV2? mealPlan)
         {
             if (mealPlan is null) return null;
             MealPlans.AddOrUpdate(mealPlan.Date, mealPlan);
@@ -83,7 +84,15 @@ namespace MealPlanner.Data.Data
             return mealPlan.Date;
         }
 
+        private string? Save(MealPlan? mealPlan)
+        {
+            if (mealPlan is null) return null;
+            MealPlans.AddOrUpdate(mealPlan.Date, mealPlan.ToV2());
+            return mealPlan.Date;
+        }
+
         public MealTime[] GetAllMealTimes() => MealTimes.Values.ToArray();
+
         public MealPlanModel?[] GetMealPlansForWeek(DateTime? startDate)
             => MealPlans.GetMealPlansForWeek(this, startDate, MealTimes, Recipes, _random);
         public RecipePicker GetRecipePicker() => RecipePicker;
@@ -130,6 +139,9 @@ namespace MealPlanner.Data.Data
                     case nameof(MealTime):
                         Save(await JSON.Deserialize<MealTime>(data.Value));
                         break;
+                    case nameof(MealPlanV2):
+                        Save(await JSON.Deserialize<MealPlanV2>(data.Value));
+                        break;
                     case nameof(MealPlan):
                         Save(await JSON.Deserialize<MealPlan>(data.Value));
                         break;
@@ -154,6 +166,9 @@ namespace MealPlanner.Data.Data
 
         public Recipe? GetRecipe(long id)
             => Recipes.GetValueOrDefault(id);
+
+        public MealPlanV2? GetMealPlan(string id)
+            => MealPlans.GetValueOrDefault(id);
 
         public List<Recipe> SearchRecipes(string search, bool strictSearch)
         {

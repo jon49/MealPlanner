@@ -6,10 +6,11 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System;
 using MealPlanner.Data.Data.Models;
+using MealPlanner.Data.Data.Models.DatabaseModels;
 
 #nullable enable
 
-namespace MealPlanner.Data.Data
+namespace MealPlanner.Data.Data.Actions
 {
     public class RecipeSearch
     {

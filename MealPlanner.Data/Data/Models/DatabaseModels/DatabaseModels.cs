@@ -2,7 +2,7 @@
 
 #nullable enable
 
-namespace MealPlanner.Data.Data.Models
+namespace MealPlanner.Data.Data.Models.DatabaseModels
 {
     public record Recipe
         (long? Id
@@ -20,6 +20,4 @@ namespace MealPlanner.Data.Data.Models
     }
 
     public record MealTime(long? Id, string Name) : IId, IName;
-
-    public record MealPlan(string Date, long[] RecipeIds);
 }
