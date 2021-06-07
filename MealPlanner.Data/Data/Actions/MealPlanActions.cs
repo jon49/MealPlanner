@@ -41,7 +41,7 @@ namespace MealPlanner.Data.Data.Actions
                 Enumerable.Range(0, 7)
                 .Select(x => start.Value.AddDays(x));
 
-            var mealPlans = new MealPlanModel[7];
+            var mealPlans = new MealPlanModel?[7];
             var count = 0;
             foreach (var date in dates)
             {
@@ -51,8 +51,8 @@ namespace MealPlanner.Data.Data.Actions
                     var recipes = Recipes.TryGetValuesOrDefault(value.MealPlanRecipes.Select(x => x.RecipeId));
                     mealPlans[count++] = new(Date: d!, Recipes:
                         from x in recipes
-                        where x.Id.HasValue
-                        select x.ToMealPlanRecipeModel(value.MealPlanRecipes.FirstOrDefault()?.Status ?? MealPlanRecipeStatus.ProgrammaticallyChosen));
+                        where x?.Id.HasValue ?? false
+                        select x?.ToMealPlanRecipeModel(value.MealPlanRecipes.FirstOrDefault()?.Status ?? MealPlanRecipeStatus.ProgrammaticallyChosen));
                 }
                 else
                 {
