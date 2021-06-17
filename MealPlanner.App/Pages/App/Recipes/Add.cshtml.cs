@@ -1,9 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
-using MealPlanner.Data.Data;
-using MealPlanner.Data.Data.Models;
-using MealPlanner.Data.Data.Models.DatabaseModels;
+using MealPlanner.Data.Dto.Models.Core;
 using Microsoft.AspNetCore.Mvc;
 using ServerApp.Actions;
 using ServerApp.Pages.App.Recipes.Shared;

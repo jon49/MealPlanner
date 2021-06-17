@@ -1,5 +1,5 @@
 ﻿@model ServerApp.Pages.App.Meal_Plans.MealViewModel
-@using MealPlanner.Data.Data.Models.DatabaseModels
+@using MealPlanner.Data.Dto.Models.Core
 @{
     var recipe = Model.Recipes.FirstOrDefault();
     var url = recipe?.Url?.ToString();

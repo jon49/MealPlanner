@@ -5,8 +5,6 @@ using MealPlanner.User.Databases;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System;
-using MealPlanner.Data.Data.Models;
-using MealPlanner.Data.Data.Models.DatabaseModels;
 using MealPlanner.Data.Dto.Models.Core;
 
 #nullable enable

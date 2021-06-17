@@ -1,4 +1,6 @@
-﻿namespace MealPlanner.Data.Data.Models.DatabaseModels
+﻿using System;
+
+namespace MealPlanner.Data.Dto.Models.Core
 {
     public enum MealPlanRecipeStatus
     {
@@ -7,10 +9,13 @@
     }
     public record MealPlanRecipe(long RecipeId, MealPlanRecipeStatus Status);
     public record MealPlanV2(string Date, MealPlanRecipe[] MealPlanRecipes);
-    internal record MealPlan(string Date, long[] RecipeIds);
+    [Obsolete]
+    public record MealPlan(string Date, long[] RecipeIds);
     public static class MealPlanExtensions
     {
-        internal static MealPlanV2 ToV2(this MealPlan plan)
+#pragma warning disable CS0612 // Type or member is obsolete
+        public static MealPlanV2 ToV2(this MealPlan plan)
+#pragma warning restore CS0612 // Type or member is obsolete
         {
             var length = plan.RecipeIds.Length;
             var recipes = new MealPlanRecipe[length];

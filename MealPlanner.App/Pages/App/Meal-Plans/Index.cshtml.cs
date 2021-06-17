@@ -8,7 +8,7 @@ using MealPlanner.Data.Data;
 using static MealPlanner.Data.Shared;
 using System.Collections.Generic;
 using ServerApp.Pages.Shared;
-using MealPlanner.Data.Data.Models.DatabaseModels;
+using MealPlanner.Data.Dto.Models.Core;
 
 #nullable enable
 
