@@ -1,4 +1,5 @@
-﻿using MealPlanner.Core;
+﻿using MealPlanner.Data.Dto.Models.Core;
+using MealPlanner.Core;
 using MealPlanner.Data.Data.Actions;
 using MealPlanner.Data.Data.Models;
 using MealPlanner.Data.Data.Models.DatabaseModels;
@@ -13,9 +14,6 @@ using System.Threading.Tasks;
 
 namespace MealPlanner.Data.Data
 {
-    public interface IId { public long? Id { get; } }
-    public interface IName { public string Name { get; } }
-
     public class UserDataAction
     {
         private readonly UserDataPersistAction _persist;

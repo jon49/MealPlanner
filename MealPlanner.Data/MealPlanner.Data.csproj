@@ -10,6 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MealPlanner.Data.Dto\MealPlanner.Data.Dto.csproj" />
     <ProjectReference Include="..\MealPlanner.Core\MealPlanner.Core.csproj" />
   </ItemGroup>
 

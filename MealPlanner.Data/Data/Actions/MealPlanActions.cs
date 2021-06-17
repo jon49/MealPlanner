@@ -1,4 +1,5 @@
-﻿using MealPlanner.Core;
+﻿using MealPlanner.Data.Dto.Models.Core;
+using MealPlanner.Core;
 using MealPlanner.Data.Data.Models;
 using MealPlanner.Data.Data.Models.DatabaseModels;
 using System;

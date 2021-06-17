@@ -2,8 +2,9 @@
 
 #nullable enable
 
-namespace MealPlanner.Data.Data.Models.DatabaseModels
+namespace MealPlanner.Data.Dto.Models.Core
 {
+
     public record Recipe
         (long? Id
         , string Name
@@ -20,4 +21,5 @@ namespace MealPlanner.Data.Data.Models.DatabaseModels
     }
 
     public record MealTime(long? Id, string Name) : IId, IName;
+
 }
