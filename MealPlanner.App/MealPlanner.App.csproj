@@ -9,6 +9,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Proto.Actor" Version="0.19.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\MealPlanner.Data\MealPlanner.Data.csproj" />
     <ProjectReference Include="..\MealPlanner.User\MealPlanner.User.csproj" />
   </ItemGroup>
