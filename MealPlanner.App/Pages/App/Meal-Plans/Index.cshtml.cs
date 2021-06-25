@@ -3,12 +3,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using System;
 using ServerApp.Actions;
-using MealPlanner.Data.Data.Models;
 using MealPlanner.Data.Data;
 using static MealPlanner.Data.Shared;
 using System.Collections.Generic;
 using ServerApp.Pages.Shared;
 using MealPlanner.Data.Dto.Models.Core;
+using MealPlanner.Data.Dto.Models.ViewModels;
 
 #nullable enable
 
@@ -218,7 +218,7 @@ namespace ServerApp.Pages.App.Meal_Plans
     }
 
     public record MealViewModel
-        (string Date
+        ( string Date
         , IEnumerable<MealPlanRecipeModel> Recipes
         , string? StartDate
         , string DayOfWeek

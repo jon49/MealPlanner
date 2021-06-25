@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 #nullable enable
 
-namespace MealPlanner.Data.Data.Models
+namespace MealPlanner.Data.Dto.Models.ViewModels
 {
     public record MealPlanRecipeModel
         ( long? Id,

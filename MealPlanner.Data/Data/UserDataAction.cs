@@ -1,13 +1,14 @@
 ﻿using MealPlanner.Data.Dto.Models.Core;
 using MealPlanner.Core;
 using MealPlanner.Data.Data.Actions;
-using MealPlanner.Data.Data.Models;
 using MealPlanner.Data.Databases;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using MealPlanner.Data.Dto.Models.ViewModels;
+using MealPlanner.Data.Data.Core;
 
 #nullable enable
 
@@ -81,9 +82,7 @@ namespace MealPlanner.Data.Data
             return mealPlan.Date;
         }
 
-#pragma warning disable CS0612 // Type or member is obsolete
         private string? Save(MealPlan? mealPlan)
-#pragma warning restore CS0612 // Type or member is obsolete
         {
             if (mealPlan is null) return null;
             MealPlans.AddOrUpdate(mealPlan.Date, mealPlan.ToV2());
@@ -141,10 +140,8 @@ namespace MealPlanner.Data.Data
                     case nameof(MealPlanV2):
                         Save(await JSON.Deserialize<MealPlanV2>(data.Value));
                         break;
-#pragma warning disable CS0612 // Type or member is obsolete
                     case nameof(MealPlan):
                         Save(await JSON.Deserialize<MealPlan>(data.Value));
-#pragma warning restore CS0612 // Type or member is obsolete
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(data.Type);
