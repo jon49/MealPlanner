@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using MealPlanner.User.Actions;
+using MealPlanner.User.Dto.Actions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;

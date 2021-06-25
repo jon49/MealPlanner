@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Hosting;
 using System;
-using System.Diagnostics;
 using System.Threading.Tasks;
 
 #nullable enable

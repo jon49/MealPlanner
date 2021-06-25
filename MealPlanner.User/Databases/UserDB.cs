@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using T = MealPlanner.User.Databases.Table;
 using static MealPlanner.User.Databases.Database;
-using System.IO;
 using Microsoft.Data.Sqlite;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,17 +10,6 @@ using System.Linq;
 
 namespace MealPlanner.User.Databases
 {
-    public record User
-        ( long Id,
-          string Email,
-          string Password,
-          string FirstName,
-          string LastName );
-
-    public record ParamQueryLogin
-        ( string Email,
-          string Password );
-
     public class UserDB : IDisposable
     {
         private readonly SqliteConnection ReadWriteConnection;

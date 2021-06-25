@@ -12,6 +12,7 @@ using ServerApp.System;
 using MealPlanner.User.Actions;
 using System;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using MealPlanner.User.Dto.Actions;
 
 #nullable enable
 

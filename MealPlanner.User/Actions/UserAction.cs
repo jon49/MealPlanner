@@ -6,25 +6,12 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using MealPlanner.User.Dto.Actions;
 
 #nullable enable
 
 namespace MealPlanner.User.Actions
 {
-    public record LoginUser
-        ( string Email,
-          string EncryptedPassword );
-
-    public record RegisterUser
-        ( string Email,
-          string EncryptedPassword,
-          string FirstName,
-          string LastName );
-
-    public record LoggedInUser
-        ( string SessionId
-        , long UserId );
-
     public class UserAction : IDisposable
     {
         private readonly UserDB userDB;
