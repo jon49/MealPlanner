@@ -82,7 +82,6 @@ thead,tfoot{background: var(--c2)}
 
 a.button, a.button:hover, a.button:visited, a.button:focus, a.button:active  {
   text-decoration: none;
-  color: inherit;
   outline: 0;
   cursor: pointer;
 }
