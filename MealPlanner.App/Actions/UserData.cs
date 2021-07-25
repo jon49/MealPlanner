@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 #nullable enable
 
-namespace ServerApp.Actions
+namespace MealPlanner.App.Actions
 {
     public class UserData
     {

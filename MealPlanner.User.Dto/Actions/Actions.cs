@@ -13,4 +13,14 @@
     public record LoggedInUser
         ( string SessionId
         , long UserId );
+
+    public record GetSession ( string Session );
+
+    public record AddBetaUser ( string Email );
+    public static class BetaUsers
+    {
+        public static readonly GetBetaUsers Get = new();
+        public record GetBetaUsers();
+    }
+
 }

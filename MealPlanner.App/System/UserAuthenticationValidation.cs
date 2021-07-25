@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication;
 using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using MealPlanner.App.Actions;
 
 #nullable enable
 
@@ -32,7 +33,7 @@ namespace MealPlanner.App.System
                 return;
             }
             
-            var user = context.RequestServices.GetRequiredService<UserAction>();
+            var user = context.RequestServices.GetRequiredService<SystemActor>().User;
 
             var session = context.User.Claims.FirstOrDefault(x => x.Type == "session")?.Value;
             if (session is null)
@@ -41,7 +42,7 @@ namespace MealPlanner.App.System
                 return;
             }
 
-            var userId = user.GetSession(session);
+            var userId = await user.GetSession(session);
             if (userId is null)
             {
                 await SignOut();

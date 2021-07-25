@@ -16,10 +16,13 @@ sudo apt install rsync
 sudo mkdir -p /var/www/meal-planner
 sudo chown -R <user>:<user> /var/www
 sudo chmod -R /var/www
-sudo apt install haproxy
 ```
 
-[**Setting up HAProxy**](https://adoltech.com/blog/installing-haproxy-on-ubuntu-18-04/#:~:text=%20Installing%20HAProxy%20on%20Ubuntu%2018.04%20%201,installing%20HAProxy%20using%20the%20command%3A%0Asudo%20apt-get...%20More%20)
+Create certificates
+
+```
+sudo certbot --nginx
+```
 
 ## [Publishing](https://docs.microsoft.com/en-us/dotnet/core/deploying/#framework-dependent-deployments-fdd)
 
@@ -35,6 +38,13 @@ Run from WSL2. Add `n` to list for a dry-run and see what will be synced
 
 ```
 rsync -av ./path/to/app <username>@<ip-address>:<target directory>
+```
+
+Restart nginx (test to make sure it is OK then restart)
+
+```
+sudo nginx -t
+sudo nginx -s reload
 ```
 
 

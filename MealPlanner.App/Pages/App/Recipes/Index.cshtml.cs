@@ -1,6 +1,6 @@
+using MealPlanner.App.Actions;
 using MealPlanner.Data.Dto.Models.Core;
 using Microsoft.AspNetCore.Mvc;
-using ServerApp.Actions;
 using ServerApp.Pages.Shared;
 using System;
 using System.Collections.Generic;
@@ -14,9 +14,7 @@ namespace ServerApp.Pages.App.Recipes
     [ResponseCache(Duration = 10, Location = ResponseCacheLocation.Client, NoStore = false)]
     public class IndexModel : BaseUserPage
     {
-        public IndexModel(UserData data) : base(data)
-        {
-        }
+        public IndexModel(UserData data) : base(data) { }
 
         public IEnumerable<RecipeListViewModel> Recipes { get; set; } = Array.Empty<RecipeListViewModel>();
 

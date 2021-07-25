@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
-using MealPlanner.User.Actions;
+using MealPlanner.App.Actions;
 using MealPlanner.User.Dto.Actions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -17,12 +17,12 @@ namespace ServerApp.Pages
     public class RegisterModel : PageModel
     {
         private readonly byte[] _salt;
-        private readonly UserAction _user;
+        private readonly User _user;
 
-        public RegisterModel(IOptions<UserSettings> userSettings, UserAction user)
+        public RegisterModel(IOptions<UserSettings> userSettings, SystemActor system)
         {
             _salt = Encoding.UTF8.GetBytes(userSettings.Value.Salt);
-            _user = user;
+            _user = system.User;
         }
 
         [BindProperty]
@@ -41,7 +41,7 @@ namespace ServerApp.Pages
                 return Page();
             }
 
-            var user = await _user.ProcessRegisterUser(UserRegister.ToRegisterUser(_salt));
+            var user = await _user.RegisterUser(UserRegister.ToRegisterUser(_salt));
             if (user?.UserId > 0)
             {
                 var claims = new Claim[]

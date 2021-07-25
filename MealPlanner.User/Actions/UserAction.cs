@@ -12,12 +12,11 @@ using MealPlanner.User.Dto.Actions;
 
 namespace MealPlanner.User.Actions
 {
-    public class UserAction : IDisposable
+    internal class UserAction : IDisposable
     {
         private readonly UserDB userDB;
         private readonly SessionDB sessionDB;
         private readonly ConcurrentDictionary<string, long?> Sessions = new();
-        //private readonly ConcurrentDictionary<long, string> Permissions = new();
 
         public UserAction()
         {
@@ -76,5 +75,6 @@ namespace MealPlanner.User.Actions
 
         public Task<IEnumerable<string>> GetBetaUsers()
             => userDB.GetBetaUsers();
+
     }
 }

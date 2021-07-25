@@ -1,5 +1,5 @@
+using MealPlanner.App.Actions;
 using Microsoft.AspNetCore.Mvc;
-using ServerApp.Actions;
 using ServerApp.Pages.App.Recipes.Shared;
 using ServerApp.Pages.Shared;
 using System;

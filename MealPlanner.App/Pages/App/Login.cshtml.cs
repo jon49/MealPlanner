@@ -9,10 +9,10 @@ using System.Threading.Tasks;
 using System.Text;
 using Microsoft.Extensions.Options;
 using ServerApp.System;
-using MealPlanner.User.Actions;
 using System;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using MealPlanner.User.Dto.Actions;
+using MealPlanner.App.Actions;
 
 #nullable enable
 
@@ -21,12 +21,12 @@ namespace ServerApp.Pages
     public class LoginModel : PageModel
     {
         private readonly byte[] _salt;
-        private readonly UserAction _user;
+        private readonly User _user;
 
-        public LoginModel(IOptions<UserSettings> userSettings, UserAction user)
+        public LoginModel(IOptions<UserSettings> userSettings, SystemActor system)
         {
             _salt = Encoding.UTF8.GetBytes(userSettings.Value.Salt);
-            _user = user ?? throw new ArgumentNullException(nameof(user));
+            _user = system?.User ?? throw new ArgumentNullException(nameof(system));
         }
 
         [BindProperty]
@@ -70,7 +70,7 @@ namespace ServerApp.Pages
         {
             if (user is null) return Task.FromResult<LoggedInUser?>(null);
             var hashedUser = user.ToDBUser(_salt);
-            return _user.ProcessLoginUser(hashedUser);
+            return _user.LoginUser(hashedUser);
         }
     }
 
