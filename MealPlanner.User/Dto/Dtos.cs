@@ -1,4 +1,4 @@
-﻿namespace MealPlanner.User.Dto.Actions
+﻿namespace MealPlanner.User.Dto
 {
     public record LoginUser
         ( string Email,
@@ -14,7 +14,7 @@
         ( string SessionId
         , long UserId );
 
-    public record GetSession ( string Session );
+    public record GetUserId ( string Session );
 
     public record AddBetaUser ( string Email );
     public static class BetaUsers

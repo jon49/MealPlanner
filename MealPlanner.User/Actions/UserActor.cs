@@ -1,4 +1,4 @@
-﻿using MealPlanner.User.Dto.Actions;
+﻿using MealPlanner.User.Dto;
 using Proto;
 using System.Threading.Tasks;
 
@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MealPlanner.User.Actions
 {
-    public class UserActor : IActor
+    internal class UserActor : IActor
     {
         private static readonly UserAction _action = new();
 
@@ -16,7 +16,7 @@ namespace MealPlanner.User.Actions
             {
                 LoginUser x => ProcessLoginUser(context, x),
                 RegisterUser x => ProcessRegisterUser(context, x),
-                GetSession x => ProcessGetSession(context, x),
+                GetUserId x => ProcessGetUserId(context, x),
                 AddBetaUser x => ProcessAddBetaUser(context, x),
                 _ => Task.CompletedTask,
             };
@@ -29,9 +29,9 @@ namespace MealPlanner.User.Actions
             context.Respond(await _action.AddBetaUser(x.Email));
         }
 
-        private Task ProcessGetSession(IContext context, GetSession x)
+        private Task ProcessGetUserId(IContext context, GetUserId x)
         {
-            var result = _action.GetSession(x.Session);
+            var result = _action.GetUserId(x.Session);
             context.Respond(result!);
             return Task.CompletedTask;
         }

@@ -42,7 +42,7 @@ namespace MealPlanner.App.System
                 return;
             }
 
-            var userId = await user.GetSession(session);
+            var userId = await user.GetUserId(session);
             if (userId is null)
             {
                 await SignOut();

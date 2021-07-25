@@ -6,7 +6,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using MealPlanner.User.Dto.Actions;
+using MealPlanner.User.Dto;
 
 #nullable enable
 
@@ -53,8 +53,8 @@ namespace MealPlanner.User.Actions
                 firstName: registerUser.FirstName,
                 lastName: registerUser.LastName ));
 
-        public long? GetSession(string session)
-            => Sessions.GetOrAdd(session, s => sessionDB.GetSession(session));
+        public long? GetUserId(string session)
+            => Sessions.GetOrAdd(session, s => sessionDB.GetUserId(session));
 
         public Task<LoggedInUser?> ProcessLoginUser(LoginUser loginUser)
             => CreateSession(userDB.ValidateUser(loginUser.Email, loginUser.EncryptedPassword));

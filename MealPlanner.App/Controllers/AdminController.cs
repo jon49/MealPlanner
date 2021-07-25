@@ -1,5 +1,6 @@
 ﻿using MealPlanner.App.Actions;
-using MealPlanner.User.Dto.Actions;
+using MealPlanner.User;
+using MealPlanner.User.Dto;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;

@@ -55,7 +55,7 @@ VALUES ({T._SessionId}, {T._CreatedDate}, {T._UserId});";
 SELECT {T.UserId}
 FROM {T.Table}
 WHERE {T.SessionId} = {T._SessionId};";
-        public long? GetSession(string session)
+        public long? GetUserId(string session)
             => ExecuteCommand<long?>(ConnectionStringReadOnly, commandGetSession, new DBParams(T._SessionId, session));
 
         private static readonly string commandDeleteSession = $@"
