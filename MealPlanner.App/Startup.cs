@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ServerApp.System;
+using System;
 
 namespace ServerApp
 {
@@ -30,6 +31,8 @@ namespace ServerApp
                     options.LoginPath = "/app/login";
                     options.LogoutPath = "/app/login?handler=logout";
                     options.Cookie.Name = "user_session";
+                    options.SlidingExpiration = true;
+                    options.ExpireTimeSpan = TimeSpan.FromDays(30);
                 });
             services.AddRazorPages(options =>
             {
