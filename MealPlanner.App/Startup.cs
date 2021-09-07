@@ -3,6 +3,7 @@ using MealPlanner.App.System;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,7 +33,8 @@ namespace ServerApp
                     options.LogoutPath = "/app/login?handler=logout";
                     options.Cookie.Name = "user_session";
                     options.SlidingExpiration = true;
-                    options.ExpireTimeSpan = TimeSpan.FromDays(30);
+                    options.Cookie.HttpOnly = true;
+                    options.Cookie.SameSite = SameSiteMode.Strict;
                 });
             services.AddRazorPages(options =>
             {
