@@ -1,12 +1,10 @@
 using System.ComponentModel.DataAnnotations;
-using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using MealPlanner.App.Actions;
+using MealPlanner.App.Utils;
 using MealPlanner.User;
 using MealPlanner.User.Dto;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
@@ -45,12 +43,7 @@ namespace ServerApp.Pages
             var user = await _user.RegisterUser(UserRegister.ToRegisterUser(_salt));
             if (user?.UserId > 0)
             {
-                var claims = new Claim[]
-                {
-                    new("session", user.UserId.ToString()),
-                };
-
-                await HttpContext.SignInAsync(new ClaimsPrincipal(new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme)));
+                await HttpUtil.Login(user, HttpContext);
 
                 return Redirect("/app");
             }

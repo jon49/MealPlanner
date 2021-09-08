@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc;
 using ServerApp.Utils;
 using System.ComponentModel.DataAnnotations;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Text;
 using Microsoft.Extensions.Options;
@@ -14,6 +13,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using MealPlanner.App.Actions;
 using MealPlanner.User.Dto;
 using MealPlanner.User;
+using MealPlanner.App.Utils;
 
 #nullable enable
 
@@ -44,19 +44,7 @@ namespace ServerApp.Pages
             var user = await ValidateLogin(UserLogin);
             if (user?.UserId > 0)
             {
-                var claims = new Claim[]
-                {
-                    new("session", user.SessionId),
-                };
-
-                var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme));
-                var authProperties = new AuthenticationProperties
-                {
-                    AllowRefresh = true,
-                    ExpiresUtc = DateTimeOffset.UtcNow.AddMonths(1),
-                    IsPersistent = true,
-                };
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal, authProperties);
+                await HttpUtil.Login(user, HttpContext);
 
                 return
                     Url.IsLocalUrl(returnUrl) && returnUrl != "/"
