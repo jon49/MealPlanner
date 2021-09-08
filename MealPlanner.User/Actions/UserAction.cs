@@ -70,11 +70,5 @@ namespace MealPlanner.User.Actions
             return null;
         }
 
-        public Task<long?> AddBetaUser(string email)
-            => userDB.AddBetaUser(email);
-
-        public Task<IEnumerable<string>> GetBetaUsers()
-            => userDB.GetBetaUsers();
-
     }
 }

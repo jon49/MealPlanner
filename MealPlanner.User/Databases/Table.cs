@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace MealPlanner.User.Databases
+﻿namespace MealPlanner.User.Databases
 {
     public static class Table
     {
@@ -42,15 +40,5 @@ namespace MealPlanner.User.Databases
             public const string _CreatedDate = "$CreatedDate";
         }
 
-        public static class BetaUser
-        {
-            public const string Table = "BetaUsers";
-
-            public const string Id = "Id";
-            public const string _Id = "$Id";
-
-            public const string Email = "email";
-            public const string _Email = "$email";
-        }
     }
 }

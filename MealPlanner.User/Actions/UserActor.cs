@@ -17,16 +17,10 @@ namespace MealPlanner.User.Actions
                 LoginUser x => ProcessLoginUser(context, x),
                 RegisterUser x => ProcessRegisterUser(context, x),
                 GetUserId x => ProcessGetUserId(context, x),
-                AddBetaUser x => ProcessAddBetaUser(context, x),
                 _ => Task.CompletedTask,
             };
 
             return Task.CompletedTask;
-        }
-
-        private async Task ProcessAddBetaUser(IContext context, AddBetaUser x)
-        {
-            context.Respond(await _action.AddBetaUser(x.Email));
         }
 
         private Task ProcessGetUserId(IContext context, GetUserId x)

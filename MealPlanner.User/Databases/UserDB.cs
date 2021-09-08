@@ -22,10 +22,7 @@ CREATE TABLE IF NOT EXISTS {T.User.Table} (
     {T.User.Password} TEXT NOT NULL,
     {T.User.FirstName} TEXT NULL,
     {T.User.LastName} TEXT NULL);
-CREATE UNIQUE INDEX IF NOT EXISTS idx_user_email ON {T.User.Table} ({T.User.Email});
-CREATE TABLE IF NOT EXISTS {T.BetaUser.Table} (
-    {T.BetaUser.Id} INTEGER NOT NULL PRIMARY KEY,
-    {T.BetaUser.Email} TEXT NOT NULL);";
+CREATE UNIQUE INDEX IF NOT EXISTS idx_user_email ON {T.User.Table} ({T.User.Email});";
         public UserDB(
             SqliteConnection connectionStringReadWriteCreate,
             SqliteConnection connectionStringReadOnly,
@@ -49,8 +46,6 @@ WHERE NOT EXISTS (SELECT * FROM {T.User.Table} WHERE {T.User.Email} = {T.User._E
 SELECT last_insert_rowid();";
         public async Task<long?> CreateUser(string email, string password, string? firstName, string? lastName)
         {
-            if ((await IsBetaUser(email)) is null) return null;
-
             var @params = new DBParams[]
             {
                 new(T.User._Email, email),
@@ -60,50 +55,6 @@ SELECT last_insert_rowid();";
             };
 
             return await ExecuteCommandAsync<long?>(ReadWriteConnection, createUserCommand, @params);
-        }
-
-        private static readonly string addBetaUser = $@"
-INSERT INTO {T.BetaUser.Table} ({T.BetaUser.Email})
-VALUES ({T.BetaUser._Email});
-SELECT last_insert_rowid();";
-        public Task<long?> AddBetaUser(string email)
-        {
-            var @params = new DBParams[]
-            {
-                new(T.BetaUser._Email, email),
-            };
-
-            return ExecuteCommandAsync<long?>(ReadWriteConnection, addBetaUser, @params);
-        }
-
-        private static readonly string getBetaUsers = $@"
-SELECT {T.BetaUser.Email}
-FROM {T.BetaUser.Table};";
-        public async Task<IEnumerable<string>> GetBetaUsers()
-        {
-            var list = new List<string?>();
-            await ExecuteCommandAsync(
-                ReadOnlyConnection,
-                getBetaUsers,
-                x => list.Add(x[T.BetaUser.Email] as string)
-                ,Array.Empty<DBParams>());
-#pragma warning disable CS8619 // Nullability of reference types in value doesn't match target type.
-            return list.Where(x => x is { });
-#pragma warning restore CS8619 // Nullability of reference types in value doesn't match target type.
-        }
-
-        private static readonly string isBetaUserQuery = $@"
-SELECT {T.BetaUser.Id}
-FROM {T.BetaUser.Table}
-WHERE {T.BetaUser.Email} = {T.BetaUser._Email}";
-        private Task<long?> IsBetaUser(string email)
-        {
-            var @params = new DBParams[]
-            {
-                new(T.BetaUser._Email, email),
-            };
-
-            return ExecuteCommandAsync<long?>(ReadOnlyConnection, isBetaUserQuery, @params);
         }
 
         private static readonly string loginCommand = $@"

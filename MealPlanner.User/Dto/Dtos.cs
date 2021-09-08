@@ -16,11 +16,4 @@
 
     public record GetUserId ( string Session );
 
-    public record AddBetaUser ( string Email );
-    public static class BetaUsers
-    {
-        public static readonly GetBetaUsers Get = new();
-        public record GetBetaUsers();
-    }
-
 }
