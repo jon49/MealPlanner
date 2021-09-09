@@ -21,9 +21,9 @@ namespace MealPlanner.Data.Data.Actions
             Random rand)
         {
             var today = DateTime.UtcNow.AddDays(-1);
-            if (MealTimes.Count == 0)
+            if (MealTimes.Count == 0 || Recipes.Count == 0)
             {
-                return new MealPlanModel[7];
+                return Array.Empty<MealPlanModel>();
             }
 
             DateTime? start = null;

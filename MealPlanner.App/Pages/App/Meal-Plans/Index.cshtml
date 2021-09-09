@@ -5,9 +5,12 @@
     ViewData["StartDate"] = Model.StartDateView;
 }
 
-@section Head { <link rel="stylesheet" type="text/css" href="~/css/meal-plans.css"> }
-
 @section H1 { <h1>Meal Plans</h1> }
+
+@if (Model.MealPlans.Any())
+{
+
+@section Head { <link rel="stylesheet" type="text/css" href="~/css/meal-plans.css"> }
 
 <p><a href="/app/meal-plans?startDate=@(Shared.ToMealPlanId(Model.StartDate.Value.AddDays(-7)))">Previous Week</a> |
 <a href="/app/meal-plans?startDate=@(Shared.ToMealPlanId(Model.StartDate.Value.AddDays(7)))">Next Week</a></p>
@@ -43,4 +46,10 @@ document.addEventListener("swapped", e => {
     form.querySelector("#swap-button").click()
 })
 </script>
+
+}
+else
+{
+<p>No recipes have been created. <a href="/app/recipes/add">Create a new recipe.</a></p>
+}
 
