@@ -13,12 +13,13 @@ namespace MealPlanner.User
         private readonly PID _userRef;
         private readonly ActorSystem _system;
 
-        public User(ActorSystem system, OneForOneStrategy strategy)
+        public User(ActorSystem system, OneForOneStrategy strategy, string userDBPath)
         {
             _system = system;
             var userProps = Props.FromProducer(() => new UserActor())
                 .WithChildSupervisorStrategy(strategy);
             _userRef = system.Root.Spawn(userProps);
+            _system.Root.Send(_userRef, new Initialize(UserDBPath: userDBPath));
         }
 
         public Task<LoggedInUser?> LoginUser(LoginUser user)

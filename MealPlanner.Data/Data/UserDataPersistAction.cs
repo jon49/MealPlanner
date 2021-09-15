@@ -13,9 +13,9 @@ namespace MealPlanner.Data.Data
         private readonly ConcurrentQueue<EventItem> queue = new();
         private volatile bool _saving = false;
 
-        public UserDataPersistAction()
+        public UserDataPersistAction(string userDataDBPath)
         {
-            db = new WriteDataDB();
+            db = new(userDataDBPath);
             timer = new Timer(SaveData, null, TimeSpan.FromSeconds(2), TimeSpan.FromSeconds(1));
         }
 

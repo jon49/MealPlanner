@@ -11,9 +11,9 @@ namespace MealPlanner.Data.Data
     {
         private readonly ReadDataDB ReadDataDB;
 
-        public UserDataFetchAction()
+        public UserDataFetchAction(string userDataDBPath)
         {
-            ReadDataDB = new ReadDataDB();
+            ReadDataDB = new ReadDataDB(userDataDBPath);
         }
 
         public void Dispose()

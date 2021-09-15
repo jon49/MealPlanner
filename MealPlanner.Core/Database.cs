@@ -1,8 +1,6 @@
 ﻿using Microsoft.Data.Sqlite;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -15,18 +13,6 @@ namespace MealPlanner.User.Databases
 
     public static class Database
     {
-        public static string GetAppDir()
-        {
-            var mealPlannerDirectoryName = "meal-planner";
-            var localAppPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            var path =
-                string.IsNullOrWhiteSpace(localAppPath)
-                    ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), ".local", mealPlannerDirectoryName)
-                : Path.Combine(localAppPath, mealPlannerDirectoryName);
-            Directory.CreateDirectory(path);
-            return path;
-        }
-
         public static async Task ExecuteCommandAsync(
             SqliteConnection connection,
             string sql,

@@ -32,9 +32,9 @@ CREATE TABLE IF NOT EXISTS {Event.Table} (
     {Event.Deleted} INTEGER NOT NULL DEFAULT 0);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_fetch ON {Event.Table} ({Event.UserId}, {Event.ItemType}, {Event.ItemId}, {Event.Id});";
 
-        public WriteDataDB()
+        public WriteDataDB(string userDataDBPath)
         {
-            var connectionString = $"Data Source={Path.Combine(GetAppDir(), "user-data.db")}";
+            var connectionString = $"Data Source={userDataDBPath}";
             ExecuteCommand($"{connectionString};Mode=ReadWriteCreate;", commandCreateDatabase);
             ReadWriteConnection = new SqliteConnection($"{connectionString};Mode=ReadWrite;");
             ReadWriteConnection.Open();

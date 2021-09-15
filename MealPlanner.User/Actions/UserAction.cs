@@ -1,10 +1,7 @@
 ﻿using MealPlanner.User.Databases;
-using static MealPlanner.User.Databases.Database;
 using Microsoft.Data.Sqlite;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 using MealPlanner.User.Dto;
 
@@ -18,9 +15,9 @@ namespace MealPlanner.User.Actions
         private readonly SessionDB sessionDB;
         private readonly ConcurrentDictionary<string, long?> Sessions = new();
 
-        public UserAction()
+        public UserAction(string userDBPath)
         {
-            var ConnectionString = $@"Data Source={Path.Combine(GetAppDir(), "users.db")}";
+            var ConnectionString = $@"Data Source={userDBPath}";
 
             using var connectionStringReadWriteCreate = new SqliteConnection($@"{ConnectionString};Mode=ReadWriteCreate;");
             connectionStringReadWriteCreate.Open();

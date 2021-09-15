@@ -15,10 +15,10 @@ namespace MealPlanner.App.Actions
         private readonly IMemoryCache _cache;
         private readonly MemoryCacheEntryOptions _option;
 
-        public UserData(IMemoryCache cache, IHostApplicationLifetime appLifetime)
+        public UserData(IMemoryCache cache, IHostApplicationLifetime appLifetime, string userDataDBPath)
         {
-            persistenceRef = new();
-            fetchRef = new();
+            persistenceRef = new(userDataDBPath);
+            fetchRef = new(userDataDBPath);
             _cache = cache;
             _option = new MemoryCacheEntryOptions
             {

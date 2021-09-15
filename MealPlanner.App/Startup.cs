@@ -5,11 +5,13 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ServerApp.System;
-using System;
+using System.IO;
+using static MealPlanner.App.Utils.Paths;
 
 namespace ServerApp
 {
@@ -51,7 +53,11 @@ namespace ServerApp
 
             services.Configure<UserSettings>(Configuration);
             services.Configure<AdminSettings>(Configuration);
-            services.AddSingleton<UserData>();
+            services.AddSingleton(x =>
+                new UserData(
+                    x.GetRequiredService<IMemoryCache>(),
+                    x.GetRequiredService<IHostApplicationLifetime>(),
+                    Path.Combine(GetAppDir(), "user-data.db")));
             services.AddSingleton<SystemActor>();
         }
 
