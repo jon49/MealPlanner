@@ -10,7 +10,7 @@
 @if (Model.MealPlans.Any())
 {
 
-@section Head { <link rel="stylesheet" type="text/css" href="~/css/meal-plans.css"> }
+@section Head { <link rel="stylesheet" type="text/css" href="~/css/meal-plans.css" asp-append-version="true"> }
 
 <p><a href="/app/meal-plans?startDate=@(Shared.ToMealPlanId(Model.StartDate.Value.AddDays(-7)))">Previous Week</a> |
 <a href="/app/meal-plans?startDate=@(Shared.ToMealPlanId(Model.StartDate.Value.AddDays(7)))">Next Week</a></p>
@@ -36,7 +36,7 @@
     <button id=swap-button></button>
 </form>
 
-<script src="~/js/draggable.min.js"></script>
+<script src="~/js/draggable.min.js" asp-append-version="true"></script>
 
 <script>
 document.addEventListener("swapped", e => {

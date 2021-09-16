@@ -84,6 +84,7 @@ a.button, a.button:hover, a.button:visited, a.button:focus, a.button:active  {
   text-decoration: none;
   outline: 0;
   cursor: pointer;
+  color: var(--c5);
 }
 
 pre,code,input,select,textarea,.button,button,img {border-radius: var(--rc)}

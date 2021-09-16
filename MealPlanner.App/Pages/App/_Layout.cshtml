@@ -6,7 +6,7 @@
     <title>@ViewData["Title"]</title>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" type="text/css" href="~/css/index.v3.css">
+    <link rel="stylesheet" type="text/css" href="~/css/index.css" asp-append-version="true">
     @RenderSection("Head", false)
 </head>
 <body data-instant-allow-query-string>
@@ -18,7 +18,7 @@
     </header>
     <main id=_main>@RenderBody()</main>
     <div id=error-message></div>
-    <script src="~/js/htmf.min.v2.js"></script>
+    <script src="~/js/htmf.min.js" asp-append-version="true"></script>
 </body>
 </html>
 
