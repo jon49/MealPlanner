@@ -20,6 +20,6 @@
         autocomplete="off"
         autofocus
 		onkeypress="hf.debounce(hf.click, 'search', { args: [this], wait: 400 })"><br>
-		<input type=submit value=Search hf-hidden>
+		<noscript><input type=submit value=Search hf-hidden></noscript>
 </form>
 <partial name="_SearchResultItems" model="@Model.Results" />
